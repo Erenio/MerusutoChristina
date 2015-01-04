@@ -1,0 +1,5 @@
+<header class="bar bar-nav">
+  <a class="icon icon-bars pull-left" sref="#toggle-sidebar"></a>
+  <a class="icon icon-close pull-right" sref="#close-modal"></a>
+  <h1 class="title"><%= @title %></h1>
+</header>
