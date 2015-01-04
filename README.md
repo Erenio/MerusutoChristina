@@ -4,8 +4,8 @@ Sample Application built with Backbone.js and Ratchet 2.0
 Depend on:
 
 * middleman
-* middleman-bower ( a extension for middleman to manage js / css packages with the power of bower )
-
+* [middleman-bower](bbtfr/middleman-bower)
+* middleman-deploy
 * underscore
 * backbone
 * zepto
