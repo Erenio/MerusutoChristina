@@ -1,4 +1,4 @@
-<%- _.renderTemplate("templates/pages/header", title: "Block buttons") %>
+<%- _.renderTemplate("templates/pages/header", title: "Block Buttons") %>
 <div class="content">
   <div class="content-padded">
     <button class="btn btn-block">Block button</button>

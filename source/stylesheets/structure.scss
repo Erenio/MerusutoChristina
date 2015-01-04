@@ -7,127 +7,26 @@
   transition: transform $properties;
 }
 
-$animation-duration: 250ms;
-$animation-timing-function: ease;
-$overlay-color: #333;
-
 a[sref] {
   cursor: pointer;
 }
 
 // Sidebar
 $sidebar-width: 240px;
-$sidebar-animation-duration: $animation-duration;
-$sidebar-animation-timing-function: $animation-timing-function;
-
 .sidebar {
   width: $sidebar-width;
   z-index: 0;
 }
 
-body {
-  background-color: $overlay-color;
-}
-
-// .sidebar {
-//   @include transition(opacity $sidebar-animation-duration 
-//     $sidebar-animation-timing-function);
-//   opacity: 0;
-// }
-
 .container {
-  @include transition-transform($sidebar-animation-duration 
-    $sidebar-animation-timing-function);
+  @include transition-transform(0.25s);
   box-shadow: -1px 0 2px rgba(0, 0, 0, 0.25), 1px 0 2px rgba(0, 0, 0, 0.25);
   overflow-x: hidden;
   z-index: 1;
 }
 
-.sidebar-open {
-  // .sidebar {
-  //   opacity: 1;
-  // }
-
-  .container {
-    @include transform(translateX($sidebar-width));
-  }
-}
-
-// Modal
-$modal-animation-duration: $animation-duration;
-$modal-animation-timing-function: $animation-timing-function;
-
-// .main {
-//   @include transition(opacity $modal-animation-duration 
-//     $modal-animation-timing-function);
-//   opacity: 1;
-// }
-
-.modal {
-  @include transition-transform($modal-animation-duration 
-    $modal-animation-timing-function);
-  opacity: 1;
-}
-
-.modal-open {
-  // .main {
-  //   opacity: 0;
-  // }
-
-  .modal {
-    @include transform(translateY(0));
-  }
-}
-
-// Pages
-$page-animation-duration: 400ms;
-$page-animation-timing-function: $animation-timing-function;
-
-.page {
-  box-shadow: -1px 0 2px rgba(0, 0, 0, 0.25), 1px 0 2px rgba(0, 0, 0, 0.25);
-  @include transition-transform($page-animation-duration 
-    $page-animation-timing-function);
-}
-
-// .page:after {
-//   content: "";
-//   position: absolute;
-//   z-index: 15;
-//   @include transition(opacity $page-animation-duration 
-//     $page-animation-timing-function);
-//   opacity: 0;
-// }
-
-// .page.inactive:after {
-//   top: 0;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-//   background-color: $overlay-color;
-// }
-
-.page-transform {
-  .page {
-    @include transform(translateX(100%));
-  }
-  .page.active {
-    @include transform(translateX(0));
-  }
-  .page.inactive {
-    @include transform(translateX(-50%));
-  }
-  // .page.inactive:after {
-  //   opacity: 1;
-  // }
-}
-
-.page-transform.reverse {
-  .page {
-    @include transform(translateX(-100%));
-  }
-  .page.inactive {
-    @include transform(translateX(50%));
-  }
+.container.sidebar-active {
+  @include transform(translateX($sidebar-width));
 }
 
 // Slider

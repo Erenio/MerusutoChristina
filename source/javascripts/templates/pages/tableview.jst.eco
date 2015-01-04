@@ -1,4 +1,4 @@
-<%- _.renderTemplate("templates/pages/header", title: "Table view") %>
+<%- _.renderTemplate("templates/pages/header", title: "Table View") %>
 <div class="content">
   <ul class="table-view">
     <li class="table-view-cell media">

@@ -13,26 +13,15 @@ class App.Views.Main extends Backbone.View
     url = $(event.currentTarget).attr("sref")
     Backbone.history.loadUrl(url)
     event.preventDefault()
-
-  sidebarOpenOnContainerClick: (event) =>
-    @toggleSidebar()
-    event.stopImmediatePropagation()
-    event.preventDefault()
   
   toggleSidebar: ->
-    @$el.toggleClass("sidebar-open")
-    $container = @views["container"].$el
-    if @$el.hasClass("sidebar-open")
-      $container.on "click", @sidebarOpenOnContainerClick
-    else
-      $container.off "click", @sidebarOpenOnContainerClick
+    @views["container"].toggleSidebar()
 
   openModal: (view) ->
-    @views["modal"].render(view)
-    @$el.addClass("modal-open")
+    @views["modal"].render(view).show()
 
   closeModal: () ->
-    @$el.removeClass("modal-open")
+    @views["modal"].hide()
 
   openPage: (view) ->
     @views["container"].render(view)
@@ -43,13 +32,23 @@ class App.Views.Container extends Backbone.View
   afterRender: (view, reverse = false) ->
     if view?
       @lastPage.remove() if @lastPage?
-      @lastPage = @currPage.expire() if @currPage?
+      @lastPage = @currPage.hide() if @currPage?
       @currPage = new App.Views.Page().render(view)
-      @$el.append(@currPage.$el)
+      @currPage.$el.appendTo(@$el)
+      @currPage.show() if @lastPage?
 
-      if @lastPage?
-        @$el.addClass("page-transform")
-        @$el.addClass("reverse") if reverse
+  onClickSidebarActive: (event) =>
+    @toggleSidebar()
+    event.stopImmediatePropagation()
+    event.preventDefault()
+
+  toggleSidebar: ->
+    @$el.toggleClass("sidebar-active")
+    if @$el.hasClass("sidebar-active")
+      @$el.on "click", @onClickSidebarActive
+    else
+      @$el.off "click", @onClickSidebarActive
+
 
 class App.Views.Page extends Backbone.View
   template: _.loadTemplate("templates/page")
@@ -58,15 +57,17 @@ class App.Views.Page extends Backbone.View
     if view?
       @view = view
       @$el.html(view.$el)
-      _.defer =>
-        # Make sure addClass is called after the dom has been appended
-        # by calling `@el.offsetWidth'
-        @el.offsetWidth
-        @$el.addClass("active")
 
-  expire: ->
-    @$el.removeClass("active").addClass("inactive")
-    @
+  show: ->
+    @$el.addClass("sliding right")
+    _.defer =>
+      # Make sure addClass is called after the dom has been appended
+      # by calling `@el.offsetWidth'
+      @el.offsetWidth
+      @$el.removeClass("right")
+
+  hide: ->
+    @$el.addClass("left")
 
   afterRemove: ->
     @view.remove() if @view?
@@ -78,3 +79,9 @@ class App.Views.Modal extends Backbone.View
     if view?
       @view = view
       @$el.html(view.$el)
+
+  show: ->
+    @$el.addClass("active")
+
+  hide: ->
+    @$el.removeClass("active")

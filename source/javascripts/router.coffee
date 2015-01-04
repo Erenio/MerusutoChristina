@@ -17,7 +17,7 @@ class App.Router extends Backbone.Router
     App.main.closeModal()
 
   index: ->
-    @navigate("#page/topography", true)
+    @navigate("#pages/typography", true)
 
   openSlidersPage: ->
     view = new App.Widgets.Slider
