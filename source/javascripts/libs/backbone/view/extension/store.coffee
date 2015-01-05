@@ -51,10 +51,14 @@ class Collection2ViewBinder
     for key in [ 'Add', 'Sort', 'Reset', 'Remove' ]
       event = key.toLowerCase()
       method = "on#{key}"
-      @handlers[event] = @options[method].bind(@)
-      @collection.on(event, @handlers[event])
+      handler = @options[method].bind(@)
+      @handlers[event] = handler
+      @collection.on(event, handler)
 
   off: ->
+    for event, handler of @handlers
+      @collection.off(event, handler)
+
 
 class Backbone.View.Extension.Store
 

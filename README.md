@@ -1,16 +1,19 @@
 Sample Application built with Backbone.js and Ratchet 2.0
+===
+[Online Demo](http://bbtfr.github.io/backbone-ratchet)
+
+Dependency
 ---
-
-Depend on:
-
 * middleman
-* [middleman-bower](bbtfr/middleman-bower)
+* [middleman-bower](https://github.com/bbtfr/middleman-bower)
 * middleman-deploy
 * underscore
 * backbone
 * zepto
 * ratchet
 
+Setup
+---
 ```bash
 # Initialize
 $ git clone git@github.com:bbtfr/backbone-ratchet.git
