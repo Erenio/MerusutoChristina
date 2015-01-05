@@ -1,3 +1,9 @@
+# Template extension for Backbone.View
+#
+# class Demo extends Backbone.View
+#   template: "template (optional, string or function)"
+#
+
 class Backbone.View.Extension.Template
 
   force: true

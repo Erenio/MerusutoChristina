@@ -16,10 +16,10 @@ class View extends BaseView
     for extension in @extensions
       extension[key]?.apply(@, args)
 
-_.each ['initialize', 'render', 'remove'], (method) ->
-  titleizedKey = method.charAt(0).toUpperCase() + method.slice(1)
-  beforeMethod = "before#{titleizedKey}"
-  afterMethod = "after#{titleizedKey}"
+_.each ['Initialize', 'Render', 'Remove'], (key) ->
+  method = key.toLowerCase()
+  beforeMethod = "before#{key}"
+  afterMethod = "after#{key}"
 
   View::[method] = ->
     @[beforeMethod].apply(@, arguments) if @[beforeMethod]?

@@ -5,7 +5,9 @@ class App.Router extends Backbone.Router
     "close-modal": "closeModal"
 
     "pages/sliders": "openSlidersPage"
+    "pages/tableview": "openTableviewPage"
     "pages/*path": "openPage"
+    "modals/form": "openFormModal"
     "modals/*path": "openModal"
 
     "*otherwise": "index"
@@ -20,9 +22,22 @@ class App.Router extends Backbone.Router
     @navigate("#pages/typography", true)
 
   openSlidersPage: ->
-    view = new App.Widgets.Slider
-      template: _.loadTemplate("templates/pages/sliders")
+    view = new App.Views.Slider()
     App.main.openPage(view.render())
+
+  openTableviewPage: ->
+    collection = new Backbone.Collection([
+      new Backbone.Model(title: "Item 3")
+      new Backbone.Model(title: "Item 2")
+      new Backbone.Model(title: "Item 1")
+    ])
+    view = new App.Views.Tableview(collection: collection)
+    App.main.openPage(view.render())
+
+  openFormModal: ->
+    model = new Backbone.Model()
+    view = new App.Views.Form(model: model)
+    App.main.openModal(view.render())
 
   openPage: (path = 'topography') ->
     view = new Backbone.View

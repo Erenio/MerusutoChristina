@@ -1,3 +1,14 @@
+# Params extension for Backbone.View
+# 
+# class Demo extends Backbone.View
+#   params:
+#     required: [
+#       ":param"
+#     ]
+#     optional:
+#       ":param": ":default"
+#
+
 class Backbone.View.Extension.Params
 
   initialize: (options) ->

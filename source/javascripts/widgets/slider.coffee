@@ -2,12 +2,12 @@
 
 class App.Widgets.Slider extends Backbone.View
   events:
-    "touchstart .slider": "onTouchStart"
-    "touchmove .slider": "onTouchMove"
-    "touchend .slider": "onTouchEnd"
-    "mousedown .slider": "onMouseDown"
-    "mousemove .slider": "onMouseMove"
-    "mouseup .slider": "onMouseUp"
+    "touchstart": "onTouchStart"
+    "touchmove": "onTouchMove"
+    "touchend": "onTouchEnd"
+    "mousedown": "onMouseDown"
+    "mousemove": "onMouseMove"
+    "mouseup": "onMouseUp"
 
   onTouchStart: (event) ->
     Ratchet.Sliders.onTouchStart(event)

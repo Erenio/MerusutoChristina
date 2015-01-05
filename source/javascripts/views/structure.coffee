@@ -32,10 +32,12 @@ class App.Views.Container extends Backbone.View
   afterRender: (view, reverse = false) ->
     if view?
       @lastPage.remove() if @lastPage?
-      @lastPage = @currPage.hide() if @currPage?
+      @lastPage = @currPage
       @currPage = new App.Views.Page().render(view)
       @currPage.$el.appendTo(@$el)
-      @currPage.show() if @lastPage?
+      if @lastPage?
+        @lastPage.hide() 
+        @currPage.show()
 
   onClickSidebarActive: (event) =>
     @toggleSidebar()
@@ -49,15 +51,27 @@ class App.Views.Container extends Backbone.View
     else
       @$el.off "click", @onClickSidebarActive
 
+class App.Views.Modal extends Backbone.View
+  template: ""
 
-class App.Views.Page extends Backbone.View
-  template: _.loadTemplate("templates/page")
-  
   afterRender: (view) ->
     if view?
+      @view.remove() if @view?
       @view = view
       @$el.html(view.$el)
 
+  afterRemove: ->
+    @view.remove() if @view?
+
+  show: ->
+    @$el.addClass("active")
+
+  hide: ->
+    @$el.removeClass("active")
+
+class App.Views.Page extends App.Views.Modal
+  template: _.loadTemplate("templates/page")
+  
   show: ->
     @$el.addClass("sliding right")
     _.defer =>
@@ -68,20 +82,3 @@ class App.Views.Page extends Backbone.View
 
   hide: ->
     @$el.addClass("left")
-
-  afterRemove: ->
-    @view.remove() if @view?
-
-class App.Views.Modal extends Backbone.View
-  template: ""
-
-  afterRender: (view) ->
-    if view?
-      @view = view
-      @$el.html(view.$el)
-
-  show: ->
-    @$el.addClass("active")
-
-  hide: ->
-    @$el.removeClass("active")

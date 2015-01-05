@@ -4,11 +4,13 @@
     <button class="btn btn-block">Block button</button>
     <button class="btn btn-primary btn-block">Block button</button>
     <button class="btn btn-positive btn-block">Block button</button>
+    <button class="btn btn-warning btn-block">Block button</button>
     <button class="btn btn-negative btn-block">Block button</button>
 
     <button class="btn btn-block btn-outlined">Block button</button>
     <button class="btn btn-primary btn-block btn-outlined">Block button</button>
     <button class="btn btn-positive btn-block btn-outlined">Block button</button>
+    <button class="btn btn-warning btn-block btn-outlined">Block button</button>
     <button class="btn btn-negative btn-block btn-outlined">Block button</button>
   </div>
 </div>
