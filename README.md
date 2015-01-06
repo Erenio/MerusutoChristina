@@ -16,7 +16,7 @@ Setup
 ---
 ```bash
 # Initialize
-$ git clone git@github.com:bbtfr/backbone-ratchet.git
+$ git clone https://github.com/bbtfr/backbone-ratchet.git
 $ cd backbone-ratchet
 $ bundle install
 $ middleman bower install
