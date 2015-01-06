@@ -9,14 +9,14 @@ class Backbone.View.Extension.Debug
 
   force: true
 
-  beforeInitialize: ->
-    _.debug("Create new Backbone.View: #{key(@)}")
-    _.time("Create #{key(@)}")
+  beforeInitialize: (view) ->
+    _.debug("Create new Backbone.View: #{key(view)}")
+    _.time("Create #{key(view)}")
 
-  afterRender: ->
-    _.debug("Render Backbone.View: #{key(@)}")
-    _.timeEnd("Create #{key(@)}")
+  afterRender: (view) ->
+    _.debug("Render Backbone.View: #{key(view)}")
+    _.timeEnd("Create #{key(view)}")
 
-  beforeRemove: ->
-    _.debug("Remove Backbone.View: #{key(@)}")
+  beforeRemove: (view) ->
+    _.debug("Remove Backbone.View: #{key(view)}")
 
