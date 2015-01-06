@@ -6,6 +6,5 @@
 asset "backbone"
 asset "underscore"
 asset "zepto"
-asset "zepto.fx"
 
 asset "ratchet"
