@@ -1,5 +1,5 @@
 // Imports and Mixins
-@import 'bourbon/bourbon';
+@import 'bourbon';
 @mixin transition-transform($properties...) {
   -webkit-transition: -webkit-transform $properties;
   -moz-transition: -moz-transform $properties;
