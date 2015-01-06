@@ -1,10 +1,4 @@
-class App.Views.Slider extends Backbone.View
-  template: _.loadTemplate("templates/pages/sliders")
-
-  layout:
-    ".slider": -> new App.Widgets.Slider()
-
-class App.Views.Tableview extends Backbone.View
+class App.Pages.Tableview extends Backbone.View
   template: _.loadTemplate("templates/pages/tableview/index")
 
   store:
@@ -35,21 +29,3 @@ class App.Views.Tableview extends Backbone.View
   remove: ->
     model = @collection.at(0)
     @collection.remove(model)
-
-class App.Views.Form extends Backbone.View
-  template: _.loadTemplate("templates/modals/form")
-
-  bindings:
-    fullname: [
-      selector: "#fullname-input"
-      event: "keyup"
-    , "#fullname" ]
-    search: [ "#search-input", "#search" ]
-    description: [ "#description-textarea", "#description" ]
-    toggle: [
-      selector: "#toggle-toggle"
-      event: "click"
-      onSet: ($el, model, attr) ->
-        $el.toggleClass("active")
-        model.set(attr, $el.hasClass("active"))
-    , "#toggle" ]

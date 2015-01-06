@@ -2,8 +2,11 @@ window.Ratchet = {}
 
 window.App =
 
-  Views: {}
+  Bindings: {}
+
   Widgets: {}
+  Views: {}
+  Pages: {}
 
   initialize: ->
     @main = new App.Views.Main

@@ -22,7 +22,7 @@ class App.Router extends Backbone.Router
     @navigate("#pages/typography", true)
 
   openSlidersPage: ->
-    view = new App.Views.Slider()
+    view = new App.Pages.Sliders()
     App.main.openPage(view.render())
 
   openTableviewPage: ->
@@ -31,12 +31,12 @@ class App.Router extends Backbone.Router
       new Backbone.Model(title: "Item 2")
       new Backbone.Model(title: "Item 1")
     ])
-    view = new App.Views.Tableview(collection: collection)
+    view = new App.Pages.Tableview(collection: collection)
     App.main.openPage(view.render())
 
   openFormModal: ->
     model = new Backbone.Model()
-    view = new App.Views.Form(model: model)
+    view = new App.Pages.Form(model: model)
     App.main.openModal(view.render())
 
   openPage: (path = 'topography') ->

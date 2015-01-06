@@ -7,8 +7,8 @@
 //= require_tree ./libs/backbone/view/extension
 
 //= require app
+//= require_tree ./bindings
 //= require_tree ./templates
 //= require_tree ./views
-//= require_tree ./widgets
 //= require router
 
