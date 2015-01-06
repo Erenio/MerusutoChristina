@@ -12,9 +12,9 @@ class View extends BaseView
         @extensions.push(extension)
     BaseView.call(@, options)
 
-  _runExtensionCallbacks: (key, args) ->
+  _runExtensionCallbacks: (key, callbackArguments) ->
     for extension in @extensions
-      extension[key]?.apply(@, args)
+      extension[key]?.apply(extension, callbackArguments)
 
 _.each ['Initialize', 'Render', 'Remove'], (key) ->
   method = key.toLowerCase()
@@ -22,10 +22,13 @@ _.each ['Initialize', 'Render', 'Remove'], (key) ->
   afterMethod = "after#{key}"
 
   View::[method] = ->
+    callbackArguments = Array.prototype.slice.call(arguments)
+    callbackArguments.unshift @
+
     @[beforeMethod].apply(@, arguments) if @[beforeMethod]?
-    @_runExtensionCallbacks(beforeMethod, arguments)
-    @_runExtensionCallbacks(method, arguments)
-    @_runExtensionCallbacks(afterMethod, arguments)
+    @_runExtensionCallbacks(beforeMethod, callbackArguments)
+    @_runExtensionCallbacks(method, callbackArguments)
+    @_runExtensionCallbacks(afterMethod, callbackArguments)
     @[afterMethod].apply(@, arguments) if @[afterMethod]?
     BaseView::[method].apply(@, arguments)
     

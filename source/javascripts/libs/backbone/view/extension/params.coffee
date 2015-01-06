@@ -11,11 +11,11 @@
 
 class Backbone.View.Extension.Params
 
-  initialize: (options) ->
+  initialize: (view, options) ->
     # Required parameters
-    for param in @params.required
-      @[param] = _.required(options, param)
+    for param in view.params.required
+      view[param] = _.required(options, param)
 
     # Optional parameters
-    for param, value of @params.optional
-      @[param] = options[param] || value
+    for param, value of view.params.optional
+      view[param] = options[param] || value

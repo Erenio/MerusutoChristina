@@ -11,12 +11,14 @@
 
 class Backbone.View.Extension.Layout
 
-  initialize: (options) ->
-    _.extend(@layout, options.layout)
+  initialize: (view, options) ->
+    _.extend(view.layout, options.layout)
 
-  render: ->
-    @views = {}
-    for key, options of @layout
+  render: (view) ->
+    @remove(view) if view.views?
+    view.views = {}
+
+    for key, options of view.layout
       if _.isString(options) || _.isFunction(options)
         selector = key
         template = options
@@ -24,21 +26,20 @@ class Backbone.View.Extension.Layout
         selector = _.required(options, "selector")
         template = _.required(options, "template")
 
-      template = template(@options) if _.isFunction(template)
+      template = template(view.options) if _.isFunction(template)
       if template instanceof Backbone.View
-        view = template
-        $template = view.render().$el
+        $template = template.render().$el
       else
         $template = $(template)
-        view = new Backbone.View(el: $template)
+        template = new Backbone.View(el: $template)
 
-      $selector = @$(selector)
+      $selector = view.$(selector)
       unless $template.html() == "" && $selector.html() != ""
         $selector.html($template)
 
-      view.setElement($selector)
-      @views[key] = view
+      template.setElement($selector)
+      view.views[key] = template
 
-  remove: ->
-    for selector, view of @views
-      view.remove()
+  remove: (view) ->
+    for selector, template of view.views
+      template.remove()

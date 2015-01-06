@@ -79,29 +79,30 @@ class Model2ViewBinder extends Binder
   off: ->
     @model.off("change:#{@attr}", @handler)
 
+
 class Backbone.View.Extension.Bindings
 
-  initialize: (options) ->
-    @model = _.required(options, "model")
-    @binders = []
+  initialize: (view, options) ->
+    model = _.required(options, "model")
+    view.binders = []
 
-    for attribute, bindings of @bindings
+    for attribute, bindings of view.bindings
       bindings = if _.isArray(bindings) then bindings else [ bindings ]
       for binding in bindings
         binding = { selector: binding } if _.isString(binding)
 
-        $selector = @$(_.required(binding, 'selector'))
+        $selector = view.$(_.required(binding, 'selector'))
         tag = $selector.attr("tagName").toLowerCase()
 
         if /input|textarea/.test(tag) || binding.event
-          binder = new View2ModelBinder(@model, attribute, @$el, binding)
+          binder = new View2ModelBinder(model, attribute, view.$el, binding)
         else
-          binder = new Model2ViewBinder(@model, attribute, @$el, binding)
+          binder = new Model2ViewBinder(model, attribute, view.$el, binding)
 
         binder.on()
-        @binders.push binder
+        view.binders.push binder
 
-  remove: ->
-    for binder in @binders
+  remove: (view) ->
+    for binder in view.binders
       binder.off()
       

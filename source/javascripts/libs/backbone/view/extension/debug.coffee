@@ -9,7 +9,7 @@ class Backbone.View.Extension.Debug
 
   force: true
 
-  beforeInitialize: (options) ->
+  beforeInitialize: ->
     _.debug("Create new Backbone.View: #{key(@)}")
     _.time("Create #{key(@)}")
 

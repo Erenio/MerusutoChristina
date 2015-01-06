@@ -62,13 +62,13 @@ class Collection2ViewBinder
 
 class Backbone.View.Extension.Store
 
-  initialize: (options) ->
+  initialize: (view, options) ->
     @collection = _.required(options, "collection")
-    @binder = new Collection2ViewBinder(@collection, @$el, @store)
-    @binder.on()
+    view.binder = new Collection2ViewBinder(@collection, view.$el, view.store)
+    view.binder.on()
 
-  render: ->
-    @binder.handlers["reset"](@collection)
+  render: (view) ->
+    view.binder.handlers["reset"](@collection)
 
-  remove: ->
-    @binder.off()
+  remove: (view) ->
+    view.binder.off()
