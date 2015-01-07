@@ -5504,7 +5504,7 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     Companion.prototype.imageUrl = function(type) {
-      return "/data/companions/" + type + "/" + this.id + ".png";
+      return "data/companions/" + type + "/" + this.id + ".png";
     };
 
     Companion.prototype.thumbnailUrl = function() {
@@ -5565,7 +5565,7 @@ window.$ === undefined && (window.$ = Zepto)
       return Companions.__super__.constructor.apply(this, arguments);
     }
 
-    Companions.prototype.url = "/data/companions.json";
+    Companions.prototype.url = "data/companions.json";
 
     Companions.prototype.model = App.Models.Companion;
 

@@ -9,7 +9,7 @@
       return Companions.__super__.constructor.apply(this, arguments);
     }
 
-    Companions.prototype.url = "/data/companions.json";
+    Companions.prototype.url = "data/companions.json";
 
     Companions.prototype.model = App.Models.Companion;
 

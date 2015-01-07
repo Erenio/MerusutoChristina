@@ -58,7 +58,7 @@
     };
 
     Companion.prototype.imageUrl = function(type) {
-      return "/data/companions/" + type + "/" + this.id + ".png";
+      return "data/companions/" + type + "/" + this.id + ".png";
     };
 
     Companion.prototype.thumbnailUrl = function() {
