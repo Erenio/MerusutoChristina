@@ -46,6 +46,16 @@
       }
     };
 
+    Container.prototype.openSidebar = function() {
+      this.$el.addClass("sidebar-active");
+      return this.$el.on("click", this.onClickSidebarActive);
+    };
+
+    Container.prototype.closeSidebar = function() {
+      this.$el.removeClass("sidebar-active");
+      return this.$el.off("click", this.onClickSidebarActive);
+    };
+
     return Container;
 
   })(Backbone.View);

@@ -117,11 +117,18 @@
   Backbone.View.Extension.Bindings = (function() {
     function Bindings() {}
 
-    Bindings.prototype.initialize = function(options) {
-      var $selector, attribute, binder, binding, bindings, tag, _ref, _results;
-      this.model = _.required(options, "model");
-      this.binders = [];
-      _ref = this.bindings;
+    Bindings.prototype.initialize = function(view, options) {
+      var $selector, attribute, binder, binding, bindings, model, tag, _ref, _results;
+      if (view.model) {
+        model = view.model;
+        if (_.isFunction(model)) {
+          model = model(options);
+        }
+      } else {
+        model = _.required(options, "model");
+      }
+      view.binders = [];
+      _ref = view.bindings;
       _results = [];
       for (attribute in _ref) {
         bindings = _ref[attribute];
@@ -136,25 +143,25 @@
                 selector: binding
               };
             }
-            $selector = this.$(_.required(binding, 'selector'));
+            $selector = view.$(_.required(binding, 'selector'));
             tag = $selector.attr("tagName").toLowerCase();
             if (/input|textarea/.test(tag) || binding.event) {
-              binder = new View2ModelBinder(this.model, attribute, this.$el, binding);
+              binder = new View2ModelBinder(model, attribute, view.$el, binding);
             } else {
-              binder = new Model2ViewBinder(this.model, attribute, this.$el, binding);
+              binder = new Model2ViewBinder(model, attribute, view.$el, binding);
             }
             binder.on();
-            _results1.push(this.binders.push(binder));
+            _results1.push(view.binders.push(binder));
           }
           return _results1;
-        }).call(this));
+        })());
       }
       return _results;
     };
 
-    Bindings.prototype.remove = function() {
+    Bindings.prototype.remove = function(view) {
       var binder, _i, _len, _ref, _results;
-      _ref = this.binders;
+      _ref = view.binders;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         binder = _ref[_i];

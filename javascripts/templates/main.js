@@ -41,11 +41,7 @@
       
         __out.push(_.renderTemplate("templates/sidebar"));
       
-        __out.push('\n\n  <container class="content container"></container>\n\n  ');
-      
-        __out.push(_.renderTemplate("templates/footer"));
-      
-        __out.push('\n</view>\n\n<modal class="modal"></modal>\n');
+        __out.push('\n\n  <container class="content container"></container>\n</view>\n\n<modal class="modal"></modal>\n');
       
       }).call(this);
       

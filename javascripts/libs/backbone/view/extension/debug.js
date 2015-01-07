@@ -10,18 +10,18 @@
 
     Debug.prototype.force = true;
 
-    Debug.prototype.beforeInitialize = function(options) {
-      _.debug("Create new Backbone.View: " + (key(this)));
-      return _.time("Create " + (key(this)));
+    Debug.prototype.beforeInitialize = function(view) {
+      _.debug("Create new Backbone.View: " + (key(view)));
+      return _.time("Create " + (key(view)));
     };
 
-    Debug.prototype.afterRender = function() {
-      _.debug("Render Backbone.View: " + (key(this)));
-      return _.timeEnd("Create " + (key(this)));
+    Debug.prototype.afterRender = function(view) {
+      _.debug("Render Backbone.View: " + (key(view)));
+      return _.timeEnd("Create " + (key(view)));
     };
 
-    Debug.prototype.beforeRemove = function() {
-      return _.debug("Remove Backbone.View: " + (key(this)));
+    Debug.prototype.beforeRemove = function(view) {
+      return _.debug("Remove Backbone.View: " + (key(view)));
     };
 
     return Debug;

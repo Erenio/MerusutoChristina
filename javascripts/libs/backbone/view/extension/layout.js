@@ -2,14 +2,17 @@
   Backbone.View.Extension.Layout = (function() {
     function Layout() {}
 
-    Layout.prototype.initialize = function(options) {
-      return _.extend(this.layout, options.layout);
+    Layout.prototype.initialize = function(view, options) {
+      return _.extend(view.layout, options.layout);
     };
 
-    Layout.prototype.render = function() {
-      var $selector, $template, key, options, selector, template, view, _ref, _results;
-      this.views = {};
-      _ref = this.layout;
+    Layout.prototype.render = function(view) {
+      var $selector, $template, key, options, selector, template, _ref, _results;
+      if (view.views != null) {
+        this.remove(view);
+      }
+      view.views = {};
+      _ref = view.layout;
       _results = [];
       for (key in _ref) {
         options = _ref[key];
@@ -21,34 +24,32 @@
           template = _.required(options, "template");
         }
         if (_.isFunction(template)) {
-          template = template(this.options);
+          template = template(view.options);
         }
         if (template instanceof Backbone.View) {
-          view = template;
-          $template = view.render().$el;
+          $template = template.render().$el;
         } else {
           $template = $(template);
-          view = new Backbone.View({
-            el: $template
-          });
         }
-        $selector = this.$(selector);
+        $selector = view.$(selector);
         if (!($template.html() === "" && $selector.html() !== "")) {
           $selector.html($template);
         }
-        view.setElement($selector);
-        _results.push(this.views[key] = view);
+        if (template.setElement != null) {
+          template.setElement($selector);
+        }
+        _results.push(view.views[key] = template);
       }
       return _results;
     };
 
-    Layout.prototype.remove = function() {
-      var selector, view, _ref, _results;
-      _ref = this.views;
+    Layout.prototype.remove = function(view) {
+      var selector, template, _ref, _results;
+      _ref = view.views;
       _results = [];
       for (selector in _ref) {
-        view = _ref[selector];
-        _results.push(view.remove());
+        template = _ref[selector];
+        _results.push(template.remove());
       }
       return _results;
     };

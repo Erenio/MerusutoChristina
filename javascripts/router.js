@@ -12,11 +12,10 @@
     Router.prototype.routes = {
       "toggle-sidebar": "toggleSidebar",
       "close-modal": "closeModal",
-      "pages/sliders": "openSlidersPage",
-      "pages/tableview": "openTableviewPage",
-      "pages/*path": "openPage",
-      "modals/form": "openFormModal",
-      "modals/*path": "openModal",
+      "companions": "openCompanionsIndexPage",
+      "companions/:id": "openCompanionsShowPage",
+      "familiars": "openFamiliarsIndexPage",
+      "familiars/:id": "openFamiliarsShowPage",
       "*otherwise": "index"
     };
 
@@ -29,62 +28,39 @@
     };
 
     Router.prototype.index = function() {
-      return this.navigate("#pages/typography", true);
+      return this.navigate("#companions", true);
     };
 
-    Router.prototype.openSlidersPage = function() {
+    Router.prototype.openCompanionsIndexPage = function() {
       var view;
-      view = new App.Pages.Sliders();
-      return App.main.openPage(view.render());
-    };
-
-    Router.prototype.openTableviewPage = function() {
-      var collection, view;
-      collection = new Backbone.Collection([
-        new Backbone.Model({
-          title: "Item 3"
-        }), new Backbone.Model({
-          title: "Item 2"
-        }), new Backbone.Model({
-          title: "Item 1"
-        })
-      ]);
-      view = new App.Pages.Tableview({
-        collection: collection
+      App.main.closeSidebar();
+      if (App.companions == null) {
+        App.companions = new App.Collections.Companions();
+        App.companions.fetch();
+      }
+      view = new App.Pages.CompanionsIndex({
+        collection: App.companions
       });
       return App.main.openPage(view.render());
     };
 
-    Router.prototype.openFormModal = function() {
+    Router.prototype.openCompanionsShowPage = function(id) {
       var model, view;
-      model = new Backbone.Model();
-      view = new App.Pages.Form({
+      if (App.companions == null) {
+        return;
+      }
+      model = App.companions.get(id);
+      view = new App.Pages.CompanionsShow({
         model: model
       });
       return App.main.openModal(view.render());
     };
 
-    Router.prototype.openPage = function(path) {
-      var view;
-      if (path == null) {
-        path = 'topography';
-      }
-      view = new Backbone.View({
-        template: _.loadTemplate("templates/pages/" + path)
-      });
-      return App.main.openPage(view.render());
+    Router.prototype.openFamiliarsIndexPage = function() {
+      return App.main.closeSidebar();
     };
 
-    Router.prototype.openModal = function(path) {
-      var view;
-      if (path == null) {
-        path = 'modal';
-      }
-      view = new Backbone.View({
-        template: _.loadTemplate("templates/modals/" + path)
-      });
-      return App.main.openModal(view.render());
-    };
+    Router.prototype.openFamiliarsShowPage = function() {};
 
     return Router;
 

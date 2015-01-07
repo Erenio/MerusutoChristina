@@ -27,13 +27,13 @@
       BaseView.call(this, options);
     }
 
-    View.prototype._runExtensionCallbacks = function(key, args) {
+    View.prototype._runExtensionCallbacks = function(key, callbackArguments) {
       var extension, _i, _len, _ref, _ref1, _results;
       _ref = this.extensions;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         extension = _ref[_i];
-        _results.push((_ref1 = extension[key]) != null ? _ref1.apply(this, args) : void 0);
+        _results.push((_ref1 = extension[key]) != null ? _ref1.apply(extension, callbackArguments) : void 0);
       }
       return _results;
     };
@@ -48,12 +48,15 @@
     beforeMethod = "before" + key;
     afterMethod = "after" + key;
     return View.prototype[method] = function() {
+      var callbackArguments;
+      callbackArguments = Array.prototype.slice.call(arguments);
+      callbackArguments.unshift(this);
       if (this[beforeMethod] != null) {
         this[beforeMethod].apply(this, arguments);
       }
-      this._runExtensionCallbacks(beforeMethod, arguments);
-      this._runExtensionCallbacks(method, arguments);
-      this._runExtensionCallbacks(afterMethod, arguments);
+      this._runExtensionCallbacks(beforeMethod, callbackArguments);
+      this._runExtensionCallbacks(method, callbackArguments);
+      this._runExtensionCallbacks(afterMethod, callbackArguments);
       if (this[afterMethod] != null) {
         this[afterMethod].apply(this, arguments);
       }

@@ -35,6 +35,14 @@
       return this.views["container"].toggleSidebar();
     };
 
+    Main.prototype.openSidebar = function() {
+      return this.views["container"].openSidebar();
+    };
+
+    Main.prototype.closeSidebar = function() {
+      return this.views["container"].closeSidebar();
+    };
+
     Main.prototype.openModal = function(view) {
       return this.views["modal"].render(view).show();
     };

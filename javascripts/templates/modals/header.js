@@ -37,11 +37,7 @@
     }
     (function() {
       (function() {
-        __out.push('<header class="bar bar-nav">\n  <a class="icon icon-close pull-right" sref="#close-modal"></a>\n  <h1 class="title">');
-      
-        __out.push(__sanitize(this.title));
-      
-        __out.push('</h1>\n</header>\n');
+        __out.push('<a class="icon icon-close pull-right" sref="#close-modal"></a>\n');
       
       }).call(this);
       

@@ -37,7 +37,7 @@
     }
     (function() {
       (function() {
-        __out.push('<sidebar class="content sidebar">\n  <ul class="table-view">\n    <li class="table-view-cell media">\n      <a class="navigate-right">\n        <span class="media-object pull-left icon icon-trash"></span>\n        <div class="media-body">\n          Item 1\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right">\n        <span class="media-object pull-left icon icon-gear"></span>\n        <div class="media-body">\n          Item 2\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right">\n        <span class="media-object pull-left icon icon-pages"></span>\n        <div class="media-body">\n          Item 3\n        </div>\n      </a>\n    </li>\n  </ul>\n</sidebar>\n');
+        __out.push('<sidebar class="content sidebar">\n  <ul class="table-view">\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#companions">\n        <span class="media-object pull-left icon icon-person"></span>\n        <div class="media-body">\n          同伴\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#familiars">\n        <span class="media-object pull-left icon icon-gear"></span>\n        <div class="media-body">\n          魔宠（敬请期待）\n        </div>\n      </a>\n    </li>\n  </ul>\n</sidebar>\n');
       
       }).call(this);
       

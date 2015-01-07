@@ -4822,13 +4822,13 @@ window.$ === undefined && (window.$ = Zepto)
       BaseView.call(this, options);
     }
 
-    View.prototype._runExtensionCallbacks = function(key, args) {
+    View.prototype._runExtensionCallbacks = function(key, callbackArguments) {
       var extension, _i, _len, _ref, _ref1, _results;
       _ref = this.extensions;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         extension = _ref[_i];
-        _results.push((_ref1 = extension[key]) != null ? _ref1.apply(this, args) : void 0);
+        _results.push((_ref1 = extension[key]) != null ? _ref1.apply(extension, callbackArguments) : void 0);
       }
       return _results;
     };
@@ -4843,12 +4843,15 @@ window.$ === undefined && (window.$ = Zepto)
     beforeMethod = "before" + key;
     afterMethod = "after" + key;
     return View.prototype[method] = function() {
+      var callbackArguments;
+      callbackArguments = Array.prototype.slice.call(arguments);
+      callbackArguments.unshift(this);
       if (this[beforeMethod] != null) {
         this[beforeMethod].apply(this, arguments);
       }
-      this._runExtensionCallbacks(beforeMethod, arguments);
-      this._runExtensionCallbacks(method, arguments);
-      this._runExtensionCallbacks(afterMethod, arguments);
+      this._runExtensionCallbacks(beforeMethod, callbackArguments);
+      this._runExtensionCallbacks(method, callbackArguments);
+      this._runExtensionCallbacks(afterMethod, callbackArguments);
       if (this[afterMethod] != null) {
         this[afterMethod].apply(this, arguments);
       }
@@ -4978,11 +4981,18 @@ window.$ === undefined && (window.$ = Zepto)
   Backbone.View.Extension.Bindings = (function() {
     function Bindings() {}
 
-    Bindings.prototype.initialize = function(options) {
-      var $selector, attribute, binder, binding, bindings, tag, _ref, _results;
-      this.model = _.required(options, "model");
-      this.binders = [];
-      _ref = this.bindings;
+    Bindings.prototype.initialize = function(view, options) {
+      var $selector, attribute, binder, binding, bindings, model, tag, _ref, _results;
+      if (view.model) {
+        model = view.model;
+        if (_.isFunction(model)) {
+          model = model(options);
+        }
+      } else {
+        model = _.required(options, "model");
+      }
+      view.binders = [];
+      _ref = view.bindings;
       _results = [];
       for (attribute in _ref) {
         bindings = _ref[attribute];
@@ -4997,25 +5007,25 @@ window.$ === undefined && (window.$ = Zepto)
                 selector: binding
               };
             }
-            $selector = this.$(_.required(binding, 'selector'));
+            $selector = view.$(_.required(binding, 'selector'));
             tag = $selector.attr("tagName").toLowerCase();
             if (/input|textarea/.test(tag) || binding.event) {
-              binder = new View2ModelBinder(this.model, attribute, this.$el, binding);
+              binder = new View2ModelBinder(model, attribute, view.$el, binding);
             } else {
-              binder = new Model2ViewBinder(this.model, attribute, this.$el, binding);
+              binder = new Model2ViewBinder(model, attribute, view.$el, binding);
             }
             binder.on();
-            _results1.push(this.binders.push(binder));
+            _results1.push(view.binders.push(binder));
           }
           return _results1;
-        }).call(this));
+        })());
       }
       return _results;
     };
 
-    Bindings.prototype.remove = function() {
+    Bindings.prototype.remove = function(view) {
       var binder, _i, _len, _ref, _results;
-      _ref = this.binders;
+      _ref = view.binders;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         binder = _ref[_i];
@@ -5041,18 +5051,18 @@ window.$ === undefined && (window.$ = Zepto)
 
     Debug.prototype.force = true;
 
-    Debug.prototype.beforeInitialize = function(options) {
-      _.debug("Create new Backbone.View: " + (key(this)));
-      return _.time("Create " + (key(this)));
+    Debug.prototype.beforeInitialize = function(view) {
+      _.debug("Create new Backbone.View: " + (key(view)));
+      return _.time("Create " + (key(view)));
     };
 
-    Debug.prototype.afterRender = function() {
-      _.debug("Render Backbone.View: " + (key(this)));
-      return _.timeEnd("Create " + (key(this)));
+    Debug.prototype.afterRender = function(view) {
+      _.debug("Render Backbone.View: " + (key(view)));
+      return _.timeEnd("Create " + (key(view)));
     };
 
-    Debug.prototype.beforeRemove = function() {
-      return _.debug("Remove Backbone.View: " + (key(this)));
+    Debug.prototype.beforeRemove = function(view) {
+      return _.debug("Remove Backbone.View: " + (key(view)));
     };
 
     return Debug;
@@ -5064,14 +5074,17 @@ window.$ === undefined && (window.$ = Zepto)
   Backbone.View.Extension.Layout = (function() {
     function Layout() {}
 
-    Layout.prototype.initialize = function(options) {
-      return _.extend(this.layout, options.layout);
+    Layout.prototype.initialize = function(view, options) {
+      return _.extend(view.layout, options.layout);
     };
 
-    Layout.prototype.render = function() {
-      var $selector, $template, key, options, selector, template, view, _ref, _results;
-      this.views = {};
-      _ref = this.layout;
+    Layout.prototype.render = function(view) {
+      var $selector, $template, key, options, selector, template, _ref, _results;
+      if (view.views != null) {
+        this.remove(view);
+      }
+      view.views = {};
+      _ref = view.layout;
       _results = [];
       for (key in _ref) {
         options = _ref[key];
@@ -5083,34 +5096,32 @@ window.$ === undefined && (window.$ = Zepto)
           template = _.required(options, "template");
         }
         if (_.isFunction(template)) {
-          template = template(this.options);
+          template = template(view.options);
         }
         if (template instanceof Backbone.View) {
-          view = template;
-          $template = view.render().$el;
+          $template = template.render().$el;
         } else {
           $template = $(template);
-          view = new Backbone.View({
-            el: $template
-          });
         }
-        $selector = this.$(selector);
+        $selector = view.$(selector);
         if (!($template.html() === "" && $selector.html() !== "")) {
           $selector.html($template);
         }
-        view.setElement($selector);
-        _results.push(this.views[key] = view);
+        if (template.setElement != null) {
+          template.setElement($selector);
+        }
+        _results.push(view.views[key] = template);
       }
       return _results;
     };
 
-    Layout.prototype.remove = function() {
-      var selector, view, _ref, _results;
-      _ref = this.views;
+    Layout.prototype.remove = function(view) {
+      var selector, template, _ref, _results;
+      _ref = view.views;
       _results = [];
       for (selector in _ref) {
-        view = _ref[selector];
-        _results.push(view.remove());
+        template = _ref[selector];
+        _results.push(template.remove());
       }
       return _results;
     };
@@ -5124,18 +5135,18 @@ window.$ === undefined && (window.$ = Zepto)
   Backbone.View.Extension.Params = (function() {
     function Params() {}
 
-    Params.prototype.initialize = function(options) {
+    Params.prototype.initialize = function(view, options) {
       var param, value, _i, _len, _ref, _ref1, _results;
-      _ref = this.params.required;
+      _ref = view.params.required;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         param = _ref[_i];
-        this[param] = _.required(options, param);
+        view[param] = _.required(options, param);
       }
-      _ref1 = this.params.optional;
+      _ref1 = view.params.optional;
       _results = [];
       for (param in _ref1) {
         value = _ref1[param];
-        _results.push(this[param] = options[param] || value);
+        _results.push(view[param] = options[param] || value);
       }
       return _results;
     };
@@ -5154,28 +5165,82 @@ window.$ === undefined && (window.$ = Zepto)
         var $template, template;
         template = this.template;
         if (_.isFunction(template)) {
-          template = template(model);
+          template = template({
+            model: model,
+            collection: collection
+          });
         }
-        $template = template instanceof Backbone.View ? template.render().$el : $(template);
-        return $template.appendTo(this.$selector).data("model-cid", model.cid);
+        if (template instanceof Backbone.View) {
+          $template = template.render().$el;
+        } else {
+          $template = template = $(template);
+        }
+        $template.appendTo(this.$selector);
+        return this.views[model.cid] = template;
       },
       onSort: function(collection, options) {
-        return collection.each((function(_this) {
-          return function(model) {
-            return _this.$selector.children("[data-model-cid='" + model.cid + "']").appendTo(_this.$selector);
-          };
-        })(this));
+        var $template, model, _i, _len, _ref, _results;
+        _ref = collection.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          model = _ref[_i];
+          $template = this.views[model.cid];
+          if ($template.$el != null) {
+            $template = $template.$el;
+          }
+          _results.push($template.appendTo(this.$selector));
+        }
+        return _results;
       },
       onReset: function(collection, options) {
-        this.$selector.empty();
-        return collection.each((function(_this) {
-          return function(model) {
-            return _this.handlers["add"](model, collection);
-          };
-        })(this));
+        var $template, cid, model, _i, _len, _ref, _ref1, _results;
+        _ref = this.views;
+        for (cid in _ref) {
+          $template = _ref[cid];
+          $template.remove();
+          delete this.views[cid];
+        }
+        _ref1 = collection.models;
+        _results = [];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          model = _ref1[_i];
+          _results.push(this.add(model, collection));
+        }
+        return _results;
       },
       onRemove: function(model, options) {
-        return this.$selector.children("[data-model-cid='" + model.cid + "']").remove();
+        this.views[model.cid].remove();
+        return delete this.views[model.cid];
+      },
+      onFilter: function(attributes) {
+        var eachTemplate;
+        eachTemplate = (function(_this) {
+          return function(collection, callback) {
+            var $template, model, _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = collection.length; _i < _len; _i++) {
+              model = collection[_i];
+              $template = _this.views[model.cid];
+              if ($template.$el != null) {
+                $template = $template.$el;
+              }
+              _results.push(callback($template));
+            }
+            return _results;
+          };
+        })(this);
+        if (attributes != null) {
+          eachTemplate(this.collection.models, function($template) {
+            return $template.hide();
+          });
+          return eachTemplate(this.collection.where(attributes), function($template) {
+            return $template.show();
+          });
+        } else {
+          return eachTemplate(this.collection.models, function($template) {
+            return $template.show();
+          });
+        }
       }
     };
 
@@ -5184,25 +5249,25 @@ window.$ === undefined && (window.$ = Zepto)
       this.options = _.defaults(options, this.defaults);
       this.template = _.required(this.options, "template");
       this.$selector = this.$el.find(_.required(this.options, 'selector'));
+      this.views = {};
     }
 
     Collection2ViewBinder.prototype.on = function() {
-      var event, handler, key, method, _i, _len, _ref, _results;
+      var event, handler, key, method, _i, _len, _ref;
       if (this.handlers != null) {
         this.off();
       }
       this.handlers = {};
       _ref = ['Add', 'Sort', 'Reset', 'Remove'];
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         key = _ref[_i];
         event = key.toLowerCase();
         method = "on" + key;
         handler = this.options[method].bind(this);
         this.handlers[event] = handler;
-        _results.push(this.collection.on(event, handler));
+        this.collection.on(event, handler);
       }
-      return _results;
+      return this.handlers['filter'] = this.options['onFilter'].bind(this);
     };
 
     Collection2ViewBinder.prototype.off = function() {
@@ -5216,6 +5281,33 @@ window.$ === undefined && (window.$ = Zepto)
       return _results;
     };
 
+    Collection2ViewBinder.prototype.add = function(model) {
+      return this.handlers["add"](model, this.collection);
+    };
+
+    Collection2ViewBinder.prototype.remove = function(model) {
+      return this.handlers["remove"](model);
+    };
+
+    Collection2ViewBinder.prototype.reset = function(collection) {
+      if (collection == null) {
+        collection = this.collection;
+      }
+      return this.handlers["reset"](collection);
+    };
+
+    Collection2ViewBinder.prototype.filter = function(attributes) {
+      if (!((attributes != null) && Object.keys(attributes).length !== 0)) {
+        attributes = void 0;
+      }
+      return this.handlers["filter"](attributes);
+    };
+
+    Collection2ViewBinder.prototype.sort = function(comparator) {
+      this.collection.comparator = comparator;
+      return this.collection.sort();
+    };
+
     return Collection2ViewBinder;
 
   })();
@@ -5223,18 +5315,26 @@ window.$ === undefined && (window.$ = Zepto)
   Backbone.View.Extension.Store = (function() {
     function Store() {}
 
-    Store.prototype.initialize = function(options) {
-      this.collection = _.required(options, "collection");
-      this.binder = new Collection2ViewBinder(this.collection, this.$el, this.store);
-      return this.binder.on();
+    Store.prototype.initialize = function(view, options) {
+      var collection;
+      if (view.collection) {
+        collection = view.collection;
+        if (_.isFunction(collection)) {
+          collection = collection(options);
+        }
+      } else {
+        collection = _.required(options, "collection");
+      }
+      view.binder = new Collection2ViewBinder(collection, view.$el, view.store);
+      return view.binder.on();
     };
 
-    Store.prototype.render = function() {
-      return this.binder.handlers["reset"](this.collection);
+    Store.prototype.render = function(view) {
+      return view.binder.reset();
     };
 
-    Store.prototype.remove = function() {
-      return this.binder.off();
+    Store.prototype.remove = function(view) {
+      return view.binder.off();
     };
 
     return Store;
@@ -5272,10 +5372,14 @@ window.$ === undefined && (window.$ = Zepto)
 
   window.App = {
     Bindings: {},
+    Utils: {},
     Widgets: {},
     Views: {},
     Pages: {},
+    Collections: {},
+    Models: {},
     initialize: function() {
+      _.setDebugLevel(2);
       this.main = new App.Views.Main({
         el: $('body')
       });
@@ -5308,53 +5412,173 @@ window.$ === undefined && (window.$ = Zepto)
   })();
 
 }).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/footer"] = function(__obj) {
-    if (!__obj) __obj = {};
-    var __out = [], __capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return __safe(result);
-    }, __sanitize = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else if (typeof value !== 'undefined' && value != null) {
-        return __escape(value);
-      } else {
-        return '';
+(function() {
+  App.Utils.SVG = {
+    getPolygonPointsString: function(ps) {
+      return _.map(ps, function(p) {
+        return "" + p.x + "," + p.y;
+      }).join(" ");
+    },
+    getBackgroundPolygonPointsString: function(l, r) {
+      var c, ps;
+      if (this.bgs && (this.bgs[r] != null)) {
+        return this.bgs[r];
       }
-    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
-    __safe = __obj.safe = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else {
-        if (!(typeof value !== 'undefined' && value != null)) value = '';
-        var result = new String(value);
-        result.ecoSafe = true;
-        return result;
-      }
-    };
-    if (!__escape) {
-      __escape = __obj.escape = function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
+      c = {
+        x: l / 2,
+        y: l / 2
       };
+      ps = _.map([0, 1, 2, 3, 4], function(i) {
+        var a;
+        a = (i * 72 - 90) * (Math.PI * 2) / 360;
+        return {
+          x: c.x + Math.cos(a) * r,
+          y: c.y + Math.sin(a) * r
+        };
+      });
+      if (!this.bgs) {
+        this.bgs = {};
+      }
+      return this.bgs[r] = App.Utils.SVG.getPolygonPointsString(ps);
     }
-    (function() {
-      (function() {
-        __out.push('<footer class="bar bar-tab">\n  <a class="tab-item" href="#pages/typography">\n    <span class="icon icon-code"></span>\n    <span class="tab-label">Typography</span>\n  </a>\n  <a class="tab-item" href="#pages/tableview">\n    <span class="icon icon-list"></span>\n    <span class="tab-label">Table View</span>\n  </a>\n  <a class="tab-item" href="#pages/sliders">\n    <span class="icon icon-pages"></span>\n    <span class="tab-label">Sliders</span>\n  </a>\n  <a class="tab-item" href="#pages/blockbuttons">\n    <span class="icon icon-more"></span>\n    <span class="tab-label">Buttons</span>\n  </a>\n</footer>\n');
-      
-      }).call(this);
-      
-    }).call(__obj);
-    __obj.safe = __objSafe, __obj.escape = __escape;
-    return __out.join('');
   };
+
+}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  App.Models.Companion = (function(_super) {
+    __extends(Companion, _super);
+
+    function Companion() {
+      return Companion.__super__.constructor.apply(this, arguments);
+    }
+
+    Companion.prototype.initialize = function(attributes, options) {
+      this.origin = {
+        atk: attributes.atk,
+        life: attributes.life
+      };
+      return this.setLevelMode("zero");
+    };
+
+    Companion.prototype.calcF = function() {
+      return this.f || (this.f = 1.8 + 0.1 * this.get("type"));
+    };
+
+    Companion.prototype.calcMaxLv = function(value) {
+      return Math.floor(value * this.calcF());
+    };
+
+    Companion.prototype.calcMaxLvAndGrow = function(value) {
+      var f, growPart, levelPart, rare;
+      f = this.calcF();
+      rare = this.get("rare");
+      levelPart = Math.floor(value * f);
+      growPart = Math.floor(value * (f - 1) / (19 + 10 * rare)) * 5 * (rare === 1 ? 5 : 15);
+      return levelPart + growPart;
+    };
+
+    Companion.prototype.setLevelMode = function(mode) {
+      var atk, dps, life, mdps;
+      switch (mode) {
+        case "zero":
+          atk = this.origin.atk;
+          life = this.origin.life;
+          break;
+        case "mxlv":
+          atk = this.calcMaxLv(this.origin.atk);
+          life = this.calcMaxLv(this.origin.life);
+          break;
+        case "mxlvgr":
+          atk = this.calcMaxLvAndGrow(this.origin.atk);
+          life = this.calcMaxLvAndGrow(this.origin.life);
+      }
+      dps = atk / this.get("aspd");
+      mdps = dps * this.get("anum");
+      this.set("atk", atk);
+      this.set("life", life);
+      this.set("dps", dps);
+      return this.set("mdps", mdps);
+    };
+
+    Companion.prototype.imageUrl = function(type) {
+      return "/data/companions/" + type + "/" + this.id + ".png";
+    };
+
+    Companion.prototype.thumbnailUrl = function() {
+      return this.imageUrl("thumbnail");
+    };
+
+    Companion.prototype.originalUrl = function() {
+      return this.imageUrl("original");
+    };
+
+    Companion.prototype.getString = function(strs, key) {
+      return strs[this.get(key) - 1];
+    };
+
+    Companion.prototype.getRareString = function() {
+      return this.getString(["★", "★★", "★★★", "★★★★", "★★★★★"], "rare");
+    };
+
+    Companion.prototype.getElementKey = function() {
+      return this.getString(["fire", "aqua", "wind", "light", "dark"], "element");
+    };
+
+    Companion.prototype.getTypeString = function() {
+      return this.getString(["早熟", "平均", "晚成"], "type");
+    };
+
+    Companion.prototype.getElementPolygonPointsString = function(l, r) {
+      var c, es, ps;
+      es = [this.get("fire"), this.get("aqua"), this.get("wind"), this.get("light"), this.get("dark")];
+      c = {
+        x: l / 2,
+        y: l / 2
+      };
+      ps = _.map([0, 1, 2, 3, 4], function(i) {
+        var a;
+        a = (i * 72 - 90) * (Math.PI * 2) / 360;
+        return {
+          x: c.x + Math.cos(a) * r * es[i],
+          y: c.y + Math.sin(a) * r * es[i]
+        };
+      });
+      return App.Utils.SVG.getPolygonPointsString(ps);
+    };
+
+    return Companion;
+
+  })(Backbone.Model);
+
+}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  App.Collections.Companions = (function(_super) {
+    __extends(Companions, _super);
+
+    function Companions() {
+      return Companions.__super__.constructor.apply(this, arguments);
+    }
+
+    Companions.prototype.url = "/data/companions.json";
+
+    Companions.prototype.model = App.Models.Companion;
+
+    Companions.prototype.initialize = function() {
+      return this.comparator = function(model) {
+        return -model.get("rare");
+      };
+    };
+
+    return Companions;
+
+  })(Backbone.Collection);
+
 }).call(this);
 (function() { this.JST || (this.JST = {}); this.JST["templates/main"] = function(__obj) {
     if (!__obj) __obj = {};
@@ -5399,11 +5623,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(_.renderTemplate("templates/sidebar"));
       
-        __out.push('\n\n  <container class="content container"></container>\n\n  ');
-      
-        __out.push(_.renderTemplate("templates/footer"));
-      
-        __out.push('\n</view>\n\n<modal class="modal"></modal>\n');
+        __out.push('\n\n  <container class="content container"></container>\n</view>\n\n<modal class="modal"></modal>\n');
       
       }).call(this);
       
@@ -5412,7 +5632,7 @@ window.$ === undefined && (window.$ = Zepto)
     return __out.join('');
   };
 }).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/modals/form"] = function(__obj) {
+(function() { this.JST || (this.JST = {}); this.JST["templates/modals/companions/show"] = function(__obj) {
     if (!__obj) __obj = {};
     var __out = [], __capture = function(callback) {
       var out = __out, result;
@@ -5451,11 +5671,13 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push(_.renderTemplate("templates/modals/header", {
-          title: "Form"
-        }));
+        __out.push(_.renderTemplate("templates/modals/header"));
       
-        __out.push('\n<div class="content">\n  <form class="content-padded">\n    <input type="text" placeholder="Full name" id="fullname-input">\n    <input type="search" placeholder="Search" id="search-input">\n    <textarea rows="5" id="description-textarea"></textarea>\n    <div class="input-toggle">\n      <label for="toggle">Toggle:</label>\n      <div class="toggle active" id="toggle-toggle">\n        <div class="toggle-handle"></div>\n      </div>\n    </div>\n    <button class="btn btn-positive btn-block">Submit</button>\n  </form>\n\n  <div class="content-padded">\n    <p>Full name: <span id="fullname"></span></p>\n    <p>Search: <span id="search"></span></p>\n    <p>Description: <span id="description"></span></p>\n    <p>Toggle: <span id="toggle"></span></p>\n  </div>\n</div>\n');
+        __out.push('\n<div class="wrap">\n  <img class="image" src="');
+      
+        __out.push(__sanitize(this.model.originalUrl()));
+      
+        __out.push('">\n</div>\n');
       
       }).call(this);
       
@@ -5503,11 +5725,7 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push('<header class="bar bar-nav">\n  <a class="icon icon-close pull-right" sref="#close-modal"></a>\n  <h1 class="title">');
-      
-        __out.push(__sanitize(this.title));
-      
-        __out.push('</h1>\n</header>\n');
+        __out.push('<a class="icon icon-close pull-right" sref="#close-modal"></a>\n');
       
       }).call(this);
       
@@ -5564,7 +5782,7 @@ window.$ === undefined && (window.$ = Zepto)
     return __out.join('');
   };
 }).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/pages/blockbuttons"] = function(__obj) {
+(function() { this.JST || (this.JST = {}); this.JST["templates/pages/companions/header"] = function(__obj) {
     if (!__obj) __obj = {};
     var __out = [], __capture = function(callback) {
       var out = __out, result;
@@ -5603,59 +5821,7 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push(_.renderTemplate("templates/pages/header", {
-          title: "Block Buttons"
-        }));
-      
-        __out.push('\n<div class="content">\n  <div class="content-padded">\n    <button class="btn btn-block">Block button</button>\n    <button class="btn btn-primary btn-block">Block button</button>\n    <button class="btn btn-positive btn-block">Block button</button>\n    <button class="btn btn-warning btn-block">Block button</button>\n    <button class="btn btn-negative btn-block">Block button</button>\n\n    <button class="btn btn-block btn-outlined">Block button</button>\n    <button class="btn btn-primary btn-block btn-outlined">Block button</button>\n    <button class="btn btn-positive btn-block btn-outlined">Block button</button>\n    <button class="btn btn-warning btn-block btn-outlined">Block button</button>\n    <button class="btn btn-negative btn-block btn-outlined">Block button</button>\n  </div>\n</div>\n');
-      
-      }).call(this);
-      
-    }).call(__obj);
-    __obj.safe = __objSafe, __obj.escape = __escape;
-    return __out.join('');
-  };
-}).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/pages/header"] = function(__obj) {
-    if (!__obj) __obj = {};
-    var __out = [], __capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return __safe(result);
-    }, __sanitize = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else if (typeof value !== 'undefined' && value != null) {
-        return __escape(value);
-      } else {
-        return '';
-      }
-    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
-    __safe = __obj.safe = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else {
-        if (!(typeof value !== 'undefined' && value != null)) value = '';
-        var result = new String(value);
-        result.ecoSafe = true;
-        return result;
-      }
-    };
-    if (!__escape) {
-      __escape = __obj.escape = function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      };
-    }
-    (function() {
-      (function() {
-        __out.push('<header class="bar bar-nav">\n  <a class="icon icon-bars pull-left" sref="#toggle-sidebar"></a>\n  <a class="icon icon-compose pull-right" sref="#modals/form"></a>\n  <h1 class="title">');
+        __out.push('<header class="bar bar-nav">\n  <a class="icon icon-bars pull-left" sref="#toggle-sidebar"></a>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      筛选\n    </a>\n    <ul class="dropdown-menu">\n      <li class="dropdown-submenu pull-left">\n        <a class="">稀有度</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="rare">全部</a></li>\n          <li><a class="filter" data-key="rare" data-value="1">★</a></li>\n          <li><a class="filter" data-key="rare" data-value="2">★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="3">★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="4">★★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="5">★★★★★</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">元素</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="element">全部</a></li>\n          <li><a class="filter" data-key="element" data-value="1">火</a></li>\n          <li><a class="filter" data-key="element" data-value="2">水</a></li>\n          <li><a class="filter" data-key="element" data-value="3">风</a></li>\n          <li><a class="filter" data-key="element" data-value="4">光</a></li>\n          <li><a class="filter" data-key="element" data-value="5">暗</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">武器</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="weapon">全部</a></li>\n          <li><a class="filter" data-key="weapon" data-value="1">斩击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="2">突击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="3">打击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="4">弓箭</a></li>\n          <li><a class="filter" data-key="weapon" data-value="5">魔法</a></li>\n          <li><a class="filter" data-key="weapon" data-value="6">铳弹</a></li>\n          <li><a class="filter" data-key="weapon" data-value="7">回复</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">成长</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="type">全部</a></li>\n          <li><a class="filter" data-key="type" data-value="1">早熟</a></li>\n          <li><a class="filter" data-key="type" data-value="2">平均</a></li>\n          <li><a class="filter" data-key="type" data-value="3">晚成</a></li>\n        </ul>\n      </li>\n      <li class="divider"></li>\n      <li><a class="reset-filter">重置</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      排序\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="sort-mode" data-key="rare">稀有度</a></li>\n      <li><a class="sort-mode" data-key="dps">单体DPS</a></li>\n      <li><a class="sort-mode" data-key="mdps">多体DPS</a></li>\n      <li><a class="sort-mode" data-key="life">生命力</a></li>\n      <li><a class="sort-mode" data-key="atk">攻击</a></li>\n      <li><a class="sort-mode" data-key="aarea">攻击距离</a></li>\n      <li><a class="sort-mode" data-key="anum">攻击数量</a></li>\n      <li><a class="sort-mode" data-key="aspd">攻击速度</a></li>\n      <li><a class="sort-mode" data-key="tenacity">韧性</a></li>\n      <li><a class="sort-mode" data-key="mspd">移动速度</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      等级\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="level-mode" data-key="zero">零觉零级</a></li>\n      <li><a class="level-mode" data-key="mxlv">零觉满级</a></li>\n      <li><a class="level-mode" data-key="mxlvgr">满觉满级</a></li>\n    </ul>\n  </div>\n  <h1 class="title">');
       
         __out.push(__sanitize(this.title));
       
@@ -5668,7 +5834,7 @@ window.$ === undefined && (window.$ = Zepto)
     return __out.join('');
   };
 }).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/pages/sliders"] = function(__obj) {
+(function() { this.JST || (this.JST = {}); this.JST["templates/pages/companions/index"] = function(__obj) {
     if (!__obj) __obj = {};
     var __out = [], __capture = function(callback) {
       var out = __out, result;
@@ -5707,11 +5873,9 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push(_.renderTemplate("templates/pages/header", {
-          title: "Sliders"
-        }));
+        __out.push(_.renderTemplate("templates/pages/companions/header"));
       
-        __out.push('\n<div class="content">\n  <div class="slider">\n    <div class="slide-group">\n      <div class="slide">\n        <img src="images/slide-1.jpg">\n        <span class="slide-text">\n          <span class="icon icon-left-nav"></span>\n          Slide me\n        </span>\n      </div>\n      <div class="slide">\n        <img src="images/slide-2.jpg">\n      </div>\n      <div class="slide">\n        <img src="images/slide-3.jpg">\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n');
       
       }).call(this);
       
@@ -5720,7 +5884,7 @@ window.$ === undefined && (window.$ = Zepto)
     return __out.join('');
   };
 }).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/pages/tableview/index"] = function(__obj) {
+(function() { this.JST || (this.JST = {}); this.JST["templates/pages/companions/item"] = function(__obj) {
     if (!__obj) __obj = {};
     var __out = [], __capture = function(callback) {
       var out = __out, result;
@@ -5759,115 +5923,83 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push(_.renderTemplate("templates/pages/header", {
-          title: "Table View"
-        }));
+        var key;
       
-        __out.push('\n<div class="content">\n  <div class="content-padded">\n    <div class="btn-group">\n      <a class="btn btn-primary btn-add">Add</a>\n      <a class="btn btn-positive btn-sort">Sort</a>\n      <a class="btn btn-warning btn-reset">Reset</a>\n      <a class="btn btn-negative btn-remove">Remove</a>\n    </div>\n  </div>\n\n  <ul class="table-view"></ul>\n</div>\n');
+        __out.push('<li class="table-view-cell media companion">\n  <a sref="#companions/');
       
-      }).call(this);
+        __out.push(__sanitize(this.model.id));
       
-    }).call(__obj);
-    __obj.safe = __objSafe, __obj.escape = __escape;
-    return __out.join('');
-  };
-}).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/pages/tableview/show"] = function(__obj) {
-    if (!__obj) __obj = {};
-    var __out = [], __capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return __safe(result);
-    }, __sanitize = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else if (typeof value !== 'undefined' && value != null) {
-        return __escape(value);
-      } else {
-        return '';
-      }
-    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
-    __safe = __obj.safe = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else {
-        if (!(typeof value !== 'undefined' && value != null)) value = '';
-        var result = new String(value);
-        result.ecoSafe = true;
-        return result;
-      }
-    };
-    if (!__escape) {
-      __escape = __obj.escape = function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      };
-    }
-    (function() {
-      (function() {
-        __out.push('<li class="table-view-cell media">\n  <a class="navigate-right">\n    <img class="media-object pull-left" src="http://placehold.it/42x42">\n    <div class="media-body">\n      ');
+        __out.push('">\n    <img class="media-object pull-left" src="');
       
-        __out.push(this.get("title"));
+        __out.push(__sanitize(this.model.thumbnailUrl()));
       
-        __out.push('\n      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore. Lorem ipsum dolor sit amet.</p>\n    </div>\n  </a>\n</li>\n');
+        __out.push('">\n    <svg class="media-graphics element pull-right" width="80" height="80">\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
       
-      }).call(this);
+        __out.push(__sanitize(App.Utils.SVG.getBackgroundPolygonPointsString(80, 40)));
       
-    }).call(__obj);
-    __obj.safe = __objSafe, __obj.escape = __escape;
-    return __out.join('');
-  };
-}).call(this);
-(function() { this.JST || (this.JST = {}); this.JST["templates/pages/typography"] = function(__obj) {
-    if (!__obj) __obj = {};
-    var __out = [], __capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return __safe(result);
-    }, __sanitize = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else if (typeof value !== 'undefined' && value != null) {
-        return __escape(value);
-      } else {
-        return '';
-      }
-    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
-    __safe = __obj.safe = function(value) {
-      if (value && value.ecoSafe) {
-        return value;
-      } else {
-        if (!(typeof value !== 'undefined' && value != null)) value = '';
-        var result = new String(value);
-        result.ecoSafe = true;
-        return result;
-      }
-    };
-    if (!__escape) {
-      __escape = __obj.escape = function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      };
-    }
-    (function() {
-      (function() {
-        __out.push(_.renderTemplate("templates/pages/header", {
-          title: "Typography"
-        }));
+        __out.push('" class="element-background"/>\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
       
-        __out.push('\n<div class="content">\n  <div class="content-padded">\n    <h1>h1. Heading</h1>\n    <h2>h2. Heading</h2>\n    <h3>h3. Heading</h3>\n    <h4>h4. Heading</h4>\n    <h5>h5. Heading</h5>\n    <h6>h6. Heading</h6>\n    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n    quis nostrud exercitation ullamco.</p>\n  </div>\n</div>\n');
+        __out.push(__sanitize(App.Utils.SVG.getBackgroundPolygonPointsString(80, 26.7)));
+      
+        __out.push('" class="element-background"/>\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
+      
+        __out.push(__sanitize(App.Utils.SVG.getBackgroundPolygonPointsString(80, 13.3)));
+      
+        __out.push('" class="element-background"/>\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
+      
+        __out.push(__sanitize(this.model.getElementPolygonPointsString(80, 20)));
+      
+        __out.push('" class="');
+      
+        if (key = this.model.getElementKey()) {
+          __out.push(__sanitize("element-" + key));
+        }
+      
+        __out.push('"/>\n    </svg>\n    <div class="media-body">\n      <h4 class="media-title">\n        ');
+      
+        __out.push(__sanitize(this.model.get("title")));
+      
+        __out.push(' ');
+      
+        __out.push(__sanitize(this.model.get("name")));
+      
+        __out.push('\n        <small>');
+      
+        __out.push(__sanitize(this.model.getRareString()));
+      
+        __out.push('</small>\n      </h4>\n      <div class="media-info-group">\n        <p class="media-info">\n          生命：<span id="life">');
+      
+        __out.push(__sanitize(this.model.get("life")));
+      
+        __out.push('</span><br>\n          攻击：<span id="atk">');
+      
+        __out.push(__sanitize(this.model.get("atk")));
+      
+        __out.push('</span><br>\n          攻距：');
+      
+        __out.push(__sanitize(this.model.get("aarea")));
+      
+        __out.push('<br>\n          攻数：');
+      
+        __out.push(__sanitize(this.model.get("anum")));
+      
+        __out.push('<br>\n        </p>\n        <p class="media-info">\n          攻速：');
+      
+        __out.push(__sanitize(this.model.get("aspd")));
+      
+        __out.push('<br>\n          韧性：');
+      
+        __out.push(__sanitize(this.model.get("tenacity")));
+      
+        __out.push('<br>\n          移速：');
+      
+        __out.push(__sanitize(this.model.get("mspd")));
+      
+        __out.push('<br>\n          成长：');
+      
+        __out.push(__sanitize(this.model.getTypeString()));
+      
+        __out.push('<br>\n        </p>\n\n      </div>\n    </div>\n  </a>\n</li>\n');
       
       }).call(this);
       
@@ -5915,7 +6047,7 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push('<sidebar class="content sidebar">\n  <ul class="table-view">\n    <li class="table-view-cell media">\n      <a class="navigate-right">\n        <span class="media-object pull-left icon icon-trash"></span>\n        <div class="media-body">\n          Item 1\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right">\n        <span class="media-object pull-left icon icon-gear"></span>\n        <div class="media-body">\n          Item 2\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right">\n        <span class="media-object pull-left icon icon-pages"></span>\n        <div class="media-body">\n          Item 3\n        </div>\n      </a>\n    </li>\n  </ul>\n</sidebar>\n');
+        __out.push('<sidebar class="content sidebar">\n  <ul class="table-view">\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#companions">\n        <span class="media-object pull-left icon icon-person"></span>\n        <div class="media-body">\n          同伴\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#familiars">\n        <span class="media-object pull-left icon icon-gear"></span>\n        <div class="media-body">\n          魔宠（敬请期待）\n        </div>\n      </a>\n    </li>\n  </ul>\n</sidebar>\n');
       
       }).call(this);
       
@@ -5928,52 +6060,123 @@ window.$ === undefined && (window.$ = Zepto)
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  App.Pages.Form = (function(_super) {
-    __extends(Form, _super);
+  App.Pages.CompanionsItem = (function(_super) {
+    __extends(CompanionsItem, _super);
 
-    function Form() {
-      return Form.__super__.constructor.apply(this, arguments);
+    function CompanionsItem() {
+      return CompanionsItem.__super__.constructor.apply(this, arguments);
     }
 
-    Form.prototype.template = _.loadTemplate("templates/modals/form");
+    CompanionsItem.prototype.template = _.loadTemplate("templates/pages/companions/item");
 
-    Form.prototype.bindings = {
-      fullname: [
-        {
-          selector: "#fullname-input",
-          event: "keyup"
-        }, "#fullname"
-      ],
-      search: ["#search-input", "#search"],
-      description: ["#description-textarea", "#description"],
-      toggle: [new App.Bindings.Toggle("#toggle-toggle"), "#toggle"]
+    CompanionsItem.prototype.bindings = {
+      life: "#life",
+      atk: "#atk"
     };
 
-    return Form;
+    return CompanionsItem;
 
   })(Backbone.View);
 
-}).call(this);
-(function() {
-  var __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  App.Pages.CompanionsIndex = (function(_super) {
+    __extends(CompanionsIndex, _super);
 
-  App.Pages.Sliders = (function(_super) {
-    __extends(Sliders, _super);
-
-    function Sliders() {
-      return Sliders.__super__.constructor.apply(this, arguments);
+    function CompanionsIndex() {
+      return CompanionsIndex.__super__.constructor.apply(this, arguments);
     }
 
-    Sliders.prototype.template = _.loadTemplate("templates/pages/sliders");
+    CompanionsIndex.prototype.template = _.loadTemplate("templates/pages/companions/index");
 
-    Sliders.prototype.layout = {
-      ".slider": function() {
-        return new App.Widgets.Slider();
+    CompanionsIndex.prototype.store = {
+      selector: ".table-view",
+      template: function(options) {
+        return new App.Pages.CompanionsItem(options);
       }
     };
 
-    return Sliders;
+    CompanionsIndex.prototype.events = {
+      "click .dropdown-toggle": "toggleDropdown",
+      "click .dropdown-submenu > a": "triggerHover",
+      "click .reset-filter": "resetFilter",
+      "click .filter": "setFilter",
+      "click .sort-mode": "setSortMode",
+      "click .level-mode": "setLevelMode"
+    };
+
+    CompanionsIndex.prototype.triggerHover = function(event) {
+      $(event.target).trigger('hover');
+      return event.stopPropagation();
+    };
+
+    CompanionsIndex.prototype.toggleDropdown = function(event) {
+      var $dropdown;
+      $dropdown = $(event.target).parent(".dropdown");
+      if ($dropdown.hasClass("active")) {
+        $dropdown.removeClass("active");
+      } else {
+        $(".dropdown.active").removeClass("active");
+        $dropdown.addClass("active");
+      }
+      $dropdown.closest(".container").one("click", function() {
+        return $dropdown.removeClass("active");
+      });
+      return event.stopPropagation();
+    };
+
+    CompanionsIndex.prototype.afterInitialize = function() {
+      return this.filters = {};
+    };
+
+    CompanionsIndex.prototype.resetFilter = function(event) {
+      var $target, key;
+      $target = $(event.target);
+      this.removeAllActive($target);
+      if (key = $target.data("key")) {
+        delete this.filters[key];
+      } else {
+        this.filters = {};
+      }
+      return this.binder.filter(this.filters);
+    };
+
+    CompanionsIndex.prototype.removeAllActive = function($target) {
+      return $target.closest('.dropdown-menu').find('.active').removeClass('active');
+    };
+
+    CompanionsIndex.prototype.setActive = function($target) {
+      this.removeAllActive($target);
+      return $target.parent('li').toggleClass("active");
+    };
+
+    CompanionsIndex.prototype.setFilter = function(event) {
+      var $target;
+      $target = $(event.target);
+      this.setActive($target);
+      this.filters[$target.data("key")] = parseInt($target.data("value"));
+      return this.binder.filter(this.filters);
+    };
+
+    CompanionsIndex.prototype.setSortMode = function(event) {
+      var $target, key;
+      $target = $(event.target);
+      this.setActive($target);
+      key = $target.data("key");
+      return this.binder.sort(function(model) {
+        return -model.get(key);
+      });
+    };
+
+    CompanionsIndex.prototype.setLevelMode = function(event) {
+      var $target, key;
+      $target = $(event.target);
+      this.setActive($target);
+      key = $target.data("key");
+      return this.binder.collection.each(function(model) {
+        return model.setLevelMode(key);
+      });
+    };
+
+    return CompanionsIndex;
 
   })(Backbone.View);
 
@@ -5982,63 +6185,20 @@ window.$ === undefined && (window.$ = Zepto)
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  App.Pages.Tableview = (function(_super) {
-    __extends(Tableview, _super);
+  App.Pages.CompanionsShow = (function(_super) {
+    __extends(CompanionsShow, _super);
 
-    function Tableview() {
-      return Tableview.__super__.constructor.apply(this, arguments);
+    function CompanionsShow() {
+      return CompanionsShow.__super__.constructor.apply(this, arguments);
     }
 
-    Tableview.prototype.template = _.loadTemplate("templates/pages/tableview/index");
+    CompanionsShow.prototype.template = _.loadTemplate("templates/modals/companions/show");
 
-    Tableview.prototype.store = {
-      selector: ".table-view",
-      template: _.loadTemplate("templates/pages/tableview/show")
-    };
+    CompanionsShow.prototype.afterRender = function() {};
 
-    Tableview.prototype.events = {
-      "click .btn-add": "add",
-      "click .btn-sort": "sort",
-      "click .btn-reset": "reset",
-      "click .btn-remove": "remove"
-    };
+    CompanionsShow.prototype.beforeRemove = function() {};
 
-    Tableview.prototype.add = function() {
-      var model;
-      model = new Backbone.Model({
-        title: "Item " + (Math.floor(Math.random() * 10))
-      });
-      return this.collection.add(model, {
-        sort: false
-      });
-    };
-
-    Tableview.prototype.sort = function() {
-      this.collection.comparator = "title";
-      return this.collection.sort();
-    };
-
-    Tableview.prototype.reset = function() {
-      return this.collection.reset([
-        new Backbone.Model({
-          title: "Item 3"
-        }), new Backbone.Model({
-          title: "Item 2"
-        }), new Backbone.Model({
-          title: "Item 1"
-        })
-      ], {
-        sort: false
-      });
-    };
-
-    Tableview.prototype.remove = function() {
-      var model;
-      model = this.collection.at(0);
-      return this.collection.remove(model);
-    };
-
-    return Tableview;
+    return CompanionsShow;
 
   })(Backbone.View);
 
@@ -6091,6 +6251,16 @@ window.$ === undefined && (window.$ = Zepto)
       }
     };
 
+    Container.prototype.openSidebar = function() {
+      this.$el.addClass("sidebar-active");
+      return this.$el.on("click", this.onClickSidebarActive);
+    };
+
+    Container.prototype.closeSidebar = function() {
+      this.$el.removeClass("sidebar-active");
+      return this.$el.off("click", this.onClickSidebarActive);
+    };
+
     return Container;
 
   })(Backbone.View);
@@ -6131,6 +6301,14 @@ window.$ === undefined && (window.$ = Zepto)
 
     Main.prototype.toggleSidebar = function() {
       return this.views["container"].toggleSidebar();
+    };
+
+    Main.prototype.openSidebar = function() {
+      return this.views["container"].openSidebar();
+    };
+
+    Main.prototype.closeSidebar = function() {
+      return this.views["container"].closeSidebar();
     };
 
     Main.prototype.openModal = function(view) {
@@ -6435,11 +6613,10 @@ window.$ === undefined && (window.$ = Zepto)
     Router.prototype.routes = {
       "toggle-sidebar": "toggleSidebar",
       "close-modal": "closeModal",
-      "pages/sliders": "openSlidersPage",
-      "pages/tableview": "openTableviewPage",
-      "pages/*path": "openPage",
-      "modals/form": "openFormModal",
-      "modals/*path": "openModal",
+      "companions": "openCompanionsIndexPage",
+      "companions/:id": "openCompanionsShowPage",
+      "familiars": "openFamiliarsIndexPage",
+      "familiars/:id": "openFamiliarsShowPage",
       "*otherwise": "index"
     };
 
@@ -6452,68 +6629,48 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     Router.prototype.index = function() {
-      return this.navigate("#pages/typography", true);
+      return this.navigate("#companions", true);
     };
 
-    Router.prototype.openSlidersPage = function() {
+    Router.prototype.openCompanionsIndexPage = function() {
       var view;
-      view = new App.Pages.Sliders();
-      return App.main.openPage(view.render());
-    };
-
-    Router.prototype.openTableviewPage = function() {
-      var collection, view;
-      collection = new Backbone.Collection([
-        new Backbone.Model({
-          title: "Item 3"
-        }), new Backbone.Model({
-          title: "Item 2"
-        }), new Backbone.Model({
-          title: "Item 1"
-        })
-      ]);
-      view = new App.Pages.Tableview({
-        collection: collection
+      App.main.closeSidebar();
+      if (App.companions == null) {
+        App.companions = new App.Collections.Companions();
+        App.companions.fetch();
+      }
+      view = new App.Pages.CompanionsIndex({
+        collection: App.companions
       });
       return App.main.openPage(view.render());
     };
 
-    Router.prototype.openFormModal = function() {
+    Router.prototype.openCompanionsShowPage = function(id) {
       var model, view;
-      model = new Backbone.Model();
-      view = new App.Pages.Form({
+      if (App.companions == null) {
+        return;
+      }
+      model = App.companions.get(id);
+      view = new App.Pages.CompanionsShow({
         model: model
       });
       return App.main.openModal(view.render());
     };
 
-    Router.prototype.openPage = function(path) {
-      var view;
-      if (path == null) {
-        path = 'topography';
-      }
-      view = new Backbone.View({
-        template: _.loadTemplate("templates/pages/" + path)
-      });
-      return App.main.openPage(view.render());
+    Router.prototype.openFamiliarsIndexPage = function() {
+      return App.main.closeSidebar();
     };
 
-    Router.prototype.openModal = function(path) {
-      var view;
-      if (path == null) {
-        path = 'modal';
-      }
-      view = new Backbone.View({
-        template: _.loadTemplate("templates/modals/" + path)
-      });
-      return App.main.openModal(view.render());
-    };
+    Router.prototype.openFamiliarsShowPage = function() {};
 
     return Router;
 
   })(Backbone.Router);
 
 }).call(this);
+
+
+
 
 
 

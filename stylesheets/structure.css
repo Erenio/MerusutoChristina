@@ -92,3 +92,254 @@ a[sref] {
 /* line 27, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_buttons.scss */
 .btn-outlined {
   background-color: transparent; }
+
+/* line 6, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown {
+  position: relative; }
+
+/* line 11, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-toggle:focus {
+  outline: 0; }
+
+/* line 15, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-toggle:after {
+  display: inline-block;
+  content: " ";
+  position: relative;
+  top: -2px;
+  left: -2px;
+  width: 0px;
+  height: 0px;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 5px 0 5px;
+  border-top-color: #ccc; }
+
+/* line 31, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  list-style: none;
+  font-size: 16px;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  background-clip: padding-box; }
+  /* line 54, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+  .dropdown-menu.pull-right {
+    right: 0;
+    left: auto; }
+  /* line 60, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+  .dropdown-menu .divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5; }
+  /* line 68, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+  .dropdown-menu > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 30px;
+    color: #333;
+    white-space: nowrap; }
+
+/* line 81, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+  text-decoration: none;
+  color: #262626;
+  background-color: #f5f5f5; }
+
+/* line 91, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+  color: #fff;
+  text-decoration: none;
+  outline: 0;
+  background-color: #007aff; }
+
+/* line 106, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-menu > .disabled > a, .dropdown-menu > .disabled > a:hover, .dropdown-menu > .disabled > a:focus {
+  color: #777; }
+/* line 113, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-menu > .disabled > a:hover, .dropdown-menu > .disabled > a:focus {
+  text-decoration: none;
+  background-color: transparent;
+  background-image: none;
+  cursor: not-allowed; }
+
+/* line 125, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown.active > .dropdown-menu {
+  display: block; }
+/* line 130, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown.active > a {
+  outline: 0; }
+
+/* line 136, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-header {
+  display: block;
+  padding: 3px 20px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #777;
+  white-space: nowrap; }
+
+/* line 146, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 9; }
+
+/* line 156, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.pull-right > .dropdown-menu {
+  right: 0;
+  left: auto; }
+
+/* line 168, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropup .caret {
+  border-top: 0;
+  border-bottom: 4px solid;
+  content: ""; }
+/* line 174, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropup .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 1px; }
+
+/* line 182, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-submenu {
+  position: relative; }
+  /* line 185, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+  .dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px; }
+
+/* line 193, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block; }
+
+/* line 197, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-submenu > a:after {
+  display: block;
+  content: " ";
+  float: right;
+  position: relative;
+  top: 5px;
+  right: -10px;
+  width: 0px;
+  height: 0px;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #ccc; }
+
+/* line 214, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+.dropdown-submenu.pull-left {
+  float: none; }
+  /* line 217, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_dropdown.scss */
+  .dropdown-submenu.pull-left > .dropdown-menu {
+    left: -100%;
+    margin-left: 10px; }
+
+/* line 21, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.media .media-object {
+  max-height: 80px; }
+/* line 25, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.media .media-body .media-title {
+  margin-top: 2px;
+  margin-bottom: 5px;
+  font-size: 14px; }
+/* line 30, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.media .media-body p, .media .media-body .media-title {
+  color: #555; }
+/* line 33, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.media .media-body .media-info-group {
+  position: relative;
+  display: table;
+  border-spacing: 20px 0;
+  margin: 0 -20px; }
+  /* line 39, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .media .media-body .media-info-group .media-info {
+    display: table-cell;
+    width: 1%; }
+/* line 44, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.media .media-body .media-info {
+  min-width: 80px;
+  line-height: 15px; }
+
+/* line 51, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.element {
+  margin-top: 5px; }
+  /* line 54, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .element .element-background {
+    fill: #000000;
+    opacity: 0.05; }
+  /* line 58, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .element .element-fire, .element .element-aqua, .element .element-wind,
+  .element .element-light, .element .element-dark {
+    opacity: 0.5; }
+  /* line 62, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .element .element-fire {
+    fill: #e74c3c; }
+  /* line 65, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .element .element-aqua {
+    fill: #3498db; }
+  /* line 68, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .element .element-wind {
+    fill: #2ecc71; }
+  /* line 71, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .element .element-light {
+    fill: #f1c40f; }
+  /* line 74, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .element .element-dark {
+    fill: #9b59b6; }
+
+/* line 80, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.table-view-cell.companion .media-object {
+  height: 80px;
+  width: 56px; }
+/* line 84, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.table-view-cell.companion > a:not(.btn) {
+  margin: -16px -120px -16px -20px; }
+
+/* line 90, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.bar .dropdown.pull-right {
+  margin-left: 10px; }
+
+/* line 95, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.modal {
+  -webkit-transition-property: opacity;
+  -moz-transition-property: opacity;
+  transition-property: opacity;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0; }
+  /* line 100, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .modal.active {
+    -webkit-transition-property: opacity;
+    -moz-transition-property: opacity;
+    transition-property: opacity; }
+  /* line 104, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .modal .icon-close {
+    color: #fff;
+    padding: 10px; }
+  /* line 108, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .modal .image {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    width: 100%; }
