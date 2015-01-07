@@ -22,3 +22,11 @@ class App.Views.Container extends Backbone.View
       @$el.on "click", @onClickSidebarActive
     else
       @$el.off "click", @onClickSidebarActive
+
+  openSidebar: ->
+    @$el.addClass("sidebar-active")
+    @$el.on "click", @onClickSidebarActive
+
+  closeSidebar: ->
+    @$el.removeClass("sidebar-active")
+    @$el.off "click", @onClickSidebarActive

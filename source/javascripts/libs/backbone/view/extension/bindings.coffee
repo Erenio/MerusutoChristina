@@ -83,9 +83,13 @@ class Model2ViewBinder extends Binder
 class Backbone.View.Extension.Bindings
 
   initialize: (view, options) ->
-    model = _.required(options, "model")
-    view.binders = []
+    if view.model
+      model = view.model
+      model = model(options) if _.isFunction(model)
+    else
+      model = _.required(options, "model")
 
+    view.binders = []
     for attribute, bindings of view.bindings
       bindings = if _.isArray(bindings) then bindings else [ bindings ]
       for binding in bindings

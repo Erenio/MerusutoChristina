@@ -1,4 +1,1 @@
-<header class="bar bar-nav">
-  <a class="icon icon-close pull-right" sref="#close-modal"></a>
-  <h1 class="title"><%= @title %></h1>
-</header>
+<a class="icon icon-close pull-right" sref="#close-modal"></a>

@@ -17,6 +17,12 @@ class App.Views.Main extends Backbone.View
   toggleSidebar: ->
     @views["container"].toggleSidebar()
 
+  openSidebar: ->
+    @views["container"].openSidebar()
+
+  closeSidebar: ->
+    @views["container"].closeSidebar()
+
   openModal: (view) ->
     @views["modal"].render(view).show()
 

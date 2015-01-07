@@ -4,11 +4,10 @@ class App.Router extends Backbone.Router
     "toggle-sidebar": "toggleSidebar"
     "close-modal": "closeModal"
 
-    "pages/sliders": "openSlidersPage"
-    "pages/tableview": "openTableviewPage"
-    "pages/*path": "openPage"
-    "modals/form": "openFormModal"
-    "modals/*path": "openModal"
+    "companions": "openCompanionsIndexPage"
+    "companions/:id": "openCompanionsShowPage"
+    "familiars": "openFamiliarsIndexPage"
+    "familiars/:id": "openFamiliarsShowPage"
 
     "*otherwise": "index"
 
@@ -19,32 +18,23 @@ class App.Router extends Backbone.Router
     App.main.closeModal()
 
   index: ->
-    @navigate("#pages/typography", true)
+    @navigate("#companions", true)
 
-  openSlidersPage: ->
-    view = new App.Pages.Sliders()
+  openCompanionsIndexPage: ->
+    App.main.closeSidebar()
+    unless App.companions?
+      App.companions = new App.Collections.Companions()
+      App.companions.fetch()
+    view = new App.Pages.CompanionsIndex(collection: App.companions)
     App.main.openPage(view.render())
 
-  openTableviewPage: ->
-    collection = new Backbone.Collection([
-      new Backbone.Model(title: "Item 3")
-      new Backbone.Model(title: "Item 2")
-      new Backbone.Model(title: "Item 1")
-    ])
-    view = new App.Pages.Tableview(collection: collection)
-    App.main.openPage(view.render())
-
-  openFormModal: ->
-    model = new Backbone.Model()
-    view = new App.Pages.Form(model: model)
+  openCompanionsShowPage: (id) ->
+    return unless App.companions?
+    model = App.companions.get(id)
+    view = new App.Pages.CompanionsShow(model: model)
     App.main.openModal(view.render())
 
-  openPage: (path = 'topography') ->
-    view = new Backbone.View
-      template: _.loadTemplate("templates/pages/#{path}")
-    App.main.openPage(view.render())
+  openFamiliarsIndexPage: ->
+    App.main.closeSidebar()
 
-  openModal: (path = 'modal') ->
-    view = new Backbone.View
-      template: _.loadTemplate("templates/modals/#{path}")
-    App.main.openModal(view.render())
+  openFamiliarsShowPage: ->

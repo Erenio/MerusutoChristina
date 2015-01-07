@@ -8,3 +8,5 @@ asset "underscore"
 asset "zepto"
 
 asset "ratchet"
+
+asset "hammerjs"

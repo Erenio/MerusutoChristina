@@ -31,13 +31,12 @@ class Backbone.View.Extension.Layout
         $template = template.render().$el
       else
         $template = $(template)
-        template = new Backbone.View(el: $template)
 
       $selector = view.$(selector)
       unless $template.html() == "" && $selector.html() != ""
         $selector.html($template)
 
-      template.setElement($selector)
+      template.setElement($selector) if template.setElement?
       view.views[key] = template
 
   remove: (view) ->

@@ -2,8 +2,6 @@
   <%- _.renderTemplate("templates/sidebar") %>
 
   <container class="content container"></container>
-
-  <%- _.renderTemplate("templates/footer") %>
 </view>
 
 <modal class="modal"></modal>

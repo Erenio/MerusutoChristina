@@ -1,0 +1,4 @@
+<%- _.renderTemplate("templates/modals/header") %>
+<div class="wrap">
+  <img class="image" src="<%= @model.originalUrl() %>">
+</div>
