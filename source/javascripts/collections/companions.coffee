@@ -1,5 +1,5 @@
 class App.Collections.Companions extends Backbone.Collection
-  url: "/data/companions.json"
+  url: "data/companions.json"
   model: App.Models.Companion
 
   initialize: ->

@@ -43,7 +43,7 @@ class App.Models.Companion extends Backbone.Model
     @set("mdps", mdps)
 
   imageUrl: (type) ->
-    "/data/companions/#{type}/#{@id}.png"
+    "data/companions/#{type}/#{@id}.png"
 
   thumbnailUrl: ->
     @imageUrl("thumbnail")
