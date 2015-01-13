@@ -1,19 +1,19 @@
 # Store (collection) extension for Backbone.View
 # Auto update html when collection add/sort/reset/remove
-# 
+#
 # class Demo extends Backbone.View
 #   store:
 #     selector: "selector (required)"
 #     template: "view or template (required, string or function)"
-#     onAdd: (model, collection, options) -> 
+#     onAdd: (model, collection, options) ->
 #       "callback on add model to collection (optional)"
-#     onSort: (collection, options) -> 
+#     onSort: (collection, options) ->
 #       "callback on sort collection (optional)"
-#     onReset: (collection, options) -> 
+#     onReset: (collection, options) ->
 #       "callback on reset collection (optional)"
-#     onRemove: (model, options) -> 
+#     onRemove: (model, options) ->
 #       "callback on remove model from collection (optional)"
-# 
+#
 
 class Collection2ViewBinder
   defaults:

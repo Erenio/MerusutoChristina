@@ -1,5 +1,5 @@
 # Layout extension for Backbone.View
-# 
+#
 # class Demo extends Backbone.View
 #   layout:
 #     ":selector": ":view/template"
@@ -7,7 +7,7 @@
 #     ":key":
 #       selector: "selector (required)"
 #       template: "view or template (required, string or function)"
-# 
+#
 
 class Backbone.View.Extension.Layout
 

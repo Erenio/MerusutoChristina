@@ -80,4 +80,7 @@ activate :bower
 activate :deploy do |deploy|
   deploy.method = :git
   deploy.build_before = true
+
+  deploy.remote = "git@github.com:bbtfr/MerusutoChristina.git"
+  deploy.branch = "gh-pages"
 end

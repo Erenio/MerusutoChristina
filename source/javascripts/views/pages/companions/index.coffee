@@ -2,15 +2,15 @@ class App.Pages.CompanionsItem extends Backbone.View
   template: _.loadTemplate("templates/pages/companions/item")
 
   bindings:
-    life: "#life"
-    atk: "#atk"
-  
+    "#life": "life"
+    "#atk": "atk"
+
 class App.Pages.CompanionsIndex extends Backbone.View
   template: _.loadTemplate("templates/pages/companions/index")
 
   store:
     selector: ".table-view"
-    template: (options) -> 
+    template: (options) ->
       new App.Pages.CompanionsItem(options)
 
   events:

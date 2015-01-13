@@ -25,6 +25,17 @@
           移速：<%= @model.get("mspd") %><br>
           成长：<%= @model.getTypeString() %><br>
         </p>
+        <p class="media-info hidden-xs">
+          火：<%= Math.round(@model.get("fire")*100) %>%<br>
+          水：<%= Math.round(@model.get("aqua")*100) %>%<br>
+          风：<%= Math.round(@model.get("wind")*100) %>%<br>
+          光：<%= Math.round(@model.get("light")*100) %>%<br>
+        </p>
+        <p class="media-info hidden-sm">
+          暗：<%= Math.round(@model.get("dark")*100) %>%<br><br>
+          DPS：<%= Math.round(@model.get("dps")) %><br>
+          总DPS：<%= Math.round(@model.get("mdps")) %><br>
+        </p>
 
       </div>
     </div>

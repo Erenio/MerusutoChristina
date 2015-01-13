@@ -1,5 +1,5 @@
 # Params extension for Backbone.View
-# 
+#
 # class Demo extends Backbone.View
 #   params:
 #     required: [

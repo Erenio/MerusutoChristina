@@ -1,6 +1,6 @@
 # Debug extension for Backbone.View
 # Show debug infomations
-# 
+#
 
 key = (view) ->
   "#{view.cid}(#{view.constructor.name})"
@@ -19,4 +19,3 @@ class Backbone.View.Extension.Debug
 
   beforeRemove: (view) ->
     _.debug("Remove Backbone.View: #{key(view)}")
-

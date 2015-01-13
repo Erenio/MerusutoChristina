@@ -31,5 +31,5 @@ _.each ['Initialize', 'Render', 'Remove'], (key) ->
     @_runExtensionCallbacks(afterMethod, callbackArguments)
     @[afterMethod].apply(@, arguments) if @[afterMethod]?
     BaseView::[method].apply(@, arguments)
-    
+
 Backbone.View = View

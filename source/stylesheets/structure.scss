@@ -50,15 +50,15 @@ a[sref] {
 
 .element {
   margin-top: 5px;
-  
+
   .element-background {
     fill: #000000;
     opacity: 0.05;
   }
-  .element-fire, .element-aqua, .element-wind, 
+  .element-fire, .element-aqua, .element-wind,
   .element-light, .element-dark {
     opacity: 0.5;
-  } 
+  }
   .element-fire {
     fill: #e74c3c;
   }
@@ -111,5 +111,17 @@ a[sref] {
     bottom: 0;
     margin: auto;
     width: 100%;
+  }
+}
+
+@media (max-width: 440px) {
+  .hidden-xs {
+    display:none!important;
+  }
+}
+
+@media (max-width: 550px) {
+  .hidden-sm {
+    display:none!important;
   }
 }
