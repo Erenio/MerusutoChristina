@@ -343,3 +343,12 @@ a[sref] {
     bottom: 0;
     margin: auto;
     width: 100%; }
+
+@media (max-width: 440px) {
+  /* line 118, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .hidden-xs {
+    display: none !important; } }
+@media (max-width: 550px) {
+  /* line 124, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .hidden-sm {
+    display: none !important; } }

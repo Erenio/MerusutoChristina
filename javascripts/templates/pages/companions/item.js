@@ -113,6 +113,34 @@
       
         __out.push(__sanitize(this.model.getTypeString()));
       
+        __out.push('<br>\n        </p>\n        <p class="media-info hidden-xs">\n          火：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
+      
+        __out.push('%<br>\n          水：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("aqua") * 100)));
+      
+        __out.push('%<br>\n          风：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("wind") * 100)));
+      
+        __out.push('%<br>\n          光：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("light") * 100)));
+      
+        __out.push('%<br>\n        </p>\n        <p class="media-info hidden-sm">\n          暗：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
+      
+        __out.push('%<br><br>\n          DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dps"))));
+      
+        __out.push('<br>\n          总DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("mdps"))));
+      
         __out.push('<br>\n        </p>\n\n      </div>\n    </div>\n  </a>\n</li>\n');
       
       }).call(this);

@@ -4,10 +4,11 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Binder = (function() {
-    function Binder(model, attr, $el, options) {
-      this.model = arguments[0], this.attr = arguments[1], this.$el = arguments[2];
+    function Binder(model, $el, options) {
+      this.model = arguments[0], this.$el = arguments[1];
       this.options = _.defaults(options, this.defaults);
       this.selector = _.required(options, 'selector');
+      this.attribute = _.required(options, 'attribute');
     }
 
     return Binder;
@@ -35,7 +36,7 @@
     function View2ModelBinder() {
       View2ModelBinder.__super__.constructor.apply(this, arguments);
       if (this.options.reverse) {
-        this.reverse = new Model2ViewBinder(this.model, this.attribute, this.$el, this.options);
+        this.reverse = new Model2ViewBinder(this.model, this.$el, this.options);
       }
     }
 
@@ -50,7 +51,7 @@
             _this.reverse._pending = true;
           }
           $selector = _this.$el.find(_this.selector);
-          return _this.options.onSet.call(_this, $selector, _this.model, _this.attr, event);
+          return _this.options.onSet.call(_this, $selector, _this.model, _this.attribute, event);
         };
       })(this);
       this.$el.on(this.options.event, this.selector, this.handler);
@@ -100,14 +101,14 @@
             return _this._pending = false;
           }
           $selector = _this.$el.find(_this.selector);
-          return _this.options.onGet.call(_this, $selector, model, _this.attr, value);
+          return _this.options.onGet.call(_this, $selector, model, _this.attribute, value);
         };
       })(this);
-      return this.model.on("change:" + this.attr, this.handler);
+      return this.model.on("change:" + this.attribute, this.handler);
     };
 
     Model2ViewBinder.prototype.off = function() {
-      return this.model.off("change:" + this.attr, this.handler);
+      return this.model.off("change:" + this.attribute, this.handler);
     };
 
     return Model2ViewBinder;
@@ -118,7 +119,7 @@
     function Bindings() {}
 
     Bindings.prototype.initialize = function(view, options) {
-      var $selector, attribute, binder, binding, bindings, model, tag, _ref, _results;
+      var $selector, binder, binding, key, model, tag, _ref, _results;
       if (view.model) {
         model = view.model;
         if (_.isFunction(model)) {
@@ -127,34 +128,28 @@
       } else {
         model = _.required(options, "model");
       }
-      view.binders = [];
+      view.binders = {};
       _ref = view.bindings;
       _results = [];
-      for (attribute in _ref) {
-        bindings = _ref[attribute];
-        bindings = _.isArray(bindings) ? bindings : [bindings];
-        _results.push((function() {
-          var _i, _len, _results1;
-          _results1 = [];
-          for (_i = 0, _len = bindings.length; _i < _len; _i++) {
-            binding = bindings[_i];
-            if (_.isString(binding)) {
-              binding = {
-                selector: binding
-              };
-            }
-            $selector = view.$(_.required(binding, 'selector'));
-            tag = $selector.attr("tagName").toLowerCase();
-            if (/input|textarea/.test(tag) || binding.event) {
-              binder = new View2ModelBinder(model, attribute, view.$el, binding);
-            } else {
-              binder = new Model2ViewBinder(model, attribute, view.$el, binding);
-            }
-            binder.on();
-            _results1.push(view.binders.push(binder));
-          }
-          return _results1;
-        })());
+      for (key in _ref) {
+        binding = _ref[key];
+        if (_.isString(binding)) {
+          binding = {
+            attribute: binding
+          };
+        }
+        if (binding.selector == null) {
+          binding.selector = key;
+        }
+        $selector = view.$(binding.selector);
+        tag = $selector.attr("tagName").toLowerCase();
+        if (/input|textarea/.test(tag) || (binding.event != null)) {
+          binder = new View2ModelBinder(model, view.$el, binding);
+        } else {
+          binder = new Model2ViewBinder(model, view.$el, binding);
+        }
+        binder.on();
+        _results.push(view.binders[key] = binder);
       }
       return _results;
     };

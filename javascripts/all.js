@@ -4610,130 +4610,6 @@ window.$ === undefined && (window.$ = Zepto)
   return Backbone;
 
 }));
-//     Zepto.js
-//     (c) 2010-2014 Thomas Fuchs
-//     Zepto.js may be freely distributed under the MIT license.
-
-;(function($, undefined){
-  var prefix = '', eventPrefix,
-    vendors = { Webkit: 'webkit', Moz: '', O: 'o' },
-    testEl = document.createElement('div'),
-    supportedTransforms = /^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
-    transform,
-    transitionProperty, transitionDuration, transitionTiming, transitionDelay,
-    animationName, animationDuration, animationTiming, animationDelay,
-    cssReset = {}
-
-  function dasherize(str) { return str.replace(/([a-z])([A-Z])/, '$1-$2').toLowerCase() }
-  function normalizeEvent(name) { return eventPrefix ? eventPrefix + name : name.toLowerCase() }
-
-  $.each(vendors, function(vendor, event){
-    if (testEl.style[vendor + 'TransitionProperty'] !== undefined) {
-      prefix = '-' + vendor.toLowerCase() + '-'
-      eventPrefix = event
-      return false
-    }
-  })
-
-  transform = prefix + 'transform'
-  cssReset[transitionProperty = prefix + 'transition-property'] =
-  cssReset[transitionDuration = prefix + 'transition-duration'] =
-  cssReset[transitionDelay    = prefix + 'transition-delay'] =
-  cssReset[transitionTiming   = prefix + 'transition-timing-function'] =
-  cssReset[animationName      = prefix + 'animation-name'] =
-  cssReset[animationDuration  = prefix + 'animation-duration'] =
-  cssReset[animationDelay     = prefix + 'animation-delay'] =
-  cssReset[animationTiming    = prefix + 'animation-timing-function'] = ''
-
-  $.fx = {
-    off: (eventPrefix === undefined && testEl.style.transitionProperty === undefined),
-    speeds: { _default: 400, fast: 200, slow: 600 },
-    cssPrefix: prefix,
-    transitionEnd: normalizeEvent('TransitionEnd'),
-    animationEnd: normalizeEvent('AnimationEnd')
-  }
-
-  $.fn.animate = function(properties, duration, ease, callback, delay){
-    if ($.isFunction(duration))
-      callback = duration, ease = undefined, duration = undefined
-    if ($.isFunction(ease))
-      callback = ease, ease = undefined
-    if ($.isPlainObject(duration))
-      ease = duration.easing, callback = duration.complete, delay = duration.delay, duration = duration.duration
-    if (duration) duration = (typeof duration == 'number' ? duration :
-                    ($.fx.speeds[duration] || $.fx.speeds._default)) / 1000
-    if (delay) delay = parseFloat(delay) / 1000
-    return this.anim(properties, duration, ease, callback, delay)
-  }
-
-  $.fn.anim = function(properties, duration, ease, callback, delay){
-    var key, cssValues = {}, cssProperties, transforms = '',
-        that = this, wrappedCallback, endEvent = $.fx.transitionEnd,
-        fired = false
-
-    if (duration === undefined) duration = $.fx.speeds._default / 1000
-    if (delay === undefined) delay = 0
-    if ($.fx.off) duration = 0
-
-    if (typeof properties == 'string') {
-      // keyframe animation
-      cssValues[animationName] = properties
-      cssValues[animationDuration] = duration + 's'
-      cssValues[animationDelay] = delay + 's'
-      cssValues[animationTiming] = (ease || 'linear')
-      endEvent = $.fx.animationEnd
-    } else {
-      cssProperties = []
-      // CSS transitions
-      for (key in properties)
-        if (supportedTransforms.test(key)) transforms += key + '(' + properties[key] + ') '
-        else cssValues[key] = properties[key], cssProperties.push(dasherize(key))
-
-      if (transforms) cssValues[transform] = transforms, cssProperties.push(transform)
-      if (duration > 0 && typeof properties === 'object') {
-        cssValues[transitionProperty] = cssProperties.join(', ')
-        cssValues[transitionDuration] = duration + 's'
-        cssValues[transitionDelay] = delay + 's'
-        cssValues[transitionTiming] = (ease || 'linear')
-      }
-    }
-
-    wrappedCallback = function(event){
-      if (typeof event !== 'undefined') {
-        if (event.target !== event.currentTarget) return // makes sure the event didn't bubble from "below"
-        $(event.target).unbind(endEvent, wrappedCallback)
-      } else
-        $(this).unbind(endEvent, wrappedCallback) // triggered by setTimeout
-
-      fired = true
-      $(this).css(cssReset)
-      callback && callback.call(this)
-    }
-    if (duration > 0){
-      this.bind(endEvent, wrappedCallback)
-      // transitionEnd is not always firing on older Android phones
-      // so make sure it gets fired
-      setTimeout(function(){
-        if (fired) return
-        wrappedCallback.call(that)
-      }, ((duration + delay) * 1000) + 25)
-    }
-
-    // trigger page reflow so new elements can animate
-    this.size() && this.get(0).clientLeft
-
-    this.css(cssValues)
-
-    if (duration <= 0) setTimeout(function() {
-      that.each(function(){ wrappedCallback.call(this) })
-    }, 0)
-
-    return this
-  }
-
-  testEl = null
-})(Zepto)
-;
 (function() {
   _.mixin({
     required: function(obj, key) {
@@ -4868,10 +4744,11 @@ window.$ === undefined && (window.$ = Zepto)
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Binder = (function() {
-    function Binder(model, attr, $el, options) {
-      this.model = arguments[0], this.attr = arguments[1], this.$el = arguments[2];
+    function Binder(model, $el, options) {
+      this.model = arguments[0], this.$el = arguments[1];
       this.options = _.defaults(options, this.defaults);
       this.selector = _.required(options, 'selector');
+      this.attribute = _.required(options, 'attribute');
     }
 
     return Binder;
@@ -4899,7 +4776,7 @@ window.$ === undefined && (window.$ = Zepto)
     function View2ModelBinder() {
       View2ModelBinder.__super__.constructor.apply(this, arguments);
       if (this.options.reverse) {
-        this.reverse = new Model2ViewBinder(this.model, this.attribute, this.$el, this.options);
+        this.reverse = new Model2ViewBinder(this.model, this.$el, this.options);
       }
     }
 
@@ -4914,7 +4791,7 @@ window.$ === undefined && (window.$ = Zepto)
             _this.reverse._pending = true;
           }
           $selector = _this.$el.find(_this.selector);
-          return _this.options.onSet.call(_this, $selector, _this.model, _this.attr, event);
+          return _this.options.onSet.call(_this, $selector, _this.model, _this.attribute, event);
         };
       })(this);
       this.$el.on(this.options.event, this.selector, this.handler);
@@ -4964,14 +4841,14 @@ window.$ === undefined && (window.$ = Zepto)
             return _this._pending = false;
           }
           $selector = _this.$el.find(_this.selector);
-          return _this.options.onGet.call(_this, $selector, model, _this.attr, value);
+          return _this.options.onGet.call(_this, $selector, model, _this.attribute, value);
         };
       })(this);
-      return this.model.on("change:" + this.attr, this.handler);
+      return this.model.on("change:" + this.attribute, this.handler);
     };
 
     Model2ViewBinder.prototype.off = function() {
-      return this.model.off("change:" + this.attr, this.handler);
+      return this.model.off("change:" + this.attribute, this.handler);
     };
 
     return Model2ViewBinder;
@@ -4982,7 +4859,7 @@ window.$ === undefined && (window.$ = Zepto)
     function Bindings() {}
 
     Bindings.prototype.initialize = function(view, options) {
-      var $selector, attribute, binder, binding, bindings, model, tag, _ref, _results;
+      var $selector, binder, binding, key, model, tag, _ref, _results;
       if (view.model) {
         model = view.model;
         if (_.isFunction(model)) {
@@ -4991,34 +4868,28 @@ window.$ === undefined && (window.$ = Zepto)
       } else {
         model = _.required(options, "model");
       }
-      view.binders = [];
+      view.binders = {};
       _ref = view.bindings;
       _results = [];
-      for (attribute in _ref) {
-        bindings = _ref[attribute];
-        bindings = _.isArray(bindings) ? bindings : [bindings];
-        _results.push((function() {
-          var _i, _len, _results1;
-          _results1 = [];
-          for (_i = 0, _len = bindings.length; _i < _len; _i++) {
-            binding = bindings[_i];
-            if (_.isString(binding)) {
-              binding = {
-                selector: binding
-              };
-            }
-            $selector = view.$(_.required(binding, 'selector'));
-            tag = $selector.attr("tagName").toLowerCase();
-            if (/input|textarea/.test(tag) || binding.event) {
-              binder = new View2ModelBinder(model, attribute, view.$el, binding);
-            } else {
-              binder = new Model2ViewBinder(model, attribute, view.$el, binding);
-            }
-            binder.on();
-            _results1.push(view.binders.push(binder));
-          }
-          return _results1;
-        })());
+      for (key in _ref) {
+        binding = _ref[key];
+        if (_.isString(binding)) {
+          binding = {
+            attribute: binding
+          };
+        }
+        if (binding.selector == null) {
+          binding.selector = key;
+        }
+        $selector = view.$(binding.selector);
+        tag = $selector.attr("tagName").toLowerCase();
+        if (/input|textarea/.test(tag) || (binding.event != null)) {
+          binder = new View2ModelBinder(model, view.$el, binding);
+        } else {
+          binder = new Model2ViewBinder(model, view.$el, binding);
+        }
+        binder.on();
+        _results.push(view.binders[key] = binder);
       }
       return _results;
     };
@@ -5999,6 +5870,34 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(this.model.getTypeString()));
       
+        __out.push('<br>\n        </p>\n        <p class="media-info hidden-xs">\n          火：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
+      
+        __out.push('%<br>\n          水：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("aqua") * 100)));
+      
+        __out.push('%<br>\n          风：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("wind") * 100)));
+      
+        __out.push('%<br>\n          光：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("light") * 100)));
+      
+        __out.push('%<br>\n        </p>\n        <p class="media-info hidden-sm">\n          暗：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
+      
+        __out.push('%<br><br>\n          DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dps"))));
+      
+        __out.push('<br>\n          总DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("mdps"))));
+      
         __out.push('<br>\n        </p>\n\n      </div>\n    </div>\n  </a>\n</li>\n');
       
       }).call(this);
@@ -6070,8 +5969,8 @@ window.$ === undefined && (window.$ = Zepto)
     CompanionsItem.prototype.template = _.loadTemplate("templates/pages/companions/item");
 
     CompanionsItem.prototype.bindings = {
-      life: "#life",
-      atk: "#atk"
+      "#life": "life",
+      "#atk": "atk"
     };
 
     return CompanionsItem;
@@ -6668,8 +6567,6 @@ window.$ === undefined && (window.$ = Zepto)
   })(Backbone.Router);
 
 }).call(this);
-
-
 
 
 

@@ -12,8 +12,8 @@
     CompanionsItem.prototype.template = _.loadTemplate("templates/pages/companions/item");
 
     CompanionsItem.prototype.bindings = {
-      life: "#life",
-      atk: "#atk"
+      "#life": "life",
+      "#atk": "atk"
     };
 
     return CompanionsItem;
