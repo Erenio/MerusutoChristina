@@ -99,6 +99,7 @@
               cid: cid
             });
           }
+          this.$container.scrollTop(0);
           this.infinite.length = 0;
           this.infinite.models = this.filters != null ? collection.where(this.filters) : collection.models;
           return this.show(this.infinite.slice);
