@@ -1,9 +1,12 @@
+#= require ./container
+#= require ./modal
+
 class App.Views.Main extends Backbone.View
   template: _.loadTemplate("templates/main")
 
   layout:
-    "container": -> new App.Views.Container()
-    "modal": -> new App.Views.Modal()
+    "container": App.Views.Container
+    "modal": App.Views.Modal
 
   events:
     "click a[sref]": "gotoState"
@@ -13,7 +16,7 @@ class App.Views.Main extends Backbone.View
     url = $(event.currentTarget).attr("sref")
     Backbone.history.loadUrl(url)
     event.preventDefault()
-  
+
   toggleSidebar: ->
     @views["container"].toggleSidebar()
 
@@ -31,4 +34,3 @@ class App.Views.Main extends Backbone.View
 
   openPage: (view) ->
     @views["container"].render(view)
-

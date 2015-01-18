@@ -26,17 +26,22 @@ class Backbone.View.Extension.Layout
         selector = _.required(options, "selector")
         template = _.required(options, "template")
 
-      template = template(view.options) if _.isFunction(template)
-      if template instanceof Backbone.View
-        $template = template.render().$el
-      else
-        $template = $(template)
-
       $selector = view.$(selector)
-      unless $template.html() == "" && $selector.html() != ""
-        $selector.html($template)
 
-      template.setElement($selector) if template.setElement?
+      if _.isFunction(template)
+        templateOptions =
+          el: $selector
+          parent: view
+        _.defaults(templateOptions, options.options)
+
+        if template.name != ""
+          template = new template(templateOptions).render()
+        else
+          template = template(templateOptions)
+          template = new Backbone.Template(el: template)
+      else
+        template = new Backbone.Template(el: template)
+
       view.views[key] = template
 
   remove: (view) ->

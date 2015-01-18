@@ -1,5 +1,5 @@
 class App.Views.Container extends Backbone.View
-  template: ""
+  template: undefined
 
   afterRender: (view, reverse = false) ->
     if view?
@@ -8,7 +8,7 @@ class App.Views.Container extends Backbone.View
       @currPage = new App.Views.Page().render(view)
       @currPage.$el.appendTo(@$el)
       if @lastPage?
-        @lastPage.hide() 
+        @lastPage.hide()
         @currPage.show()
 
   onClickSidebarActive: (event) =>

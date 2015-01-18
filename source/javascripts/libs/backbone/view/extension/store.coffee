@@ -19,42 +19,89 @@ class Collection2ViewBinder
   defaults:
     onAdd: (model, collection, options) ->
       template = @template
+
       if _.isFunction(template)
-        template = template(model: model, collection: collection)
-      if template instanceof Backbone.View
-        $template = template.render().$el
+        templateOptions =
+          model: model
+          collection: collection
+          parent: @view
+
+        if template.name != ""
+          template = new template(templateOptions).render()
+        else
+          template = template(templateOptions)
+          template = new Backbone.Template(el: template)
       else
-        $template = template = $(template)
-      $template.appendTo(@$selector)
+        template = new Backbone.Template(el: template)
+
+      template.$el.appendTo(@$selector)
       @views[model.cid] = template
+
     onSort: (collection, options) ->
       for model in collection.models
-        $template = @views[model.cid]
-        $template = $template.$el if $template.$el?
-        $template.appendTo(@$selector)
+        template = @views[model.cid]
+        template.$el.appendTo(@$selector)
+
     onReset: (collection, options) ->
-      for cid, $template of @views
-        $template.remove()
-        delete @views[cid]
-      for model in collection.models
-        @add(model, collection)
+      @remove(cid: cid) for cid, template of @views
+      @add(model, collection) for model in collection.models
+
     onRemove: (model, options) ->
       @views[model.cid].remove()
       delete @views[model.cid]
+
     onFilter: (attributes) ->
       eachTemplate = (collection, callback) =>
         for model in collection
-          $template = @views[model.cid]
-          $template = $template.$el if $template.$el?
-          callback($template)
+          template = @views[model.cid]
+          callback(template.$el)
       if attributes?
-        eachTemplate @collection.models, ($template) ->
-          $template.hide()
-        eachTemplate @collection.where(attributes), ($template) ->
-          $template.show()
+        eachTemplate @collection.models, (template) ->
+          template.hide()
+        eachTemplate @collection.where(attributes), (template) ->
+          template.show()
       else
-        eachTemplate @collection.models, ($template) ->
-          $template.show()
+        eachTemplate @collection.models, (template) ->
+          template.show()
+
+    infinite:
+      prefix: false
+      suffix: false
+
+      onReset: (collection, options) ->
+        @remove(cid: cid) for cid, template of @views
+        @$container.scrollTop(0)
+        @infinite.length = 0
+        @infinite.models = if @filters?
+            collection.where(@filters)
+          else
+            collection.models
+        @show(@infinite.slice)
+
+      onFilter: (collection, attributes) ->
+        @filters = attributes
+        @reset()
+
+      onSort: (collection, options) ->
+        @reset()
+
+      onScroll: ->
+        @infinite.height ||= @$selector.height() / @infinite.length
+        height = @$container.attr("scrollHeight")
+        height -= @$container.attr("scrollTop")
+        height -= @$container.height()
+        height -= @$suffix.height() if @$suffix?
+        if height < @infinite.height * @infinite.slice
+          @show(@infinite.length + @infinite.slice)
+
+      onShow: (length) ->
+        models = @infinite.models[@infinite.length...length]
+        @infinite.length = length
+        @add(model) for model in models
+        if @$suffix?
+          height = (@infinite.models.length - @infinite.length) * @infinite.height
+          height = if height > 0 then height else 0
+          @$suffix.height(height)
 
   constructor: (collection, $el, options) ->
     [ @collection, @$el ] = arguments
@@ -62,6 +109,10 @@ class Collection2ViewBinder
     @template = _.required(@options, "template")
     @$selector = @$el.find(_.required(@options, 'selector'))
     @views = {}
+
+    @infinite = options.infinite
+    if @infinite?
+      @options = _.extend(@options, @defaults.infinite, @infinite)
 
   on: ->
     @off() if @handlers?
@@ -74,6 +125,16 @@ class Collection2ViewBinder
       @handlers[event] = handler
       @collection.on(event, handler)
     @handlers['filter'] = @options['onFilter'].bind(@)
+
+    if @infinite
+      @show = @options["onShow"].bind(@)
+      @$container = @$selector.closest(@infinite.container)
+      if @options.suffix
+        @$suffix = $("<div class=\"infinite-suffix\"></div>")
+          .appendTo(@$container)
+      handler = @options["onScroll"].bind(@)
+      @handlers['scroll'] = handler
+      @$container.on('scroll', handler)
 
   off: ->
     for event, handler of @handlers
@@ -90,7 +151,7 @@ class Collection2ViewBinder
 
   filter: (attributes) ->
     attributes = undefined unless attributes? && Object.keys(attributes).length != 0
-    @handlers["filter"](attributes)
+    @handlers["filter"](@collection, attributes)
 
   sort: (comparator) ->
     @collection.comparator = comparator

@@ -16,10 +16,6 @@
 #         "callback on get model attribute (optional)"
 #       onSet: ($el, model, attr, event) ->
 #         "callback on set model attribute (optional)"
-#     ":attribute": [
-#       options
-#       options
-#     ]
 #
 
 class Binder

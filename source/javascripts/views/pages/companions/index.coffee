@@ -10,8 +10,11 @@ class App.Pages.CompanionsIndex extends Backbone.View
 
   store:
     selector: ".table-view"
-    template: (options) ->
-      new App.Pages.CompanionsItem(options)
+    template: App.Pages.CompanionsItem
+    infinite:
+      container: ".content"
+      slice: 10
+      suffix: true
 
   events:
     "click .dropdown-toggle": "toggleDropdown"
@@ -20,6 +23,9 @@ class App.Pages.CompanionsIndex extends Backbone.View
     "click .filter": "setFilter"
     "click .sort-mode": "setSortMode"
     "click .level-mode": "setLevelMode"
+
+  beforeInitialize: ->
+    @filters = {}
 
   triggerHover: (event) ->
     $(event.target).trigger('hover')
@@ -35,9 +41,6 @@ class App.Pages.CompanionsIndex extends Backbone.View
     $dropdown.closest(".container").one "click", ->
       $dropdown.removeClass("active")
     event.stopPropagation()
-
-  afterInitialize: ->
-    @filters = {}
 
   resetFilter: (event) ->
     $target = $(event.target)

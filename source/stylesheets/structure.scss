@@ -11,6 +11,11 @@ a[sref] {
   cursor: pointer;
 }
 
+.bar-nav ~ .content {
+  padding-top: initial;
+  margin-top: 44px;
+}
+
 @import "structure/sidebar";
 @import "structure/slider";
 @import "structure/form";

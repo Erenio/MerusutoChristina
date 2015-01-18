@@ -24,7 +24,7 @@ class App.Router extends Backbone.Router
     App.main.closeSidebar()
     unless App.companions?
       App.companions = new App.Collections.Companions()
-      App.companions.fetch()
+      App.companions.fetch(reset: true)
     view = new App.Pages.CompanionsIndex(collection: App.companions)
     App.main.openPage(view.render())
 
