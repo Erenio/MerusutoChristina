@@ -11,7 +11,7 @@
       return Container.__super__.constructor.apply(this, arguments);
     }
 
-    Container.prototype.template = "";
+    Container.prototype.template = void 0;
 
     Container.prototype.afterRender = function(view, reverse) {
       if (reverse == null) {

@@ -31,8 +31,11 @@
 
     CompanionsIndex.prototype.store = {
       selector: ".table-view",
-      template: function(options) {
-        return new App.Pages.CompanionsItem(options);
+      template: App.Pages.CompanionsItem,
+      infinite: {
+        container: ".content",
+        slice: 10,
+        suffix: true
       }
     };
 
@@ -43,6 +46,10 @@
       "click .filter": "setFilter",
       "click .sort-mode": "setSortMode",
       "click .level-mode": "setLevelMode"
+    };
+
+    CompanionsIndex.prototype.beforeInitialize = function() {
+      return this.filters = {};
     };
 
     CompanionsIndex.prototype.triggerHover = function(event) {
@@ -63,10 +70,6 @@
         return $dropdown.removeClass("active");
       });
       return event.stopPropagation();
-    };
-
-    CompanionsIndex.prototype.afterInitialize = function() {
-      return this.filters = {};
     };
 
     CompanionsIndex.prototype.resetFilter = function(event) {

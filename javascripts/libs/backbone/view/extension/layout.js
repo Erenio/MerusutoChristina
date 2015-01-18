@@ -7,7 +7,7 @@
     };
 
     Layout.prototype.render = function(view) {
-      var $selector, $template, key, options, selector, template, _ref, _results;
+      var $selector, key, options, selector, template, templateOptions, _ref, _results;
       if (view.views != null) {
         this.remove(view);
       }
@@ -23,20 +23,25 @@
           selector = _.required(options, "selector");
           template = _.required(options, "template");
         }
-        if (_.isFunction(template)) {
-          template = template(view.options);
-        }
-        if (template instanceof Backbone.View) {
-          $template = template.render().$el;
-        } else {
-          $template = $(template);
-        }
         $selector = view.$(selector);
-        if (!($template.html() === "" && $selector.html() !== "")) {
-          $selector.html($template);
-        }
-        if (template.setElement != null) {
-          template.setElement($selector);
+        if (_.isFunction(template)) {
+          templateOptions = {
+            el: $selector,
+            parent: view
+          };
+          _.defaults(templateOptions, options.options);
+          if (template.name !== "") {
+            template = new template(templateOptions).render();
+          } else {
+            template = template(templateOptions);
+            template = new Backbone.Template({
+              el: template
+            });
+          }
+        } else {
+          template = new Backbone.Template({
+            el: template
+          });
         }
         _results.push(view.views[key] = template);
       }

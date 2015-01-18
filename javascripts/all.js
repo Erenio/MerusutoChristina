@@ -4670,13 +4670,32 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(this);
 (function() {
+  Backbone.Template = (function() {
+    function Template(options) {
+      this.$el = $(_.required(options, "el"));
+    }
+
+    Template.prototype.render = function() {
+      return this;
+    };
+
+    Template.prototype.remove = function() {
+      return this.$el.remove();
+    };
+
+    return Template;
+
+  })();
+
+}).call(this);
+(function() {
   var BaseView, View,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Backbone.View.Extension = {};
 
-  BaseView = Backbone.View;
+  Backbone.BaseView = BaseView = Backbone.View;
 
   View = (function(_super) {
     __extends(View, _super);
@@ -4950,7 +4969,7 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     Layout.prototype.render = function(view) {
-      var $selector, $template, key, options, selector, template, _ref, _results;
+      var $selector, key, options, selector, template, templateOptions, _ref, _results;
       if (view.views != null) {
         this.remove(view);
       }
@@ -4966,20 +4985,25 @@ window.$ === undefined && (window.$ = Zepto)
           selector = _.required(options, "selector");
           template = _.required(options, "template");
         }
-        if (_.isFunction(template)) {
-          template = template(view.options);
-        }
-        if (template instanceof Backbone.View) {
-          $template = template.render().$el;
-        } else {
-          $template = $(template);
-        }
         $selector = view.$(selector);
-        if (!($template.html() === "" && $selector.html() !== "")) {
-          $selector.html($template);
-        }
-        if (template.setElement != null) {
-          template.setElement($selector);
+        if (_.isFunction(template)) {
+          templateOptions = {
+            el: $selector,
+            parent: view
+          };
+          _.defaults(templateOptions, options.options);
+          if (template.name !== "") {
+            template = new template(templateOptions).render();
+          } else {
+            template = template(templateOptions);
+            template = new Backbone.Template({
+              el: template
+            });
+          }
+        } else {
+          template = new Backbone.Template({
+            el: template
+          });
         }
         _results.push(view.views[key] = template);
       }
@@ -5033,43 +5057,49 @@ window.$ === undefined && (window.$ = Zepto)
   Collection2ViewBinder = (function() {
     Collection2ViewBinder.prototype.defaults = {
       onAdd: function(model, collection, options) {
-        var $template, template;
+        var template, templateOptions;
         template = this.template;
         if (_.isFunction(template)) {
-          template = template({
+          templateOptions = {
             model: model,
-            collection: collection
+            collection: collection,
+            parent: this.view
+          };
+          if (template.name !== "") {
+            template = new template(templateOptions).render();
+          } else {
+            template = template(templateOptions);
+            template = new Backbone.Template({
+              el: template
+            });
+          }
+        } else {
+          template = new Backbone.Template({
+            el: template
           });
         }
-        if (template instanceof Backbone.View) {
-          $template = template.render().$el;
-        } else {
-          $template = template = $(template);
-        }
-        $template.appendTo(this.$selector);
+        template.$el.appendTo(this.$selector);
         return this.views[model.cid] = template;
       },
       onSort: function(collection, options) {
-        var $template, model, _i, _len, _ref, _results;
+        var model, template, _i, _len, _ref, _results;
         _ref = collection.models;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           model = _ref[_i];
-          $template = this.views[model.cid];
-          if ($template.$el != null) {
-            $template = $template.$el;
-          }
-          _results.push($template.appendTo(this.$selector));
+          template = this.views[model.cid];
+          _results.push(template.$el.appendTo(this.$selector));
         }
         return _results;
       },
       onReset: function(collection, options) {
-        var $template, cid, model, _i, _len, _ref, _ref1, _results;
+        var cid, model, template, _i, _len, _ref, _ref1, _results;
         _ref = this.views;
         for (cid in _ref) {
-          $template = _ref[cid];
-          $template.remove();
-          delete this.views[cid];
+          template = _ref[cid];
+          this.remove({
+            cid: cid
+          });
         }
         _ref1 = collection.models;
         _results = [];
@@ -5087,30 +5117,87 @@ window.$ === undefined && (window.$ = Zepto)
         var eachTemplate;
         eachTemplate = (function(_this) {
           return function(collection, callback) {
-            var $template, model, _i, _len, _results;
+            var model, template, _i, _len, _results;
             _results = [];
             for (_i = 0, _len = collection.length; _i < _len; _i++) {
               model = collection[_i];
-              $template = _this.views[model.cid];
-              if ($template.$el != null) {
-                $template = $template.$el;
-              }
-              _results.push(callback($template));
+              template = _this.views[model.cid];
+              _results.push(callback(template.$el));
             }
             return _results;
           };
         })(this);
         if (attributes != null) {
-          eachTemplate(this.collection.models, function($template) {
-            return $template.hide();
+          eachTemplate(this.collection.models, function(template) {
+            return template.hide();
           });
-          return eachTemplate(this.collection.where(attributes), function($template) {
-            return $template.show();
+          return eachTemplate(this.collection.where(attributes), function(template) {
+            return template.show();
           });
         } else {
-          return eachTemplate(this.collection.models, function($template) {
-            return $template.show();
+          return eachTemplate(this.collection.models, function(template) {
+            return template.show();
           });
+        }
+      },
+      infinite: {
+        prefix: false,
+        suffix: false,
+        onReset: function(collection, options) {
+          var cid, template, _ref;
+          _ref = this.views;
+          for (cid in _ref) {
+            template = _ref[cid];
+            this.remove({
+              cid: cid
+            });
+          }
+          this.infinite.length = 0;
+          this.infinite.models = collection.models;
+          return this.show(this.infinite.slice);
+        },
+        onFilter: function(collection, attributes) {
+          if (attributes != null) {
+            return this.reset({
+              models: collection.where(attributes)
+            });
+          } else {
+            return this.reset({
+              models: collection.models
+            });
+          }
+        },
+        onSort: function(collection, options) {
+          return this.reset({
+            models: collection.models
+          });
+        },
+        onScroll: function() {
+          var height, _base;
+          (_base = this.infinite).height || (_base.height = this.$selector.height() / this.infinite.length);
+          height = this.$container.attr("scrollHeight");
+          height -= this.$container.attr("scrollTop");
+          height -= this.$container.height();
+          if (this.$suffix != null) {
+            height -= this.$suffix.height();
+          }
+          if (height < this.infinite.height * this.infinite.slice) {
+            return this.show(this.infinite.length + this.infinite.slice);
+          }
+        },
+        onShow: function(length) {
+          var height, model, models, _i, _len;
+          models = this.infinite.models.slice(this.infinite.length, length);
+          this.infinite.length = length;
+          for (_i = 0, _len = models.length; _i < _len; _i++) {
+            model = models[_i];
+            this.add(model);
+          }
+          if (this.$suffix != null) {
+            height = (this.infinite.models.length - this.infinite.length) * this.infinite.height;
+            height = height > 0 ? height : 0;
+            return this.$suffix.height(height);
+          }
         }
       }
     };
@@ -5121,6 +5208,10 @@ window.$ === undefined && (window.$ = Zepto)
       this.template = _.required(this.options, "template");
       this.$selector = this.$el.find(_.required(this.options, 'selector'));
       this.views = {};
+      this.infinite = options.infinite;
+      if (this.infinite != null) {
+        this.options = _.extend(this.options, this.defaults.infinite, this.infinite);
+      }
     }
 
     Collection2ViewBinder.prototype.on = function() {
@@ -5138,7 +5229,17 @@ window.$ === undefined && (window.$ = Zepto)
         this.handlers[event] = handler;
         this.collection.on(event, handler);
       }
-      return this.handlers['filter'] = this.options['onFilter'].bind(this);
+      this.handlers['filter'] = this.options['onFilter'].bind(this);
+      if (this.infinite) {
+        this.show = this.options["onShow"].bind(this);
+        this.$container = this.$selector.closest(this.infinite.container);
+        if (this.options.suffix) {
+          this.$suffix = $("<div class=\"infinite-suffix\"></div>").appendTo(this.$container);
+        }
+        handler = this.options["onScroll"].bind(this);
+        this.handlers['scroll'] = handler;
+        return this.$container.on('scroll', handler);
+      }
     };
 
     Collection2ViewBinder.prototype.off = function() {
@@ -5171,7 +5272,7 @@ window.$ === undefined && (window.$ = Zepto)
       if (!((attributes != null) && Object.keys(attributes).length !== 0)) {
         attributes = void 0;
       }
-      return this.handlers["filter"](attributes);
+      return this.handlers["filter"](this.collection, attributes);
     };
 
     Collection2ViewBinder.prototype.sort = function(comparator) {
@@ -5988,8 +6089,11 @@ window.$ === undefined && (window.$ = Zepto)
 
     CompanionsIndex.prototype.store = {
       selector: ".table-view",
-      template: function(options) {
-        return new App.Pages.CompanionsItem(options);
+      template: App.Pages.CompanionsItem,
+      infinite: {
+        container: ".content",
+        slice: 10,
+        suffix: true
       }
     };
 
@@ -6000,6 +6104,10 @@ window.$ === undefined && (window.$ = Zepto)
       "click .filter": "setFilter",
       "click .sort-mode": "setSortMode",
       "click .level-mode": "setLevelMode"
+    };
+
+    CompanionsIndex.prototype.beforeInitialize = function() {
+      return this.filters = {};
     };
 
     CompanionsIndex.prototype.triggerHover = function(event) {
@@ -6020,10 +6128,6 @@ window.$ === undefined && (window.$ = Zepto)
         return $dropdown.removeClass("active");
       });
       return event.stopPropagation();
-    };
-
-    CompanionsIndex.prototype.afterInitialize = function() {
-      return this.filters = {};
     };
 
     CompanionsIndex.prototype.resetFilter = function(event) {
@@ -6115,7 +6219,7 @@ window.$ === undefined && (window.$ = Zepto)
       return Container.__super__.constructor.apply(this, arguments);
     }
 
-    Container.prototype.template = "";
+    Container.prototype.template = void 0;
 
     Container.prototype.afterRender = function(view, reverse) {
       if (reverse == null) {
@@ -6161,68 +6265,6 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     return Container;
-
-  })(Backbone.View);
-
-}).call(this);
-(function() {
-  var __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  App.Views.Main = (function(_super) {
-    __extends(Main, _super);
-
-    function Main() {
-      return Main.__super__.constructor.apply(this, arguments);
-    }
-
-    Main.prototype.template = _.loadTemplate("templates/main");
-
-    Main.prototype.layout = {
-      "container": function() {
-        return new App.Views.Container();
-      },
-      "modal": function() {
-        return new App.Views.Modal();
-      }
-    };
-
-    Main.prototype.events = {
-      "click a[sref]": "gotoState"
-    };
-
-    Main.prototype.gotoState = function(event) {
-      var url;
-      url = $(event.currentTarget).attr("sref");
-      Backbone.history.loadUrl(url);
-      return event.preventDefault();
-    };
-
-    Main.prototype.toggleSidebar = function() {
-      return this.views["container"].toggleSidebar();
-    };
-
-    Main.prototype.openSidebar = function() {
-      return this.views["container"].openSidebar();
-    };
-
-    Main.prototype.closeSidebar = function() {
-      return this.views["container"].closeSidebar();
-    };
-
-    Main.prototype.openModal = function(view) {
-      return this.views["modal"].render(view).show();
-    };
-
-    Main.prototype.closeModal = function() {
-      return this.views["modal"].hide();
-    };
-
-    Main.prototype.openPage = function(view) {
-      return this.views["container"].render(view);
-    };
-
-    return Main;
 
   })(Backbone.View);
 
@@ -6299,6 +6341,64 @@ window.$ === undefined && (window.$ = Zepto)
     return Modal;
 
   })(App.Views.Page);
+
+}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  App.Views.Main = (function(_super) {
+    __extends(Main, _super);
+
+    function Main() {
+      return Main.__super__.constructor.apply(this, arguments);
+    }
+
+    Main.prototype.template = _.loadTemplate("templates/main");
+
+    Main.prototype.layout = {
+      "container": App.Views.Container,
+      "modal": App.Views.Modal
+    };
+
+    Main.prototype.events = {
+      "click a[sref]": "gotoState"
+    };
+
+    Main.prototype.gotoState = function(event) {
+      var url;
+      url = $(event.currentTarget).attr("sref");
+      Backbone.history.loadUrl(url);
+      return event.preventDefault();
+    };
+
+    Main.prototype.toggleSidebar = function() {
+      return this.views["container"].toggleSidebar();
+    };
+
+    Main.prototype.openSidebar = function() {
+      return this.views["container"].openSidebar();
+    };
+
+    Main.prototype.closeSidebar = function() {
+      return this.views["container"].closeSidebar();
+    };
+
+    Main.prototype.openModal = function(view) {
+      return this.views["modal"].render(view).show();
+    };
+
+    Main.prototype.closeModal = function() {
+      return this.views["modal"].hide();
+    };
+
+    Main.prototype.openPage = function(view) {
+      return this.views["container"].render(view);
+    };
+
+    return Main;
+
+  })(Backbone.View);
 
 }).call(this);
 /* ========================================================================
@@ -6536,7 +6636,9 @@ window.$ === undefined && (window.$ = Zepto)
       App.main.closeSidebar();
       if (App.companions == null) {
         App.companions = new App.Collections.Companions();
-        App.companions.fetch();
+        App.companions.fetch({
+          reset: true
+        });
       }
       view = new App.Pages.CompanionsIndex({
         collection: App.companions
@@ -6567,6 +6669,7 @@ window.$ === undefined && (window.$ = Zepto)
   })(Backbone.Router);
 
 }).call(this);
+
 
 
 

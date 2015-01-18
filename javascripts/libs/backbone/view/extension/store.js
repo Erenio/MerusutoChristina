@@ -4,43 +4,49 @@
   Collection2ViewBinder = (function() {
     Collection2ViewBinder.prototype.defaults = {
       onAdd: function(model, collection, options) {
-        var $template, template;
+        var template, templateOptions;
         template = this.template;
         if (_.isFunction(template)) {
-          template = template({
+          templateOptions = {
             model: model,
-            collection: collection
+            collection: collection,
+            parent: this.view
+          };
+          if (template.name !== "") {
+            template = new template(templateOptions).render();
+          } else {
+            template = template(templateOptions);
+            template = new Backbone.Template({
+              el: template
+            });
+          }
+        } else {
+          template = new Backbone.Template({
+            el: template
           });
         }
-        if (template instanceof Backbone.View) {
-          $template = template.render().$el;
-        } else {
-          $template = template = $(template);
-        }
-        $template.appendTo(this.$selector);
+        template.$el.appendTo(this.$selector);
         return this.views[model.cid] = template;
       },
       onSort: function(collection, options) {
-        var $template, model, _i, _len, _ref, _results;
+        var model, template, _i, _len, _ref, _results;
         _ref = collection.models;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           model = _ref[_i];
-          $template = this.views[model.cid];
-          if ($template.$el != null) {
-            $template = $template.$el;
-          }
-          _results.push($template.appendTo(this.$selector));
+          template = this.views[model.cid];
+          _results.push(template.$el.appendTo(this.$selector));
         }
         return _results;
       },
       onReset: function(collection, options) {
-        var $template, cid, model, _i, _len, _ref, _ref1, _results;
+        var cid, model, template, _i, _len, _ref, _ref1, _results;
         _ref = this.views;
         for (cid in _ref) {
-          $template = _ref[cid];
-          $template.remove();
-          delete this.views[cid];
+          template = _ref[cid];
+          this.remove({
+            cid: cid
+          });
         }
         _ref1 = collection.models;
         _results = [];
@@ -58,30 +64,87 @@
         var eachTemplate;
         eachTemplate = (function(_this) {
           return function(collection, callback) {
-            var $template, model, _i, _len, _results;
+            var model, template, _i, _len, _results;
             _results = [];
             for (_i = 0, _len = collection.length; _i < _len; _i++) {
               model = collection[_i];
-              $template = _this.views[model.cid];
-              if ($template.$el != null) {
-                $template = $template.$el;
-              }
-              _results.push(callback($template));
+              template = _this.views[model.cid];
+              _results.push(callback(template.$el));
             }
             return _results;
           };
         })(this);
         if (attributes != null) {
-          eachTemplate(this.collection.models, function($template) {
-            return $template.hide();
+          eachTemplate(this.collection.models, function(template) {
+            return template.hide();
           });
-          return eachTemplate(this.collection.where(attributes), function($template) {
-            return $template.show();
+          return eachTemplate(this.collection.where(attributes), function(template) {
+            return template.show();
           });
         } else {
-          return eachTemplate(this.collection.models, function($template) {
-            return $template.show();
+          return eachTemplate(this.collection.models, function(template) {
+            return template.show();
           });
+        }
+      },
+      infinite: {
+        prefix: false,
+        suffix: false,
+        onReset: function(collection, options) {
+          var cid, template, _ref;
+          _ref = this.views;
+          for (cid in _ref) {
+            template = _ref[cid];
+            this.remove({
+              cid: cid
+            });
+          }
+          this.infinite.length = 0;
+          this.infinite.models = collection.models;
+          return this.show(this.infinite.slice);
+        },
+        onFilter: function(collection, attributes) {
+          if (attributes != null) {
+            return this.reset({
+              models: collection.where(attributes)
+            });
+          } else {
+            return this.reset({
+              models: collection.models
+            });
+          }
+        },
+        onSort: function(collection, options) {
+          return this.reset({
+            models: collection.models
+          });
+        },
+        onScroll: function() {
+          var height, _base;
+          (_base = this.infinite).height || (_base.height = this.$selector.height() / this.infinite.length);
+          height = this.$container.attr("scrollHeight");
+          height -= this.$container.attr("scrollTop");
+          height -= this.$container.height();
+          if (this.$suffix != null) {
+            height -= this.$suffix.height();
+          }
+          if (height < this.infinite.height * this.infinite.slice) {
+            return this.show(this.infinite.length + this.infinite.slice);
+          }
+        },
+        onShow: function(length) {
+          var height, model, models, _i, _len;
+          models = this.infinite.models.slice(this.infinite.length, length);
+          this.infinite.length = length;
+          for (_i = 0, _len = models.length; _i < _len; _i++) {
+            model = models[_i];
+            this.add(model);
+          }
+          if (this.$suffix != null) {
+            height = (this.infinite.models.length - this.infinite.length) * this.infinite.height;
+            height = height > 0 ? height : 0;
+            return this.$suffix.height(height);
+          }
         }
       }
     };
@@ -92,6 +155,10 @@
       this.template = _.required(this.options, "template");
       this.$selector = this.$el.find(_.required(this.options, 'selector'));
       this.views = {};
+      this.infinite = options.infinite;
+      if (this.infinite != null) {
+        this.options = _.extend(this.options, this.defaults.infinite, this.infinite);
+      }
     }
 
     Collection2ViewBinder.prototype.on = function() {
@@ -109,7 +176,17 @@
         this.handlers[event] = handler;
         this.collection.on(event, handler);
       }
-      return this.handlers['filter'] = this.options['onFilter'].bind(this);
+      this.handlers['filter'] = this.options['onFilter'].bind(this);
+      if (this.infinite) {
+        this.show = this.options["onShow"].bind(this);
+        this.$container = this.$selector.closest(this.infinite.container);
+        if (this.options.suffix) {
+          this.$suffix = $("<div class=\"infinite-suffix\"></div>").appendTo(this.$container);
+        }
+        handler = this.options["onScroll"].bind(this);
+        this.handlers['scroll'] = handler;
+        return this.$container.on('scroll', handler);
+      }
     };
 
     Collection2ViewBinder.prototype.off = function() {
@@ -142,7 +219,7 @@
       if (!((attributes != null) && Object.keys(attributes).length !== 0)) {
         attributes = void 0;
       }
-      return this.handlers["filter"](attributes);
+      return this.handlers["filter"](this.collection, attributes);
     };
 
     Collection2ViewBinder.prototype.sort = function(comparator) {

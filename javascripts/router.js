@@ -36,7 +36,9 @@
       App.main.closeSidebar();
       if (App.companions == null) {
         App.companions = new App.Collections.Companions();
-        App.companions.fetch();
+        App.companions.fetch({
+          reset: true
+        });
       }
       view = new App.Pages.CompanionsIndex({
         collection: App.companions
