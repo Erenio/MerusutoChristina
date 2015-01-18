@@ -100,24 +100,15 @@
             });
           }
           this.infinite.length = 0;
-          this.infinite.models = collection.models;
+          this.infinite.models = this.filters != null ? collection.where(this.filters) : collection.models;
           return this.show(this.infinite.slice);
         },
         onFilter: function(collection, attributes) {
-          if (attributes != null) {
-            return this.reset({
-              models: collection.where(attributes)
-            });
-          } else {
-            return this.reset({
-              models: collection.models
-            });
-          }
+          this.filters = attributes;
+          return this.reset();
         },
         onSort: function(collection, options) {
-          return this.reset({
-            models: collection.models
-          });
+          return this.reset();
         },
         onScroll: function() {
           var height, _base;
