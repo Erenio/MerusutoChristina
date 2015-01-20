@@ -358,30 +358,33 @@ a[sref] {
   .modal .icon-close {
     color: #fff;
     padding: 10px; }
-  /* line 130, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
-  .modal .wrap {
+  /* line 131, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .modal .content, .modal .slider {
+    background-color: transparent; }
+  /* line 134, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .modal .slider, .modal .slide-group {
     height: 100%; }
-    /* line 132, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
-    .modal .wrap .image {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      margin: auto;
-      width: 100%; }
 
-/* line 143, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+/* line 141, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-info-group {
   padding: 10px; }
-  /* line 145, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 143, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .modal .media-info-group .media-info {
     text-shadow: 0 0 5px #000;
     color: white !important; }
+/* line 148, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.modal .image {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  width: 100%; }
 
 @media (max-width: 440px) {
-  /* line 153, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 158, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-xs {
     display: none !important; } }
 @media (max-width: 550px) {
-  /* line 159, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 164, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-sm {
     display: none !important; } }
