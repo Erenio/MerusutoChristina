@@ -93,7 +93,24 @@ a[sref] {
 
 .bar {
   .dropdown.pull-right {
-    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+.input-icon {
+  position: relative;
+  .icon {
+    position: absolute;
+    top: 0;
+    color: #aaa;
+    padding: 10px;
+    font-size: 20px;
+  }
+  input {
+    padding-left: 40px;
+  }
+  .pull-right {
+    right: 0;
   }
 }
 
@@ -110,12 +127,25 @@ a[sref] {
     color: #fff;
     padding: 10px;
   }
-  .image {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    width: 100%;
+  .wrap {
+    height: 100%;
+    .image {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      width: 100%;
+    }
+  }
+}
+
+.modal {
+  .media-info-group {
+    padding: 10px;
+    .media-info {
+      text-shadow: 0 0 5px #000;
+      color: white!important;
+    }
   }
 }
 

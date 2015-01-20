@@ -1,4 +1,32 @@
 <%- _.renderTemplate("templates/modals/header") %>
 <div class="wrap">
   <img class="image" src="<%= @model.originalUrl() %>">
+
+  <div class="media">
+    <div class="media-body">
+      <div class="media-info-group">
+        <p class="media-info">
+          生命：<span id="life"><%= @model.get("life") %></span><br>
+          攻击：<span id="atk"><%= @model.get("atk") %></span><br>
+          攻距：<%= @model.get("aarea") %><br>
+          攻数：<%= @model.get("anum") %><br>
+          攻速：<%= @model.get("aspd") %><br>
+          韧性：<%= @model.get("tenacity") %><br>
+          移速：<%= @model.get("mspd") %><br>
+          成长：<%= @model.getTypeString() %><br>
+        </p>
+        <p class="media-info">
+          火：<%= Math.round(@model.get("fire")*100) %>%<br>
+          水：<%= Math.round(@model.get("aqua")*100) %>%<br>
+          风：<%= Math.round(@model.get("wind")*100) %>%<br>
+          光：<%= Math.round(@model.get("light")*100) %>%<br>
+          暗：<%= Math.round(@model.get("dark")*100) %>%<br><br>
+        </p>
+        <p class="media-info">
+          DPS：<%= Math.round(@model.get("dps")) %><br>
+          MDPS：<%= Math.round(@model.get("mdps")) %><br>
+        </p>
+      </div>
+    </div>
+  </div>
 </div>

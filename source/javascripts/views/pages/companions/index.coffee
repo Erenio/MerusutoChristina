@@ -19,10 +19,12 @@ class App.Pages.CompanionsIndex extends Backbone.View
   events:
     "click .dropdown-toggle": "toggleDropdown"
     "click .dropdown-submenu > a": "triggerHover"
-    "click .reset-filter": "resetFilter"
+    "click .filter-reset": "resetFilter"
     "click .filter": "setFilter"
     "click .sort-mode": "setSortMode"
     "click .level-mode": "setLevelMode"
+    "click .search-open": "openSearch"
+    "click .search-close": "closeSearch"
 
   beforeInitialize: ->
     @filters = {}
@@ -41,6 +43,43 @@ class App.Pages.CompanionsIndex extends Backbone.View
     $dropdown.closest(".container").one "click", ->
       $dropdown.removeClass("active")
     event.stopPropagation()
+
+  openSearch: (event) ->
+    $children = $(event.target).closest("header").children()
+    $search = $children.filter(".input-search")
+    $children.not($search).hide()
+    $search.show()
+    $input = $search.children("input")
+    $input.trigger("focus").val("")
+    @searchInterval = setInterval =>
+      query = $input.val()
+      @search(query)
+    , 200
+
+  closeSearch: (event) ->
+    @binder.filter(@filters)
+    clearInterval(@searchInterval) if @searchInterval
+    $children = $(event.target).closest("header").children()
+    $search = $children.filter(".input-search")
+    $children.not($search).show()
+    $search.hide()
+
+  search: (query) ->
+    if query != @searchQuery
+      @binder.filter (collection) =>
+        models = if _.isEmpty(@filters)
+            collection.models
+          else
+            collection.where(@filters)
+        if query != ""
+          models = _.filter models, (model) ->
+            for key in ["name", "title"]
+              value = model.get(key)
+              if value && value.indexOf(query) >= 0
+                return true
+            false
+        models
+      @searchQuery = query
 
   resetFilter: (event) ->
     $target = $(event.target)

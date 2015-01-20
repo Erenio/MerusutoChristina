@@ -1,5 +1,13 @@
 <header class="bar bar-nav">
+
+  <div class="input-icon input-search" style="display:none;">
+    <span class="icon icon-search"></span>
+    <input type="search" placeholder="Search">
+    <a class="icon icon-close pull-right search-close"></a>
+  </div>
+
   <a class="icon icon-bars pull-left" sref="#toggle-sidebar"></a>
+  <a class="icon icon-search pull-right search-open"></a>
   <div class="dropdown pull-right">
     <a class="btn btn-link dropdown-toggle">
       筛选
@@ -8,7 +16,7 @@
       <li class="dropdown-submenu pull-left">
         <a class="">稀有度</a>
         <ul class="dropdown-menu">
-          <li><a class="reset-filter" data-key="rare">全部</a></li>
+          <li><a class="filter-reset" data-key="rare">全部</a></li>
           <li><a class="filter" data-key="rare" data-value="1">★</a></li>
           <li><a class="filter" data-key="rare" data-value="2">★★</a></li>
           <li><a class="filter" data-key="rare" data-value="3">★★★</a></li>
@@ -19,7 +27,7 @@
       <li class="dropdown-submenu pull-left">
         <a class="">元素</a>
         <ul class="dropdown-menu">
-          <li><a class="reset-filter" data-key="element">全部</a></li>
+          <li><a class="filter-reset" data-key="element">全部</a></li>
           <li><a class="filter" data-key="element" data-value="1">火</a></li>
           <li><a class="filter" data-key="element" data-value="2">水</a></li>
           <li><a class="filter" data-key="element" data-value="3">风</a></li>
@@ -30,7 +38,7 @@
       <li class="dropdown-submenu pull-left">
         <a class="">武器</a>
         <ul class="dropdown-menu">
-          <li><a class="reset-filter" data-key="weapon">全部</a></li>
+          <li><a class="filter-reset" data-key="weapon">全部</a></li>
           <li><a class="filter" data-key="weapon" data-value="1">斩击</a></li>
           <li><a class="filter" data-key="weapon" data-value="2">突击</a></li>
           <li><a class="filter" data-key="weapon" data-value="3">打击</a></li>
@@ -43,14 +51,14 @@
       <li class="dropdown-submenu pull-left">
         <a class="">成长</a>
         <ul class="dropdown-menu">
-          <li><a class="reset-filter" data-key="type">全部</a></li>
+          <li><a class="filter-reset" data-key="type">全部</a></li>
           <li><a class="filter" data-key="type" data-value="1">早熟</a></li>
           <li><a class="filter" data-key="type" data-value="2">平均</a></li>
           <li><a class="filter" data-key="type" data-value="3">晚成</a></li>
         </ul>
       </li>
       <li class="divider"></li>
-      <li><a class="reset-filter">重置</a></li>
+      <li><a class="filter-reset">重置</a></li>
     </ul>
   </div>
   <div class="dropdown pull-right">

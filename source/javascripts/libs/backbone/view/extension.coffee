@@ -1,6 +1,6 @@
 Backbone.View.Extension = {}
 
-Backbone.BaseView = BaseView = Backbone.View
+BaseView = Backbone.View
 
 class View extends BaseView
 

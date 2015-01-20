@@ -15,6 +15,12 @@
 #       "callback on remove model from collection (optional)"
 #
 
+_where = (collection, attributes) ->
+  if _.isFunction(attributes)
+    attributes(collection)
+  else
+    collection.where(attributes)
+
 class Collection2ViewBinder
   defaults:
     onAdd: (model, collection, options) ->
@@ -50,18 +56,18 @@ class Collection2ViewBinder
       @views[model.cid].remove()
       delete @views[model.cid]
 
-    onFilter: (attributes) ->
-      eachTemplate = (collection, callback) =>
-        for model in collection
+    onFilter: (collection, attributes) ->
+      eachTemplate = (models, callback) =>
+        for model in models
           template = @views[model.cid]
           callback(template.$el)
       if attributes?
-        eachTemplate @collection.models, (template) ->
+        eachTemplate collection.models, (template) ->
           template.hide()
-        eachTemplate @collection.where(attributes), (template) ->
+        eachTemplate _where(collection, attributes), (template) ->
           template.show()
       else
-        eachTemplate @collection.models, (template) ->
+        eachTemplate collection.models, (template) ->
           template.show()
 
     infinite:
@@ -72,14 +78,14 @@ class Collection2ViewBinder
         @remove(cid: cid) for cid, template of @views
         @$container.scrollTop(0)
         @infinite.length = 0
-        @infinite.models = if @filters?
-            collection.where(@filters)
+        @infinite.models = if @infinite.attributes?
+            _where(collection, @infinite.attributes)
           else
             collection.models
         @show(@infinite.slice)
 
       onFilter: (collection, attributes) ->
-        @filters = attributes
+        @infinite.attributes = attributes
         @reset()
 
       onSort: (collection, options) ->
@@ -150,7 +156,8 @@ class Collection2ViewBinder
     @handlers["reset"](collection)
 
   filter: (attributes) ->
-    attributes = undefined unless attributes? && Object.keys(attributes).length != 0
+    if _.isEmpty(attributes) and not _.isFunction(attributes)
+      attributes = undefined 
     @handlers["filter"](@collection, attributes)
 
   sort: (comparator) ->

@@ -9,9 +9,9 @@ class App.Views.Main extends Backbone.View
     "modal": App.Views.Modal
 
   events:
-    "click a[sref]": "gotoState"
+    "click a[sref]": "loadState"
 
-  gotoState: (event) ->
+  loadState: (event) ->
     # load url & run callback defined in AppRouter without change hash
     url = $(event.currentTarget).attr("sref")
     Backbone.history.loadUrl(url)
