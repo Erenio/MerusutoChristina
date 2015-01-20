@@ -370,15 +370,16 @@ a[sref] {
 
 /* line 143, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-info-group {
-  padding: 50px; }
+  padding: 10px; }
 /* line 146, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-info-group .media-info, .modal .media-title {
   text-shadow: 1px 1px 5px #000, 1px -1px 5px #000,  -1px 1px 5px #000, -1px -1px 5px #000;
   color: white !important; }
 /* line 151, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-title {
-  font-size: 18px !important; }
-/* line 154, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  font-size: 18px !important;
+  padding-top: 50px; }
+/* line 155, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .image {
   position: absolute;
   top: 0;
@@ -387,10 +388,10 @@ a[sref] {
   width: 100%; }
 
 @media (max-width: 440px) {
-  /* line 164, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 165, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-xs {
     display: none !important; } }
 @media (max-width: 550px) {
-  /* line 170, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 171, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-sm {
     display: none !important; } }
