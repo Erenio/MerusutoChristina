@@ -126,26 +126,38 @@ a[sref] {
   .icon-close {
     color: #fff;
     padding: 10px;
+    position: absolute;
+    right: 0;
+    z-index: 1;
   }
-  .wrap {
+
+  .content, .slider {
+    background-color: transparent;
+  }
+  .slider, .slide-group {
     height: 100%;
-    .image {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      margin: auto;
-      width: 100%;
-    }
   }
 }
 
 .modal {
   .media-info-group {
-    padding: 10px;
-    .media-info {
-      text-shadow: 0 0 5px #000;
-      color: white!important;
-    }
+    padding: 10px 25px;
+  }
+  .media-info-group .media-info, .media-title {
+    text-shadow: 1px 1px 5px #000, 1px -1px 5px #000, 
+      -1px 1px 5px #000, -1px -1px 5px #000;
+    color: white!important;
+  }
+  .media-title {
+    font-size: 18px!important;
+    padding-top: 50px;
+  }
+  .image {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    width: 100%;
   }
 }
 

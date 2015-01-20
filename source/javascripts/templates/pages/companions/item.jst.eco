@@ -34,7 +34,7 @@
         <p class="media-info hidden-sm">
           暗：<%= Math.round(@model.get("dark")*100) %>%<br><br>
           DPS：<%= Math.round(@model.get("dps")) %><br>
-          MDPS：<%= Math.round(@model.get("mdps")) %><br>
+          总DPS：<%= Math.round(@model.get("mdps")) %><br>
         </p>
 
       </div>
