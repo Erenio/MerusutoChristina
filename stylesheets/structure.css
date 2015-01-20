@@ -359,24 +359,28 @@ a[sref] {
     color: #fff;
     padding: 10px; }
   /* line 131, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
-  .modal .content, .modal .slider {
-    background-color: transparent; }
-  /* line 134, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
-  .modal .slider, .modal .slide-group {
+  .modal .content {
+    background-color: transparent;
+    margin-top: 40px; }
+  /* line 135, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .modal .slider {
+    background-color: transparent;
+    height: 100%; }
+  /* line 139, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  .modal .slide-group {
     height: 100%; }
 
-/* line 141, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+/* line 145, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-info-group {
   padding: 10px; }
-/* line 144, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+/* line 148, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-info-group .media-info, .modal .media-title {
   text-shadow: 1px 1px 5px #000, 1px -1px 5px #000,  -1px 1px 5px #000, -1px -1px 5px #000;
   color: white !important; }
-/* line 149, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
-.modal .media-title {
-  padding-top: 50px;
-  font-size: 18px !important; }
 /* line 153, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+.modal .media-title {
+  font-size: 18px !important; }
+/* line 156, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .image {
   position: absolute;
   top: 0;
@@ -385,10 +389,10 @@ a[sref] {
   width: 100%; }
 
 @media (max-width: 440px) {
-  /* line 163, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 166, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-xs {
     display: none !important; } }
 @media (max-width: 550px) {
-  /* line 169, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 172, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-sm {
     display: none !important; } }
