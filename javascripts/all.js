@@ -5612,7 +5612,19 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(this.model.originalUrl()));
       
-        __out.push('">\n      </div>\n      <div class="slide media">\n        <div class="media-body">\n          <div class="media-info-group">\n            <p class="media-info">\n              生命：<span id="life">');
+        __out.push('">\n      </div>\n      <div class="slide media">\n        <div class="media-body">\n          <h4 class="media-title media-info-group">\n            ');
+      
+        __out.push(__sanitize(this.model.get("title")));
+      
+        __out.push(' ');
+      
+        __out.push(__sanitize(this.model.get("name")));
+      
+        __out.push('\n            <small>');
+      
+        __out.push(__sanitize(this.model.getRareString()));
+      
+        __out.push('</small>\n          </h4>\n          <div class="media-info-group">\n            <p class="media-info">\n              生命：<span id="life">');
       
         __out.push(__sanitize(this.model.get("life")));
       
@@ -5628,7 +5640,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(this.model.get("anum")));
       
-        __out.push('<br>\n              攻速：');
+        __out.push('<br>\n            </p>\n            <p class="media-info">\n              攻速：');
       
         __out.push(__sanitize(this.model.get("aspd")));
       
@@ -5644,7 +5656,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(this.model.getTypeString()));
       
-        __out.push('<br>\n            </p>\n            <p class="media-info">\n              火：');
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-group">\n            <p class="media-info">\n              火：');
       
         __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
       
@@ -5668,7 +5680,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(Math.round(this.model.get("dps"))));
       
-        __out.push('<br>\n              MDPS：');
+        __out.push('<br>\n              总DPS：');
       
         __out.push(__sanitize(Math.round(this.model.get("mdps"))));
       
@@ -6018,7 +6030,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(Math.round(this.model.get("dps"))));
       
-        __out.push('<br>\n          MDPS：');
+        __out.push('<br>\n          总DPS：');
       
         __out.push(__sanitize(Math.round(this.model.get("mdps"))));
       

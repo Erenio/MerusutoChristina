@@ -137,7 +137,7 @@
       
         __out.push(__sanitize(Math.round(this.model.get("dps"))));
       
-        __out.push('<br>\n          MDPS：');
+        __out.push('<br>\n          总DPS：');
       
         __out.push(__sanitize(Math.round(this.model.get("mdps"))));
       
