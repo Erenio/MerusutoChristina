@@ -370,7 +370,7 @@ a[sref] {
 
 /* line 143, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-info-group {
-  padding: 10px; }
+  padding: 10px 25px; }
 /* line 146, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .media-info-group .media-info, .modal .media-title {
   text-shadow: 1px 1px 5px #000, 1px -1px 5px #000,  -1px 1px 5px #000, -1px -1px 5px #000;
