@@ -42,10 +42,12 @@
     CompanionsIndex.prototype.events = {
       "click .dropdown-toggle": "toggleDropdown",
       "click .dropdown-submenu > a": "triggerHover",
-      "click .reset-filter": "resetFilter",
+      "click .filter-reset": "resetFilter",
       "click .filter": "setFilter",
       "click .sort-mode": "setSortMode",
-      "click .level-mode": "setLevelMode"
+      "click .level-mode": "setLevelMode",
+      "click .search-open": "openSearch",
+      "click .search-close": "closeSearch"
     };
 
     CompanionsIndex.prototype.beforeInitialize = function() {
@@ -70,6 +72,62 @@
         return $dropdown.removeClass("active");
       });
       return event.stopPropagation();
+    };
+
+    CompanionsIndex.prototype.openSearch = function(event) {
+      var $children, $input, $search;
+      $children = $(event.target).closest("header").children();
+      $search = $children.filter(".input-search");
+      $children.not($search).hide();
+      $search.show();
+      $input = $search.children("input");
+      $input.trigger("focus").val("");
+      return this.searchInterval = setInterval((function(_this) {
+        return function() {
+          var query;
+          query = $input.val();
+          return _this.search(query);
+        };
+      })(this), 200);
+    };
+
+    CompanionsIndex.prototype.closeSearch = function(event) {
+      var $children, $search;
+      this.binder.filter(this.filters);
+      if (this.searchInterval) {
+        clearInterval(this.searchInterval);
+      }
+      $children = $(event.target).closest("header").children();
+      $search = $children.filter(".input-search");
+      $children.not($search).show();
+      return $search.hide();
+    };
+
+    CompanionsIndex.prototype.search = function(query) {
+      if (query !== this.searchQuery) {
+        this.binder.filter((function(_this) {
+          return function(collection) {
+            var models;
+            models = _.isEmpty(_this.filters) ? collection.models : collection.where(_this.filters);
+            if (query !== "") {
+              models = _.filter(models, function(model) {
+                var key, value, _i, _len, _ref;
+                _ref = ["name", "title"];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  key = _ref[_i];
+                  value = model.get(key);
+                  if (value && value.indexOf(query) >= 0) {
+                    return true;
+                  }
+                }
+                return false;
+              });
+            }
+            return models;
+          };
+        })(this));
+        return this.searchQuery = query;
+      }
     };
 
     CompanionsIndex.prototype.resetFilter = function(event) {

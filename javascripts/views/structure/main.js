@@ -154,10 +154,10 @@
     };
 
     Main.prototype.events = {
-      "click a[sref]": "gotoState"
+      "click a[sref]": "loadState"
     };
 
-    Main.prototype.gotoState = function(event) {
+    Main.prototype.loadState = function(event) {
       var url;
       url = $(event.currentTarget).attr("sref");
       Backbone.history.loadUrl(url);

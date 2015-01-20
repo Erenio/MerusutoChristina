@@ -5,7 +5,7 @@
 
   Backbone.View.Extension = {};
 
-  Backbone.BaseView = BaseView = Backbone.View;
+  BaseView = Backbone.View;
 
   View = (function(_super) {
     __extends(View, _super);

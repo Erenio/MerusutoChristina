@@ -1,5 +1,13 @@
 (function() {
-  var Collection2ViewBinder;
+  var Collection2ViewBinder, _where;
+
+  _where = function(collection, attributes) {
+    if (_.isFunction(attributes)) {
+      return attributes(collection);
+    } else {
+      return collection.where(attributes);
+    }
+  };
 
   Collection2ViewBinder = (function() {
     Collection2ViewBinder.prototype.defaults = {
@@ -60,14 +68,14 @@
         this.views[model.cid].remove();
         return delete this.views[model.cid];
       },
-      onFilter: function(attributes) {
+      onFilter: function(collection, attributes) {
         var eachTemplate;
         eachTemplate = (function(_this) {
-          return function(collection, callback) {
+          return function(models, callback) {
             var model, template, _i, _len, _results;
             _results = [];
-            for (_i = 0, _len = collection.length; _i < _len; _i++) {
-              model = collection[_i];
+            for (_i = 0, _len = models.length; _i < _len; _i++) {
+              model = models[_i];
               template = _this.views[model.cid];
               _results.push(callback(template.$el));
             }
@@ -75,14 +83,14 @@
           };
         })(this);
         if (attributes != null) {
-          eachTemplate(this.collection.models, function(template) {
+          eachTemplate(collection.models, function(template) {
             return template.hide();
           });
-          return eachTemplate(this.collection.where(attributes), function(template) {
+          return eachTemplate(_where(collection, attributes), function(template) {
             return template.show();
           });
         } else {
-          return eachTemplate(this.collection.models, function(template) {
+          return eachTemplate(collection.models, function(template) {
             return template.show();
           });
         }
@@ -101,11 +109,11 @@
           }
           this.$container.scrollTop(0);
           this.infinite.length = 0;
-          this.infinite.models = this.filters != null ? collection.where(this.filters) : collection.models;
+          this.infinite.models = this.infinite.attributes != null ? _where(collection, this.infinite.attributes) : collection.models;
           return this.show(this.infinite.slice);
         },
         onFilter: function(collection, attributes) {
-          this.filters = attributes;
+          this.infinite.attributes = attributes;
           return this.reset();
         },
         onSort: function(collection, options) {
@@ -208,7 +216,7 @@
     };
 
     Collection2ViewBinder.prototype.filter = function(attributes) {
-      if (!((attributes != null) && Object.keys(attributes).length !== 0)) {
+      if (_.isEmpty(attributes) && !_.isFunction(attributes)) {
         attributes = void 0;
       }
       return this.handlers["filter"](this.collection, attributes);

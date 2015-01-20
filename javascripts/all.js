@@ -1,8 +1,9 @@
-/* Zepto v1.1.6 - zepto event ajax form ie - zeptojs.com/license */
-
+//     Zepto.js
+//     (c) 2010-2015 Thomas Fuchs
+//     Zepto.js may be freely distributed under the MIT license.
 
 var Zepto = (function() {
-  var undefined, key, $, classList, emptyArray = [], slice = emptyArray.slice, filter = emptyArray.filter,
+  var undefined, key, $, classList, emptyArray = [], concat = emptyArray.concat, filter = emptyArray.filter, slice = emptyArray.slice,
     document = window.document,
     elementDisplay = {}, classCache = {},
     cssNumber = { 'column-count': 1, 'columns': 1, 'font-weight': 1, 'line-height': 1,'opacity': 1, 'z-index': 1, 'zoom': 1 },
@@ -115,6 +116,13 @@ var Zepto = (function() {
       $.map(element.childNodes, function(node){ if (node.nodeType == 1) return node })
   }
 
+  function Z(dom, selector) {
+    var i, len = dom ? dom.length : 0
+    for (i = 0; i < len; i++) this[i] = dom[i]
+    this.length = len
+    this.selector = selector || ''
+  }
+
   // `$.zepto.fragment` takes a html string and an optional tag name
   // to generate DOM nodes nodes from the given html string.
   // The generated DOM nodes are returned as an array.
@@ -151,13 +159,9 @@ var Zepto = (function() {
 
   // `$.zepto.Z` swaps out the prototype of the given `dom` array
   // of nodes with `$.fn` and thus supplying all the Zepto functions
-  // to the array. Note that `__proto__` is not supported on Internet
-  // Explorer. This method can be overriden in plugins.
+  // to the array. This method can be overriden in plugins.
   zepto.Z = function(dom, selector) {
-    dom = dom || []
-    dom.__proto__ = $.fn
-    dom.selector = selector || ''
-    return dom
+    return new Z(dom, selector)
   }
 
   // `$.zepto.isZ` should return `true` if the given object is a Zepto
@@ -252,11 +256,11 @@ var Zepto = (function() {
         maybeClass = !maybeID && selector[0] == '.',
         nameOnly = maybeID || maybeClass ? selector.slice(1) : selector, // Ensure that a 1 char tag name still gets checked
         isSimple = simpleSelectorRE.test(nameOnly)
-    return (isDocument(element) && isSimple && maybeID) ?
+    return (element.getElementById && isSimple && maybeID) ? // Safari DocumentFragment doesn't have getElementById
       ( (found = element.getElementById(nameOnly)) ? [found] : [] ) :
-      (element.nodeType !== 1 && element.nodeType !== 9) ? [] :
+      (element.nodeType !== 1 && element.nodeType !== 9 && element.nodeType !== 11) ? [] :
       slice.call(
-        isSimple && !maybeID ?
+        isSimple && !maybeID && element.getElementsByClassName ? // DocumentFragment doesn't have getElementsByClassName/TagName
           maybeClass ? element.getElementsByClassName(nameOnly) : // If it's simple, it could be a class
           element.getElementsByTagName(selector) : // Or a tag
           element.querySelectorAll(selector) // Or it's not simple, and we need to query all
@@ -342,6 +346,7 @@ var Zepto = (function() {
   $.uuid = 0
   $.support = { }
   $.expr = { }
+  $.noop = function() {}
 
   $.map = function(elements, callback){
     var value, values = [], i, key
@@ -385,14 +390,25 @@ var Zepto = (function() {
   // Define methods that will be available on all
   // Zepto collections
   $.fn = {
+    constructor: zepto.Z,
+    length: 0,
+
     // Because a collection acts like an array
     // copy over these useful array functions.
     forEach: emptyArray.forEach,
     reduce: emptyArray.reduce,
     push: emptyArray.push,
     sort: emptyArray.sort,
+    splice: emptyArray.splice,
     indexOf: emptyArray.indexOf,
-    concat: emptyArray.concat,
+    concat: function(){
+      var i, value, args = []
+      for (i = 0; i < arguments.length; i++) {
+        value = arguments[i]
+        args[i] = zepto.isZ(value) ? value.toArray() : value
+      }
+      return concat.apply(zepto.isZ(this) ? this.toArray() : this, args)
+    },
 
     // `map` and `slice` in the jQuery API work differently
     // from their array counterparts
@@ -513,7 +529,7 @@ var Zepto = (function() {
       return filtered(this.map(function(){ return children(this) }), selector)
     },
     contents: function() {
-      return this.map(function() { return slice.call(this.childNodes) })
+      return this.map(function() { return this.contentDocument || slice.call(this.childNodes) })
     },
     siblings: function(selector){
       return filtered(this.map(function(i, el){
@@ -872,7 +888,7 @@ var Zepto = (function() {
     }
   })
 
-  zepto.Z.prototype = $.fn
+  zepto.Z.prototype = Z.prototype = $.fn
 
   // Export internal API functions in the `$.zepto` namespace
   zepto.uniq = uniq
@@ -882,8 +898,13 @@ var Zepto = (function() {
   return $
 })()
 
+// If `$` is not yet defined, point it to `Zepto`
 window.Zepto = Zepto
 window.$ === undefined && (window.$ = Zepto)
+;
+//     Zepto.js
+//     (c) 2010-2015 Thomas Fuchs
+//     Zepto.js may be freely distributed under the MIT license.
 
 ;(function($){
   var _zid = 1, undefined,
@@ -1065,7 +1086,7 @@ window.$ === undefined && (window.$ = Zepto)
 
     if (!isString(selector) && !isFunction(callback) && callback !== false)
       callback = data, data = selector, selector = undefined
-    if (isFunction(data) || data === false)
+    if (callback === undefined || data === false)
       callback = data, data = undefined
 
     if (callback === false) callback = returnFalse
@@ -1154,6 +1175,10 @@ window.$ === undefined && (window.$ = Zepto)
   }
 
 })(Zepto)
+;
+//     Zepto.js
+//     (c) 2010-2015 Thomas Fuchs
+//     Zepto.js may be freely distributed under the MIT license.
 
 ;(function($){
   var jsonpID = 0,
@@ -1341,7 +1366,7 @@ window.$ === undefined && (window.$ = Zepto)
   $.ajax = function(options){
     var settings = $.extend({}, options || {}),
         deferred = $.Deferred && $.Deferred(),
-        urlAnchor
+        urlAnchor, hashIndex
     for (key in $.ajaxSettings) if (settings[key] === undefined) settings[key] = $.ajaxSettings[key]
 
     ajaxStart(settings)
@@ -1354,6 +1379,7 @@ window.$ === undefined && (window.$ = Zepto)
     }
 
     if (!settings.url) settings.url = window.location.toString()
+    if ((hashIndex = settings.url.indexOf('#')) > -1) settings.url = settings.url.slice(0, hashIndex)
     serializeData(settings)
 
     var dataType = settings.dataType, hasPlaceholder = /\?.+=\?/.test(settings.url)
@@ -1514,79 +1540,10 @@ window.$ === undefined && (window.$ = Zepto)
     return params.join('&').replace(/%20/g, '+')
   }
 })(Zepto)
-
-;(function($){
-  $.fn.serializeArray = function() {
-    var name, type, result = [],
-      add = function(value) {
-        if (value.forEach) return value.forEach(add)
-        result.push({ name: name, value: value })
-      }
-    if (this[0]) $.each(this[0].elements, function(_, field){
-      type = field.type, name = field.name
-      if (name && field.nodeName.toLowerCase() != 'fieldset' &&
-        !field.disabled && type != 'submit' && type != 'reset' && type != 'button' && type != 'file' &&
-        ((type != 'radio' && type != 'checkbox') || field.checked))
-          add($(field).val())
-    })
-    return result
-  }
-
-  $.fn.serialize = function(){
-    var result = []
-    this.serializeArray().forEach(function(elm){
-      result.push(encodeURIComponent(elm.name) + '=' + encodeURIComponent(elm.value))
-    })
-    return result.join('&')
-  }
-
-  $.fn.submit = function(callback) {
-    if (0 in arguments) this.bind('submit', callback)
-    else if (this.length) {
-      var event = $.Event('submit')
-      this.eq(0).trigger(event)
-      if (!event.isDefaultPrevented()) this.get(0).submit()
-    }
-    return this
-  }
-
-})(Zepto)
-
-;(function($){
-  // __proto__ doesn't exist on IE<11, so redefine
-  // the Z function to use object extension instead
-  if (!('__proto__' in {})) {
-    $.extend($.zepto, {
-      Z: function(dom, selector){
-        dom = dom || []
-        $.extend(dom, $.fn)
-        dom.selector = selector || ''
-        dom.__Z = true
-        return dom
-      },
-      // this is a kludge but works
-      isZ: function(object){
-        return $.type(object) === 'array' && '__Z' in object
-      }
-    })
-  }
-
-  // getComputedStyle shouldn't freak out when called
-  // without a valid element as argument
-  try {
-    getComputedStyle(undefined)
-  } catch(e) {
-    var nativeGetComputedStyle = getComputedStyle;
-    window.getComputedStyle = function(element){
-      try {
-        return nativeGetComputedStyle(element)
-      } catch(e) {
-        return null
-      }
-    }
-  }
-})(Zepto)
 ;
+
+
+
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -3002,6 +2959,67 @@ window.$ === undefined && (window.$ = Zepto)
     });
   }
 }.call(this));
+(function() {
+  _.mixin({
+    required: function(obj, key) {
+      return _.tap(obj[key], function(value) {
+        if (!value) {
+          return _.error("Parameter '" + key + "' is required for ", obj);
+        }
+      });
+    },
+    deleted: function(obj, key) {
+      return _.tap(obj[key], function() {
+        return delete obj[key];
+      });
+    },
+    loadTemplate: function(path) {
+      var template;
+      if (template = $("[id='" + path + "']").html()) {
+        JST[path] = _.template(template);
+      }
+      return _.required(JST, path);
+    },
+    renderTemplate: function(path, options) {
+      if (options == null) {
+        options = {};
+      }
+      return _.loadTemplate(path)(options);
+    },
+    setDebugLevel: function(debugLevel) {
+      var DebugLevelMap, level, method, methods, _results;
+      DebugLevelMap = {
+        0: ['debug', 'time', 'timeEnd'],
+        1: ['info', 'log'],
+        2: ['warn'],
+        3: ['error', 'assert']
+      };
+      _results = [];
+      for (level in DebugLevelMap) {
+        methods = DebugLevelMap[level];
+        _results.push((function() {
+          var _i, _len, _results1;
+          _results1 = [];
+          for (_i = 0, _len = methods.length; _i < _len; _i++) {
+            method = methods[_i];
+            if (debugLevel <= level && (console[method] != null)) {
+              _results1.push(_[method] = _.bind(console[method], console));
+            } else {
+              _results1.push(_[method] = _.noop);
+            }
+          }
+          return _results1;
+        })());
+      }
+      return _results;
+    }
+  });
+
+  _.setDebugLevel(0);
+
+}).call(this);
+
+
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -4611,65 +4629,6 @@ window.$ === undefined && (window.$ = Zepto)
 
 }));
 (function() {
-  _.mixin({
-    required: function(obj, key) {
-      return _.tap(obj[key], function(value) {
-        if (!value) {
-          return _.error("Parameter '" + key + "' is required for ", obj);
-        }
-      });
-    },
-    deleted: function(obj, key) {
-      return _.tap(obj[key], function() {
-        return delete obj[key];
-      });
-    },
-    loadTemplate: function(path) {
-      var template;
-      if (template = $("[id='" + path + "']").html()) {
-        JST[path] = _.template(template);
-      }
-      return _.required(JST, path);
-    },
-    renderTemplate: function(path, options) {
-      if (options == null) {
-        options = {};
-      }
-      return _.loadTemplate(path)(options);
-    },
-    setDebugLevel: function(debugLevel) {
-      var DebugLevelMap, level, method, methods, _results;
-      DebugLevelMap = {
-        0: ['debug', 'time', 'timeEnd'],
-        1: ['info', 'log'],
-        2: ['warn'],
-        3: ['error', 'assert']
-      };
-      _results = [];
-      for (level in DebugLevelMap) {
-        methods = DebugLevelMap[level];
-        _results.push((function() {
-          var _i, _len, _results1;
-          _results1 = [];
-          for (_i = 0, _len = methods.length; _i < _len; _i++) {
-            method = methods[_i];
-            if (debugLevel <= level && (console[method] != null)) {
-              _results1.push(_[method] = _.bind(console[method], console));
-            } else {
-              _results1.push(_[method] = _.noop);
-            }
-          }
-          return _results1;
-        })());
-      }
-      return _results;
-    }
-  });
-
-  _.setDebugLevel(0);
-
-}).call(this);
-(function() {
   Backbone.Template = (function() {
     function Template(options) {
       this.$el = $(_.required(options, "el"));
@@ -4695,7 +4654,7 @@ window.$ === undefined && (window.$ = Zepto)
 
   Backbone.View.Extension = {};
 
-  Backbone.BaseView = BaseView = Backbone.View;
+  BaseView = Backbone.View;
 
   View = (function(_super) {
     __extends(View, _super);
@@ -5052,7 +5011,15 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(this);
 (function() {
-  var Collection2ViewBinder;
+  var Collection2ViewBinder, _where;
+
+  _where = function(collection, attributes) {
+    if (_.isFunction(attributes)) {
+      return attributes(collection);
+    } else {
+      return collection.where(attributes);
+    }
+  };
 
   Collection2ViewBinder = (function() {
     Collection2ViewBinder.prototype.defaults = {
@@ -5113,14 +5080,14 @@ window.$ === undefined && (window.$ = Zepto)
         this.views[model.cid].remove();
         return delete this.views[model.cid];
       },
-      onFilter: function(attributes) {
+      onFilter: function(collection, attributes) {
         var eachTemplate;
         eachTemplate = (function(_this) {
-          return function(collection, callback) {
+          return function(models, callback) {
             var model, template, _i, _len, _results;
             _results = [];
-            for (_i = 0, _len = collection.length; _i < _len; _i++) {
-              model = collection[_i];
+            for (_i = 0, _len = models.length; _i < _len; _i++) {
+              model = models[_i];
               template = _this.views[model.cid];
               _results.push(callback(template.$el));
             }
@@ -5128,14 +5095,14 @@ window.$ === undefined && (window.$ = Zepto)
           };
         })(this);
         if (attributes != null) {
-          eachTemplate(this.collection.models, function(template) {
+          eachTemplate(collection.models, function(template) {
             return template.hide();
           });
-          return eachTemplate(this.collection.where(attributes), function(template) {
+          return eachTemplate(_where(collection, attributes), function(template) {
             return template.show();
           });
         } else {
-          return eachTemplate(this.collection.models, function(template) {
+          return eachTemplate(collection.models, function(template) {
             return template.show();
           });
         }
@@ -5154,11 +5121,11 @@ window.$ === undefined && (window.$ = Zepto)
           }
           this.$container.scrollTop(0);
           this.infinite.length = 0;
-          this.infinite.models = this.filters != null ? collection.where(this.filters) : collection.models;
+          this.infinite.models = this.infinite.attributes != null ? _where(collection, this.infinite.attributes) : collection.models;
           return this.show(this.infinite.slice);
         },
         onFilter: function(collection, attributes) {
-          this.filters = attributes;
+          this.infinite.attributes = attributes;
           return this.reset();
         },
         onSort: function(collection, options) {
@@ -5261,7 +5228,7 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     Collection2ViewBinder.prototype.filter = function(attributes) {
-      if (!((attributes != null) && Object.keys(attributes).length !== 0)) {
+      if (_.isEmpty(attributes) && !_.isFunction(attributes)) {
         attributes = void 0;
       }
       return this.handlers["filter"](this.collection, attributes);
@@ -5331,6 +5298,10 @@ window.$ === undefined && (window.$ = Zepto)
   })();
 
 }).call(this);
+
+
+
+
 (function() {
   window.Ratchet = {};
 
@@ -5641,7 +5612,67 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(this.model.originalUrl()));
       
-        __out.push('">\n</div>\n');
+        __out.push('">\n\n  <div class="media">\n    <div class="media-body">\n      <div class="media-info-group">\n        <p class="media-info">\n          生命：<span id="life">');
+      
+        __out.push(__sanitize(this.model.get("life")));
+      
+        __out.push('</span><br>\n          攻击：<span id="atk">');
+      
+        __out.push(__sanitize(this.model.get("atk")));
+      
+        __out.push('</span><br>\n          攻距：');
+      
+        __out.push(__sanitize(this.model.get("aarea")));
+      
+        __out.push('<br>\n          攻数：');
+      
+        __out.push(__sanitize(this.model.get("anum")));
+      
+        __out.push('<br>\n          攻速：');
+      
+        __out.push(__sanitize(this.model.get("aspd")));
+      
+        __out.push('<br>\n          韧性：');
+      
+        __out.push(__sanitize(this.model.get("tenacity")));
+      
+        __out.push('<br>\n          移速：');
+      
+        __out.push(__sanitize(this.model.get("mspd")));
+      
+        __out.push('<br>\n          成长：');
+      
+        __out.push(__sanitize(this.model.getTypeString()));
+      
+        __out.push('<br>\n        </p>\n        <p class="media-info">\n          火：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
+      
+        __out.push('%<br>\n          水：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("aqua") * 100)));
+      
+        __out.push('%<br>\n          风：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("wind") * 100)));
+      
+        __out.push('%<br>\n          光：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("light") * 100)));
+      
+        __out.push('%<br>\n          暗：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
+      
+        __out.push('%<br><br>\n        </p>\n        <p class="media-info">\n          DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dps"))));
+      
+        __out.push('<br>\n          MDPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("mdps"))));
+      
+        __out.push('<br>\n        </p>\n      </div>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       
@@ -5785,7 +5816,7 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push('<header class="bar bar-nav">\n  <a class="icon icon-bars pull-left" sref="#toggle-sidebar"></a>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      筛选\n    </a>\n    <ul class="dropdown-menu">\n      <li class="dropdown-submenu pull-left">\n        <a class="">稀有度</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="rare">全部</a></li>\n          <li><a class="filter" data-key="rare" data-value="1">★</a></li>\n          <li><a class="filter" data-key="rare" data-value="2">★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="3">★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="4">★★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="5">★★★★★</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">元素</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="element">全部</a></li>\n          <li><a class="filter" data-key="element" data-value="1">火</a></li>\n          <li><a class="filter" data-key="element" data-value="2">水</a></li>\n          <li><a class="filter" data-key="element" data-value="3">风</a></li>\n          <li><a class="filter" data-key="element" data-value="4">光</a></li>\n          <li><a class="filter" data-key="element" data-value="5">暗</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">武器</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="weapon">全部</a></li>\n          <li><a class="filter" data-key="weapon" data-value="1">斩击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="2">突击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="3">打击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="4">弓箭</a></li>\n          <li><a class="filter" data-key="weapon" data-value="5">魔法</a></li>\n          <li><a class="filter" data-key="weapon" data-value="6">铳弹</a></li>\n          <li><a class="filter" data-key="weapon" data-value="7">回复</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">成长</a>\n        <ul class="dropdown-menu">\n          <li><a class="reset-filter" data-key="type">全部</a></li>\n          <li><a class="filter" data-key="type" data-value="1">早熟</a></li>\n          <li><a class="filter" data-key="type" data-value="2">平均</a></li>\n          <li><a class="filter" data-key="type" data-value="3">晚成</a></li>\n        </ul>\n      </li>\n      <li class="divider"></li>\n      <li><a class="reset-filter">重置</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      排序\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="sort-mode" data-key="rare">稀有度</a></li>\n      <li><a class="sort-mode" data-key="dps">单体DPS</a></li>\n      <li><a class="sort-mode" data-key="mdps">多体DPS</a></li>\n      <li><a class="sort-mode" data-key="life">生命力</a></li>\n      <li><a class="sort-mode" data-key="atk">攻击</a></li>\n      <li><a class="sort-mode" data-key="aarea">攻击距离</a></li>\n      <li><a class="sort-mode" data-key="anum">攻击数量</a></li>\n      <li><a class="sort-mode" data-key="aspd">攻击速度</a></li>\n      <li><a class="sort-mode" data-key="tenacity">韧性</a></li>\n      <li><a class="sort-mode" data-key="mspd">移动速度</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      等级\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="level-mode" data-key="zero">零觉零级</a></li>\n      <li><a class="level-mode" data-key="mxlv">零觉满级</a></li>\n      <li><a class="level-mode" data-key="mxlvgr">满觉满级</a></li>\n    </ul>\n  </div>\n  <h1 class="title">');
+        __out.push('<header class="bar bar-nav">\n\n  <div class="input-icon input-search" style="display:none;">\n    <span class="icon icon-search"></span>\n    <input type="search" placeholder="Search">\n    <a class="icon icon-close pull-right search-close"></a>\n  </div>\n\n  <a class="icon icon-bars pull-left" sref="#toggle-sidebar"></a>\n  <a class="icon icon-search pull-right search-open"></a>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      筛选\n    </a>\n    <ul class="dropdown-menu">\n      <li class="dropdown-submenu pull-left">\n        <a class="">稀有度</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="rare">全部</a></li>\n          <li><a class="filter" data-key="rare" data-value="1">★</a></li>\n          <li><a class="filter" data-key="rare" data-value="2">★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="3">★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="4">★★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="5">★★★★★</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">元素</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="element">全部</a></li>\n          <li><a class="filter" data-key="element" data-value="1">火</a></li>\n          <li><a class="filter" data-key="element" data-value="2">水</a></li>\n          <li><a class="filter" data-key="element" data-value="3">风</a></li>\n          <li><a class="filter" data-key="element" data-value="4">光</a></li>\n          <li><a class="filter" data-key="element" data-value="5">暗</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">武器</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="weapon">全部</a></li>\n          <li><a class="filter" data-key="weapon" data-value="1">斩击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="2">突击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="3">打击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="4">弓箭</a></li>\n          <li><a class="filter" data-key="weapon" data-value="5">魔法</a></li>\n          <li><a class="filter" data-key="weapon" data-value="6">铳弹</a></li>\n          <li><a class="filter" data-key="weapon" data-value="7">回复</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">成长</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="type">全部</a></li>\n          <li><a class="filter" data-key="type" data-value="1">早熟</a></li>\n          <li><a class="filter" data-key="type" data-value="2">平均</a></li>\n          <li><a class="filter" data-key="type" data-value="3">晚成</a></li>\n        </ul>\n      </li>\n      <li class="divider"></li>\n      <li><a class="filter-reset">重置</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      排序\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="sort-mode" data-key="rare">稀有度</a></li>\n      <li><a class="sort-mode" data-key="dps">单体DPS</a></li>\n      <li><a class="sort-mode" data-key="mdps">多体DPS</a></li>\n      <li><a class="sort-mode" data-key="life">生命力</a></li>\n      <li><a class="sort-mode" data-key="atk">攻击</a></li>\n      <li><a class="sort-mode" data-key="aarea">攻击距离</a></li>\n      <li><a class="sort-mode" data-key="anum">攻击数量</a></li>\n      <li><a class="sort-mode" data-key="aspd">攻击速度</a></li>\n      <li><a class="sort-mode" data-key="tenacity">韧性</a></li>\n      <li><a class="sort-mode" data-key="mspd">移动速度</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      等级\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="level-mode" data-key="zero">零觉零级</a></li>\n      <li><a class="level-mode" data-key="mxlv">零觉满级</a></li>\n      <li><a class="level-mode" data-key="mxlvgr">满觉满级</a></li>\n    </ul>\n  </div>\n  <h1 class="title">');
       
         __out.push(__sanitize(this.title));
       
@@ -5987,7 +6018,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(Math.round(this.model.get("dps"))));
       
-        __out.push('<br>\n          总DPS：');
+        __out.push('<br>\n          MDPS：');
       
         __out.push(__sanitize(Math.round(this.model.get("mdps"))));
       
@@ -6092,10 +6123,12 @@ window.$ === undefined && (window.$ = Zepto)
     CompanionsIndex.prototype.events = {
       "click .dropdown-toggle": "toggleDropdown",
       "click .dropdown-submenu > a": "triggerHover",
-      "click .reset-filter": "resetFilter",
+      "click .filter-reset": "resetFilter",
       "click .filter": "setFilter",
       "click .sort-mode": "setSortMode",
-      "click .level-mode": "setLevelMode"
+      "click .level-mode": "setLevelMode",
+      "click .search-open": "openSearch",
+      "click .search-close": "closeSearch"
     };
 
     CompanionsIndex.prototype.beforeInitialize = function() {
@@ -6120,6 +6153,62 @@ window.$ === undefined && (window.$ = Zepto)
         return $dropdown.removeClass("active");
       });
       return event.stopPropagation();
+    };
+
+    CompanionsIndex.prototype.openSearch = function(event) {
+      var $children, $input, $search;
+      $children = $(event.target).closest("header").children();
+      $search = $children.filter(".input-search");
+      $children.not($search).hide();
+      $search.show();
+      $input = $search.children("input");
+      $input.trigger("focus").val("");
+      return this.searchInterval = setInterval((function(_this) {
+        return function() {
+          var query;
+          query = $input.val();
+          return _this.search(query);
+        };
+      })(this), 200);
+    };
+
+    CompanionsIndex.prototype.closeSearch = function(event) {
+      var $children, $search;
+      this.binder.filter(this.filters);
+      if (this.searchInterval) {
+        clearInterval(this.searchInterval);
+      }
+      $children = $(event.target).closest("header").children();
+      $search = $children.filter(".input-search");
+      $children.not($search).show();
+      return $search.hide();
+    };
+
+    CompanionsIndex.prototype.search = function(query) {
+      if (query !== this.searchQuery) {
+        this.binder.filter((function(_this) {
+          return function(collection) {
+            var models;
+            models = _.isEmpty(_this.filters) ? collection.models : collection.where(_this.filters);
+            if (query !== "") {
+              models = _.filter(models, function(model) {
+                var key, value, _i, _len, _ref;
+                _ref = ["name", "title"];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  key = _ref[_i];
+                  value = model.get(key);
+                  if (value && value.indexOf(query) >= 0) {
+                    return true;
+                  }
+                }
+                return false;
+              });
+            }
+            return models;
+          };
+        })(this));
+        return this.searchQuery = query;
+      }
     };
 
     CompanionsIndex.prototype.resetFilter = function(event) {
@@ -6189,9 +6278,13 @@ window.$ === undefined && (window.$ = Zepto)
 
     CompanionsShow.prototype.template = _.loadTemplate("templates/modals/companions/show");
 
-    CompanionsShow.prototype.afterRender = function() {};
+    CompanionsShow.prototype.events = {
+      "click": "closeModal"
+    };
 
-    CompanionsShow.prototype.beforeRemove = function() {};
+    CompanionsShow.prototype.closeModal = function() {
+      return Backbone.history.loadUrl("#close-modal");
+    };
 
     return CompanionsShow;
 
@@ -6354,10 +6447,10 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     Main.prototype.events = {
-      "click a[sref]": "gotoState"
+      "click a[sref]": "loadState"
     };
 
-    Main.prototype.gotoState = function(event) {
+    Main.prototype.loadState = function(event) {
       var url;
       url = $(event.currentTarget).attr("sref");
       Backbone.history.loadUrl(url);
@@ -6661,10 +6754,6 @@ window.$ === undefined && (window.$ = Zepto)
   })(Backbone.Router);
 
 }).call(this);
-
-
-
-
 
 
 

@@ -11,9 +11,13 @@
 
     CompanionsShow.prototype.template = _.loadTemplate("templates/modals/companions/show");
 
-    CompanionsShow.prototype.afterRender = function() {};
+    CompanionsShow.prototype.events = {
+      "click": "closeModal"
+    };
 
-    CompanionsShow.prototype.beforeRemove = function() {};
+    CompanionsShow.prototype.closeModal = function() {
+      return Backbone.history.loadUrl("#close-modal");
+    };
 
     return CompanionsShow;
 
