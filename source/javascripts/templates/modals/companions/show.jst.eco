@@ -13,12 +13,16 @@
           </h4>
           <div class="media-info-group">
             <p class="media-info">
-              生命：<span id="life"><%= @model.get("life") %></span><br>
-              攻击：<span id="atk"><%= @model.get("atk") %></span><br>
-              攻距：<%= @model.get("aarea") %><br>
-              攻数：<%= @model.get("anum") %><br>
+              初始生命：<%= @model.origin.life %><br>
+              满级生命：<%= @model.calcMaxLv(@model.origin.life) %><br>
+              满觉生命：<%= @model.calcMaxLvAndGrow(@model.origin.life) %><br>
+              初始攻击：<%= @model.origin.atk %><br>
+              满级攻击：<%= @model.calcMaxLv(@model.origin.atk) %><br>
+              满觉攻击：<%= @model.calcMaxLvAndGrow(@model.origin.atk) %><br>
             </p>
             <p class="media-info">
+              攻距：<%= @model.get("aarea") %><br>
+              攻数：<%= @model.get("anum") %><br>
               攻速：<%= @model.get("aspd") %><br>
               韧性：<%= @model.get("tenacity") %><br>
               移速：<%= @model.get("mspd") %><br>
