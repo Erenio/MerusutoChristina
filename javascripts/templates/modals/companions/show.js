@@ -55,15 +55,31 @@
       
         __out.push(__sanitize(this.model.getRareString()));
       
-        __out.push('</small>\n          </h4>\n          <div class="media-info-group">\n            <p class="media-info">\n              生命：<span id="life">');
+        __out.push('</small>\n          </h4>\n          <div class="media-info-group">\n            <p class="media-info">\n              初始生命：');
       
-        __out.push(__sanitize(this.model.get("life")));
+        __out.push(__sanitize(this.model.origin.life));
       
-        __out.push('</span><br>\n              攻击：<span id="atk">');
+        __out.push('<br>\n              满级生命：');
       
-        __out.push(__sanitize(this.model.get("atk")));
+        __out.push(__sanitize(this.model.calcMaxLv(this.model.origin.life)));
       
-        __out.push('</span><br>\n              攻距：');
+        __out.push('<br>\n              满觉生命：');
+      
+        __out.push(__sanitize(this.model.calcMaxLvAndGrow(this.model.origin.life)));
+      
+        __out.push('<br>\n              初始攻击：');
+      
+        __out.push(__sanitize(this.model.origin.atk));
+      
+        __out.push('<br>\n              满级攻击：');
+      
+        __out.push(__sanitize(this.model.calcMaxLv(this.model.origin.atk)));
+      
+        __out.push('<br>\n              满觉攻击：');
+      
+        __out.push(__sanitize(this.model.calcMaxLvAndGrow(this.model.origin.atk)));
+      
+        __out.push('<br>\n            </p>\n            <p class="media-info">\n              攻距：');
       
         __out.push(__sanitize(this.model.get("aarea")));
       
@@ -71,7 +87,7 @@
       
         __out.push(__sanitize(this.model.get("anum")));
       
-        __out.push('<br>\n            </p>\n            <p class="media-info">\n              攻速：');
+        __out.push('<br>\n              攻速：');
       
         __out.push(__sanitize(this.model.get("aspd")));
       
