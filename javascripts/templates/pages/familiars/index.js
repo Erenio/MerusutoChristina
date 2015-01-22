@@ -1,4 +1,4 @@
-(function() { this.JST || (this.JST = {}); this.JST["templates/sidebar"] = function(__obj) {
+(function() { this.JST || (this.JST = {}); this.JST["templates/pages/familiars/index"] = function(__obj) {
     if (!__obj) __obj = {};
     var __out = [], __capture = function(callback) {
       var out = __out, result;
@@ -37,7 +37,9 @@
     }
     (function() {
       (function() {
-        __out.push('<sidebar class="content sidebar">\n  <ul class="table-view">\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#companions">\n        <span class="media-object pull-left icon icon-person"></span>\n        <div class="media-body">\n          同伴\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#familiars">\n        <span class="media-object pull-left icon icon-gear"></span>\n        <div class="media-body">\n          魔宠\n        </div>\n      </a>\n    </li>\n  </ul>\n</sidebar>\n');
+        __out.push(_.renderTemplate("templates/pages/companions/header"));
+      
+        __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n');
       
       }).call(this);
       

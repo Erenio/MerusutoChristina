@@ -1,4 +1,4 @@
-(function() { this.JST || (this.JST = {}); this.JST["templates/modals/companions/show"] = function(__obj) {
+(function() { this.JST || (this.JST = {}); this.JST["templates/modals/familiars/show"] = function(__obj) {
     if (!__obj) __obj = {};
     var __out = [], __capture = function(callback) {
       var out = __out, result;
@@ -55,31 +55,15 @@
       
         __out.push(__sanitize(this.model.getRareString()));
       
-        __out.push('</small>\n          </h4>\n          <div class="media-info-group">\n            <p class="media-info">\n              初始生命：');
+        __out.push('</small>\n          </h4>\n          <div class="media-info-group">\n            <p class="media-info">\n              生命：');
       
         __out.push(__sanitize(this.model.origin.life));
       
-        __out.push('<br>\n              满级生命：');
-      
-        __out.push(__sanitize(this.model.calcMaxLv(this.model.origin.life)));
-      
-        __out.push('<br>\n              满觉生命：');
-      
-        __out.push(__sanitize(this.model.calcMaxLvAndGrow(this.model.origin.life)));
-      
-        __out.push('<br>\n              初始攻击：');
+        __out.push('<br>\n              攻击：');
       
         __out.push(__sanitize(this.model.origin.atk));
       
-        __out.push('<br>\n              满级攻击：');
-      
-        __out.push(__sanitize(this.model.calcMaxLv(this.model.origin.atk)));
-      
-        __out.push('<br>\n              满觉攻击：');
-      
-        __out.push(__sanitize(this.model.calcMaxLvAndGrow(this.model.origin.atk)));
-      
-        __out.push('<br>\n            </p>\n            <p class="media-info">\n              攻距：');
+        __out.push('<br>\n              攻距：');
       
         __out.push(__sanitize(this.model.get("aarea")));
       
@@ -87,7 +71,7 @@
       
         __out.push(__sanitize(this.model.get("anum")));
       
-        __out.push('<br>\n              攻速：');
+        __out.push('<br>\n            </p>\n            <p class="media-info">\n              攻速：');
       
         __out.push(__sanitize(this.model.get("aspd")));
       
@@ -99,9 +83,9 @@
       
         __out.push(__sanitize(this.model.get("mspd")));
       
-        __out.push('<br>\n              成长：');
+        __out.push('<br>\n              皮肤：');
       
-        __out.push(__sanitize(this.model.getTypeString()));
+        __out.push(__sanitize(this.model.getSkinString()));
       
         __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-group">\n            <p class="media-info">\n              火：');
       
@@ -131,7 +115,23 @@
       
         __out.push(__sanitize(Math.round(this.model.get("mdps"))));
       
-        __out.push('<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-title">技能</div>\n          <div class="media-info-group">\n            <p class="media-info">\n              ');
+      
+        __out.push(__sanitize(this.model.get("skill")));
+      
+        __out.push('<br><br>\n              技能消耗SP：');
+      
+        __out.push(__sanitize(this.model.get("sklsp")));
+      
+        __out.push('<br>\n              技能CD：');
+      
+        __out.push(__sanitize(this.model.get("sklcd")));
+      
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-title">掉落</div>\n          <div class="media-info-group">\n            <p class="media-info">\n              ');
+      
+        __out.push(__sanitize(this.model.get("obtain")));
+      
+        __out.push('\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       

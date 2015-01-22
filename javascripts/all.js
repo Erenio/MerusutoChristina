@@ -3018,8 +3018,6 @@ window.$ === undefined && (window.$ = Zepto)
   _.setDebugLevel(0);
 
 }).call(this);
-
-
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -5300,8 +5298,6 @@ window.$ === undefined && (window.$ = Zepto)
 }).call(this);
 
 
-
-
 (function() {
   window.Ratchet = {};
 
@@ -5493,6 +5489,53 @@ window.$ === undefined && (window.$ = Zepto)
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  App.Models.Familiar = (function(_super) {
+    __extends(Familiar, _super);
+
+    function Familiar() {
+      return Familiar.__super__.constructor.apply(this, arguments);
+    }
+
+    Familiar.prototype.initialize = function(attributes, options) {
+      this.origin = {
+        atk: attributes.atk,
+        life: attributes.life
+      };
+      return this.setLevelMode("zero");
+    };
+
+    Familiar.prototype.setLevelMode = function(mode) {
+      var atk, dps, life, mdps;
+      switch (mode) {
+        case "zero":
+          atk = this.origin.atk;
+          life = this.origin.life;
+      }
+      dps = atk / this.get("aspd");
+      mdps = dps * this.get("anum");
+      this.set("atk", atk);
+      this.set("life", life);
+      this.set("dps", dps);
+      return this.set("mdps", mdps);
+    };
+
+    Familiar.prototype.imageUrl = function(type) {
+      return "data/familiars/" + type + "/" + this.id + ".png";
+    };
+
+    Familiar.prototype.getSkinString = function() {
+      return this.getString(["坚硬", "常规", "柔软"], "skin");
+    };
+
+    return Familiar;
+
+  })(App.Models.Companion);
+
+}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   App.Collections.Companions = (function(_super) {
     __extends(Companions, _super);
 
@@ -5513,6 +5556,26 @@ window.$ === undefined && (window.$ = Zepto)
     return Companions;
 
   })(Backbone.Collection);
+
+}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  App.Collections.Familiars = (function(_super) {
+    __extends(Familiars, _super);
+
+    function Familiars() {
+      return Familiars.__super__.constructor.apply(this, arguments);
+    }
+
+    Familiars.prototype.url = "data/familiars.json";
+
+    Familiars.prototype.model = App.Models.Familiar;
+
+    return Familiars;
+
+  })(App.Collections.Companions);
 
 }).call(this);
 (function() { this.JST || (this.JST = {}); this.JST["templates/main"] = function(__obj) {
@@ -5692,7 +5755,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
       
-        __out.push('%<br><br>\n            </p>\n            <p class="media-info">\n              DPS：');
+        __out.push('%<br>\n            </p>\n            <p class="media-info">\n              DPS：');
       
         __out.push(__sanitize(Math.round(this.model.get("dps"))));
       
@@ -5701,6 +5764,148 @@ window.$ === undefined && (window.$ = Zepto)
         __out.push(__sanitize(Math.round(this.model.get("mdps"))));
       
         __out.push('<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+      
+      }).call(this);
+      
+    }).call(__obj);
+    __obj.safe = __objSafe, __obj.escape = __escape;
+    return __out.join('');
+  };
+}).call(this);
+(function() { this.JST || (this.JST = {}); this.JST["templates/modals/familiars/show"] = function(__obj) {
+    if (!__obj) __obj = {};
+    var __out = [], __capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return __safe(result);
+    }, __sanitize = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else if (typeof value !== 'undefined' && value != null) {
+        return __escape(value);
+      } else {
+        return '';
+      }
+    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+    __safe = __obj.safe = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else {
+        if (!(typeof value !== 'undefined' && value != null)) value = '';
+        var result = new String(value);
+        result.ecoSafe = true;
+        return result;
+      }
+    };
+    if (!__escape) {
+      __escape = __obj.escape = function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      };
+    }
+    (function() {
+      (function() {
+        __out.push(_.renderTemplate("templates/modals/header"));
+      
+        __out.push('\n<div class="content">\n  <div class="slider">\n    <div class="slide-group">\n      <div class="slide">\n        <img class="image" src="');
+      
+        __out.push(__sanitize(this.model.originalUrl()));
+      
+        __out.push('">\n      </div>\n      <div class="slide media">\n        <div class="media-body">\n          <h4 class="media-title media-info-group">\n            ');
+      
+        __out.push(__sanitize(this.model.get("title")));
+      
+        __out.push(' ');
+      
+        __out.push(__sanitize(this.model.get("name")));
+      
+        __out.push('\n            <small>');
+      
+        __out.push(__sanitize(this.model.getRareString()));
+      
+        __out.push('</small>\n          </h4>\n          <div class="media-info-group">\n            <p class="media-info">\n              生命：');
+      
+        __out.push(__sanitize(this.model.origin.life));
+      
+        __out.push('<br>\n              攻击：');
+      
+        __out.push(__sanitize(this.model.origin.atk));
+      
+        __out.push('<br>\n              攻距：');
+      
+        __out.push(__sanitize(this.model.get("aarea")));
+      
+        __out.push('<br>\n              攻数：');
+      
+        __out.push(__sanitize(this.model.get("anum")));
+      
+        __out.push('<br>\n            </p>\n            <p class="media-info">\n              攻速：');
+      
+        __out.push(__sanitize(this.model.get("aspd")));
+      
+        __out.push('<br>\n              韧性：');
+      
+        __out.push(__sanitize(this.model.get("tenacity")));
+      
+        __out.push('<br>\n              移速：');
+      
+        __out.push(__sanitize(this.model.get("mspd")));
+      
+        __out.push('<br>\n              皮肤：');
+      
+        __out.push(__sanitize(this.model.getSkinString()));
+      
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-group">\n            <p class="media-info">\n              火：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
+      
+        __out.push('%<br>\n              水：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("aqua") * 100)));
+      
+        __out.push('%<br>\n              风：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("wind") * 100)));
+      
+        __out.push('%<br>\n              光：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("light") * 100)));
+      
+        __out.push('%<br>\n              暗：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
+      
+        __out.push('%<br>\n            </p>\n            <p class="media-info">\n              DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dps"))));
+      
+        __out.push('<br>\n              总DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("mdps"))));
+      
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-title">技能</div>\n          <div class="media-info-group">\n            <p class="media-info">\n              ');
+      
+        __out.push(__sanitize(this.model.get("skill")));
+      
+        __out.push('<br><br>\n              技能消耗SP：');
+      
+        __out.push(__sanitize(this.model.get("sklsp")));
+      
+        __out.push('<br>\n              技能CD：');
+      
+        __out.push(__sanitize(this.model.get("sklcd")));
+      
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-title">掉落</div>\n          <div class="media-info-group">\n            <p class="media-info">\n              ');
+      
+        __out.push(__sanitize(this.model.get("obtain")));
+      
+        __out.push('\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       
@@ -6059,6 +6264,260 @@ window.$ === undefined && (window.$ = Zepto)
     return __out.join('');
   };
 }).call(this);
+(function() { this.JST || (this.JST = {}); this.JST["templates/pages/familiars/header"] = function(__obj) {
+    if (!__obj) __obj = {};
+    var __out = [], __capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return __safe(result);
+    }, __sanitize = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else if (typeof value !== 'undefined' && value != null) {
+        return __escape(value);
+      } else {
+        return '';
+      }
+    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+    __safe = __obj.safe = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else {
+        if (!(typeof value !== 'undefined' && value != null)) value = '';
+        var result = new String(value);
+        result.ecoSafe = true;
+        return result;
+      }
+    };
+    if (!__escape) {
+      __escape = __obj.escape = function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      };
+    }
+    (function() {
+      (function() {
+        __out.push('<header class="bar bar-nav">\n\n  <div class="input-icon input-search" style="display:none;">\n    <span class="icon icon-search"></span>\n    <input type="search" placeholder="Search">\n    <a class="icon icon-close pull-right search-close"></a>\n  </div>\n\n  <a class="icon icon-bars pull-left" sref="#toggle-sidebar"></a>\n  <a class="icon icon-search pull-right search-open"></a>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      筛选\n    </a>\n    <ul class="dropdown-menu">\n      <li class="dropdown-submenu pull-left">\n        <a class="">稀有度</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="rare">全部</a></li>\n          <li><a class="filter" data-key="rare" data-value="1">★</a></li>\n          <li><a class="filter" data-key="rare" data-value="2">★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="3">★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="4">★★★★</a></li>\n          <li><a class="filter" data-key="rare" data-value="5">★★★★★</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">元素</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="element">全部</a></li>\n          <li><a class="filter" data-key="element" data-value="1">火</a></li>\n          <li><a class="filter" data-key="element" data-value="2">水</a></li>\n          <li><a class="filter" data-key="element" data-value="3">风</a></li>\n          <li><a class="filter" data-key="element" data-value="4">光</a></li>\n          <li><a class="filter" data-key="element" data-value="5">暗</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">武器</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="weapon">全部</a></li>\n          <li><a class="filter" data-key="weapon" data-value="1">斩击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="2">突击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="3">打击</a></li>\n          <li><a class="filter" data-key="weapon" data-value="4">弓箭</a></li>\n          <li><a class="filter" data-key="weapon" data-value="5">魔法</a></li>\n          <li><a class="filter" data-key="weapon" data-value="6">铳弹</a></li>\n          <li><a class="filter" data-key="weapon" data-value="7">回复</a></li>\n        </ul>\n      </li>\n      <li class="dropdown-submenu pull-left">\n        <a class="">成长</a>\n        <ul class="dropdown-menu">\n          <li><a class="filter-reset" data-key="type">全部</a></li>\n          <li><a class="filter" data-key="type" data-value="1">早熟</a></li>\n          <li><a class="filter" data-key="type" data-value="2">平均</a></li>\n          <li><a class="filter" data-key="type" data-value="3">晚成</a></li>\n        </ul>\n      </li>\n      <li class="divider"></li>\n      <li><a class="filter-reset">重置</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      排序\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="sort-mode" data-key="rare">稀有度</a></li>\n      <li><a class="sort-mode" data-key="dps">单体DPS</a></li>\n      <li><a class="sort-mode" data-key="mdps">多体DPS</a></li>\n      <li><a class="sort-mode" data-key="life">生命力</a></li>\n      <li><a class="sort-mode" data-key="atk">攻击</a></li>\n      <li><a class="sort-mode" data-key="aarea">攻击距离</a></li>\n      <li><a class="sort-mode" data-key="anum">攻击数量</a></li>\n      <li><a class="sort-mode" data-key="aspd">攻击速度</a></li>\n      <li><a class="sort-mode" data-key="tenacity">韧性</a></li>\n      <li><a class="sort-mode" data-key="mspd">移动速度</a></li>\n    </ul>\n  </div>\n  <div class="dropdown pull-right">\n    <a class="btn btn-link dropdown-toggle">\n      等级\n    </a>\n    <ul class="dropdown-menu">\n      <li class="active"><a class="level-mode" data-key="zero">零觉零级</a></li>\n      <li><a class="level-mode" data-key="mxlv">零觉满级</a></li>\n      <li><a class="level-mode" data-key="mxlvgr">满觉满级</a></li>\n    </ul>\n  </div>\n  <h1 class="title">');
+      
+        __out.push(__sanitize(this.title));
+      
+        __out.push('</h1>\n</header>\n');
+      
+      }).call(this);
+      
+    }).call(__obj);
+    __obj.safe = __objSafe, __obj.escape = __escape;
+    return __out.join('');
+  };
+}).call(this);
+(function() { this.JST || (this.JST = {}); this.JST["templates/pages/familiars/index"] = function(__obj) {
+    if (!__obj) __obj = {};
+    var __out = [], __capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return __safe(result);
+    }, __sanitize = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else if (typeof value !== 'undefined' && value != null) {
+        return __escape(value);
+      } else {
+        return '';
+      }
+    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+    __safe = __obj.safe = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else {
+        if (!(typeof value !== 'undefined' && value != null)) value = '';
+        var result = new String(value);
+        result.ecoSafe = true;
+        return result;
+      }
+    };
+    if (!__escape) {
+      __escape = __obj.escape = function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      };
+    }
+    (function() {
+      (function() {
+        __out.push(_.renderTemplate("templates/pages/companions/header"));
+      
+        __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n');
+      
+      }).call(this);
+      
+    }).call(__obj);
+    __obj.safe = __objSafe, __obj.escape = __escape;
+    return __out.join('');
+  };
+}).call(this);
+(function() { this.JST || (this.JST = {}); this.JST["templates/pages/familiars/item"] = function(__obj) {
+    if (!__obj) __obj = {};
+    var __out = [], __capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return __safe(result);
+    }, __sanitize = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else if (typeof value !== 'undefined' && value != null) {
+        return __escape(value);
+      } else {
+        return '';
+      }
+    }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+    __safe = __obj.safe = function(value) {
+      if (value && value.ecoSafe) {
+        return value;
+      } else {
+        if (!(typeof value !== 'undefined' && value != null)) value = '';
+        var result = new String(value);
+        result.ecoSafe = true;
+        return result;
+      }
+    };
+    if (!__escape) {
+      __escape = __obj.escape = function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      };
+    }
+    (function() {
+      (function() {
+        var key;
+      
+        __out.push('<li class="table-view-cell media companion">\n  <a sref="#familiars/');
+      
+        __out.push(__sanitize(this.model.id));
+      
+        __out.push('">\n    <img class="media-object pull-left" src="');
+      
+        __out.push(__sanitize(this.model.thumbnailUrl()));
+      
+        __out.push('">\n    <svg class="media-graphics element pull-right" width="80" height="80">\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
+      
+        __out.push(__sanitize(App.Utils.SVG.getBackgroundPolygonPointsString(80, 40)));
+      
+        __out.push('" class="element-background"/>\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
+      
+        __out.push(__sanitize(App.Utils.SVG.getBackgroundPolygonPointsString(80, 26.7)));
+      
+        __out.push('" class="element-background"/>\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
+      
+        __out.push(__sanitize(App.Utils.SVG.getBackgroundPolygonPointsString(80, 13.3)));
+      
+        __out.push('" class="element-background"/>\n      <polygon xmlns="http://www.w3.org/2000/svg" points="');
+      
+        __out.push(__sanitize(this.model.getElementPolygonPointsString(80, 20)));
+      
+        __out.push('" class="');
+      
+        if (key = this.model.getElementKey()) {
+          __out.push(__sanitize("element-" + key));
+        }
+      
+        __out.push('"/>\n    </svg>\n    <div class="media-body">\n      <h4 class="media-title">\n        ');
+      
+        __out.push(__sanitize(this.model.get("title")));
+      
+        __out.push(' ');
+      
+        __out.push(__sanitize(this.model.get("name")));
+      
+        __out.push('\n        <small>');
+      
+        __out.push(__sanitize(this.model.getRareString()));
+      
+        __out.push('</small>\n      </h4>\n      <div class="media-info-group">\n        <p class="media-info">\n          生命：<span id="life">');
+      
+        __out.push(__sanitize(this.model.get("life")));
+      
+        __out.push('</span><br>\n          攻击：<span id="atk">');
+      
+        __out.push(__sanitize(this.model.get("atk")));
+      
+        __out.push('</span><br>\n          攻距：');
+      
+        __out.push(__sanitize(this.model.get("aarea")));
+      
+        __out.push('<br>\n          攻数：');
+      
+        __out.push(__sanitize(this.model.get("anum")));
+      
+        __out.push('<br>\n        </p>\n        <p class="media-info">\n          攻速：');
+      
+        __out.push(__sanitize(this.model.get("aspd")));
+      
+        __out.push('<br>\n          韧性：');
+      
+        __out.push(__sanitize(this.model.get("tenacity")));
+      
+        __out.push('<br>\n          移速：');
+      
+        __out.push(__sanitize(this.model.get("mspd")));
+      
+        __out.push('<br>\n          皮肤：');
+      
+        __out.push(__sanitize(this.model.getSkinString()));
+      
+        __out.push('<br>\n        </p>\n        <p class="media-info hidden-xs">\n          火：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
+      
+        __out.push('%<br>\n          水：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("aqua") * 100)));
+      
+        __out.push('%<br>\n          风：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("wind") * 100)));
+      
+        __out.push('%<br>\n          光：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("light") * 100)));
+      
+        __out.push('%<br>\n        </p>\n        <p class="media-info hidden-sm">\n          暗：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
+      
+        __out.push('%<br><br>\n          DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("dps"))));
+      
+        __out.push('<br>\n          总DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.get("mdps"))));
+      
+        __out.push('<br>\n        </p>\n\n      </div>\n    </div>\n  </a>\n</li>\n');
+      
+      }).call(this);
+      
+    }).call(__obj);
+    __obj.safe = __objSafe, __obj.escape = __escape;
+    return __out.join('');
+  };
+}).call(this);
 (function() { this.JST || (this.JST = {}); this.JST["templates/sidebar"] = function(__obj) {
     if (!__obj) __obj = {};
     var __out = [], __capture = function(callback) {
@@ -6098,7 +6557,7 @@ window.$ === undefined && (window.$ = Zepto)
     }
     (function() {
       (function() {
-        __out.push('<sidebar class="content sidebar">\n  <ul class="table-view">\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#companions">\n        <span class="media-object pull-left icon icon-person"></span>\n        <div class="media-body">\n          同伴\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#familiars">\n        <span class="media-object pull-left icon icon-gear"></span>\n        <div class="media-body">\n          魔宠（敬请期待）\n        </div>\n      </a>\n    </li>\n  </ul>\n</sidebar>\n');
+        __out.push('<sidebar class="content sidebar">\n  <ul class="table-view">\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#companions">\n        <span class="media-object pull-left icon icon-person"></span>\n        <div class="media-body">\n          同伴\n        </div>\n      </a>\n    </li>\n    <li class="table-view-cell media">\n      <a class="navigate-right" href="#familiars">\n        <span class="media-object pull-left icon icon-gear"></span>\n        <div class="media-body">\n          魔宠\n        </div>\n      </a>\n    </li>\n  </ul>\n</sidebar>\n');
       
       }).call(this);
       
@@ -6513,6 +6972,46 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(this);
 (function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  App.Pages.FamiliarsIndex = (function(_super) {
+    __extends(FamiliarsIndex, _super);
+
+    function FamiliarsIndex() {
+      return FamiliarsIndex.__super__.constructor.apply(this, arguments);
+    }
+
+    FamiliarsIndex.prototype.template = _.loadTemplate("templates/pages/familiars/index");
+
+    FamiliarsIndex.prototype.store = _.extend({}, App.Pages.CompanionsIndex.prototype.store, {
+      template: _.loadTemplate("templates/pages/familiars/item")
+    });
+
+    return FamiliarsIndex;
+
+  })(App.Pages.CompanionsIndex);
+
+}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  App.Pages.FamiliarsShow = (function(_super) {
+    __extends(FamiliarsShow, _super);
+
+    function FamiliarsShow() {
+      return FamiliarsShow.__super__.constructor.apply(this, arguments);
+    }
+
+    FamiliarsShow.prototype.template = _.loadTemplate("templates/modals/familiars/show");
+
+    return FamiliarsShow;
+
+  })(App.Pages.CompanionsShow);
+
+}).call(this);
+(function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -6758,7 +7257,7 @@ window.$ === undefined && (window.$ = Zepto)
     Router.prototype.openCompanionsShowPage = function(id) {
       var model, view;
       if (App.companions == null) {
-        return;
+        return this.navigate("#companions", true);
       }
       model = App.companions.get(id);
       view = new App.Pages.CompanionsShow({
@@ -6768,16 +7267,40 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     Router.prototype.openFamiliarsIndexPage = function() {
-      return App.main.closeSidebar();
+      var view;
+      App.main.closeSidebar();
+      if (App.familiars == null) {
+        App.familiars = new App.Collections.Familiars();
+        App.familiars.fetch({
+          reset: true
+        });
+      }
+      view = new App.Pages.FamiliarsIndex({
+        collection: App.familiars
+      });
+      return App.main.openPage(view.render());
     };
 
-    Router.prototype.openFamiliarsShowPage = function() {};
+    Router.prototype.openFamiliarsShowPage = function(id) {
+      var model, view;
+      if (App.familiars == null) {
+        return this.navigate("#familiars", true);
+      }
+      model = App.familiars.get(id);
+      view = new App.Pages.FamiliarsShow({
+        model: model
+      });
+      return App.main.openModal(view.render());
+    };
 
     return Router;
 
   })(Backbone.Router);
 
 }).call(this);
+
+
+
 
 
 

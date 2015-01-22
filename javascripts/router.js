@@ -49,7 +49,7 @@
     Router.prototype.openCompanionsShowPage = function(id) {
       var model, view;
       if (App.companions == null) {
-        return;
+        return this.navigate("#companions", true);
       }
       model = App.companions.get(id);
       view = new App.Pages.CompanionsShow({
@@ -59,10 +59,31 @@
     };
 
     Router.prototype.openFamiliarsIndexPage = function() {
-      return App.main.closeSidebar();
+      var view;
+      App.main.closeSidebar();
+      if (App.familiars == null) {
+        App.familiars = new App.Collections.Familiars();
+        App.familiars.fetch({
+          reset: true
+        });
+      }
+      view = new App.Pages.FamiliarsIndex({
+        collection: App.familiars
+      });
+      return App.main.openPage(view.render());
     };
 
-    Router.prototype.openFamiliarsShowPage = function() {};
+    Router.prototype.openFamiliarsShowPage = function(id) {
+      var model, view;
+      if (App.familiars == null) {
+        return this.navigate("#familiars", true);
+      }
+      model = App.familiars.get(id);
+      view = new App.Pages.FamiliarsShow({
+        model: model
+      });
+      return App.main.openModal(view.render());
+    };
 
     return Router;
 
