@@ -1,6 +1,9 @@
-//= require libs/zepto
-//= require libs/underscore
-//= require libs/backbone
+//= require zepto
+//= require underscore
+//= require underscore/extra
+//= require backbone
+//= require backbone/template
+//= require backbone/view/extensions
 
 //= require app
 //= require_tree ./bindings

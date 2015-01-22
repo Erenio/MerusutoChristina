@@ -10,3 +10,4 @@ gem "middleman-deploy"
 gem "eco"
 
 gem "bourbon"
+gem "frontend-toolkit", github: "bbtfr/frontend-toolkit"

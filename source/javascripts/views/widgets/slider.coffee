@@ -1,4 +1,4 @@
-#= require libs/ratchet/sliders
+#= require decorators/ratchet/sliders
 
 class App.Widgets.Slider extends Backbone.View
   events:

@@ -13,20 +13,16 @@
           </h4>
           <div class="media-info-group">
             <p class="media-info">
-              初始生命：<%= @model.origin.life %><br>
-              满级生命：<%= @model.calcMaxLv(@model.origin.life) %><br>
-              满觉生命：<%= @model.calcMaxLvAndGrow(@model.origin.life) %><br>
-              初始攻击：<%= @model.origin.atk %><br>
-              满级攻击：<%= @model.calcMaxLv(@model.origin.atk) %><br>
-              满觉攻击：<%= @model.calcMaxLvAndGrow(@model.origin.atk) %><br>
-            </p>
-            <p class="media-info">
+              生命：<%= @model.origin.life %><br>
+              攻击：<%= @model.origin.atk %><br>
               攻距：<%= @model.get("aarea") %><br>
               攻数：<%= @model.get("anum") %><br>
+            </p>
+            <p class="media-info">
               攻速：<%= @model.get("aspd") %><br>
               韧性：<%= @model.get("tenacity") %><br>
               移速：<%= @model.get("mspd") %><br>
-              成长：<%= @model.getTypeString() %><br>
+              皮肤：<%= @model.getSkinString() %><br>
             </p>
           </div>
           <div class="media-info-group">
@@ -40,6 +36,20 @@
             <p class="media-info">
               DPS：<%= Math.round(@model.get("dps")) %><br>
               总DPS：<%= Math.round(@model.get("mdps")) %><br>
+            </p>
+          </div>
+          <div class="media-info-title">技能</div>
+          <div class="media-info-group">
+            <p class="media-info">
+              <%= @model.get("skill") %><br><br>
+              技能消耗SP：<%= @model.get("sklsp") %><br>
+              技能CD：<%= @model.get("sklcd") %><br>
+            </p>
+          </div>
+          <div class="media-info-title">掉落</div>
+          <div class="media-info-group">
+            <p class="media-info">
+              <%= @model.get("obtain") %>
             </p>
           </div>
         </div>

@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/bbtfr/frontend-toolkit.git
+  revision: e927a61540360998a09dcb1c6bb725aeaf17b275
+  specs:
+    frontend-toolkit (0.0.1)
+
+GIT
   remote: git://github.com/bbtfr/middleman-bower.git
   revision: 024da5be717979e561b1d274965a2e36c40f8879
   specs:
@@ -150,6 +156,7 @@ PLATFORMS
 DEPENDENCIES
   bourbon
   eco
+  frontend-toolkit!
   middleman
   middleman-bower!
   middleman-deploy

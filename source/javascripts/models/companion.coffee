@@ -1,7 +1,7 @@
 class App.Models.Companion extends Backbone.Model
 
   initialize: (attributes, options) ->
-    @origin = 
+    @origin =
       atk: attributes.atk
       life: attributes.life
     @setLevelMode("zero")
@@ -18,7 +18,7 @@ class App.Models.Companion extends Backbone.Model
     f = @calcF()
     rare = @get("rare")
     levelPart = Math.floor(value * f)
-    growPart = Math.floor(value * (f - 1) / (19 + 10 * rare)) * 
+    growPart = Math.floor(value * (f - 1) / (19 + 10 * rare)) *
       5 * (if rare == 1 then 5 else 15)
     levelPart + growPart
 
@@ -55,16 +55,16 @@ class App.Models.Companion extends Backbone.Model
     strs[@get(key) - 1]
 
   getRareString: ->
-    @getString([ "★", "★★", "★★★", "★★★★", "★★★★★" ], "rare")
+    @getString(["★", "★★", "★★★", "★★★★", "★★★★★"], "rare")
 
   getElementKey: ->
-    @getString([ "fire", "aqua", "wind", "light", "dark" ], "element")
+    @getString(["fire", "aqua", "wind", "light", "dark"], "element")
 
   getTypeString: ->
-    @getString([ "早熟", "平均", "晚成" ], "type")
+    @getString(["早熟", "平均", "晚成"], "type")
 
   getElementPolygonPointsString: (l, r) ->
-    es = [ @get("fire"), @get("aqua"), @get("wind"), @get("light"), @get("dark") ]
+    es = [@get("fire"), @get("aqua"), @get("wind"), @get("light"), @get("dark")]
     c = { x: l/2, y: l/2 }
     ps = _.map [0..4], (i) ->
       a = (i * 72 - 90) * (Math.PI * 2) / 360

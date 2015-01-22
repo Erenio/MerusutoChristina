@@ -1,0 +1,4 @@
+<%- _.renderTemplate("templates/pages/companions/header") %>
+<div class="content">
+  <ul class="table-view"></ul>
+</div>

@@ -29,12 +29,21 @@ class App.Router extends Backbone.Router
     App.main.openPage(view.render())
 
   openCompanionsShowPage: (id) ->
-    return unless App.companions?
+    return @navigate("#companions", true) unless App.companions?
     model = App.companions.get(id)
     view = new App.Pages.CompanionsShow(model: model)
     App.main.openModal(view.render())
 
   openFamiliarsIndexPage: ->
     App.main.closeSidebar()
+    unless App.familiars?
+      App.familiars = new App.Collections.Familiars()
+      App.familiars.fetch(reset: true)
+    view = new App.Pages.FamiliarsIndex(collection: App.familiars)
+    App.main.openPage(view.render())
 
-  openFamiliarsShowPage: ->
+  openFamiliarsShowPage: (id) ->
+    return @navigate("#familiars", true) unless App.familiars?
+    model = App.familiars.get(id)
+    view = new App.Pages.FamiliarsShow(model: model)
+    App.main.openModal(view.render())
