@@ -175,6 +175,10 @@
     };
 
     Slider.prototype.onMouseDown = function(event) {
+      if (this.mouseIsDown) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
       this.mouseIsDown = true;
       return this.onTouchStart(this._imitateTouchEvent(event));
     };

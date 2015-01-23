@@ -115,23 +115,23 @@
       
         __out.push(__sanitize(Math.round(this.model.get("mdps"))));
       
-        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-title">技能</div>\n          <div class="media-info-group">\n            <p class="media-info">\n              ');
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-title">技能</div>\n          <p class="media-info">\n            ');
       
         __out.push(__sanitize(this.model.get("skill")));
       
-        __out.push('<br><br>\n              技能消耗SP：');
+        __out.push('<br><br>\n            技能消耗SP：');
       
         __out.push(__sanitize(this.model.get("sklsp")));
       
-        __out.push('<br>\n              技能CD：');
+        __out.push('<br>\n            技能CD：');
       
         __out.push(__sanitize(this.model.get("sklcd")));
       
-        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-title">掉落</div>\n          <div class="media-info-group">\n            <p class="media-info">\n              ');
+        __out.push('<br>\n          </p>\n          <div class="media-info-title">掉落</div>\n          <p class="media-info">\n            ');
       
         __out.push(__sanitize(this.model.get("obtain")));
       
-        __out.push('\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('\n          </p>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       
