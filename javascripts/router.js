@@ -33,7 +33,6 @@
 
     Router.prototype.openCompanionsIndexPage = function() {
       var view;
-      App.main.closeSidebar();
       if (App.companions == null) {
         App.companions = new App.Collections.Companions();
         App.companions.fetch({
@@ -60,7 +59,6 @@
 
     Router.prototype.openFamiliarsIndexPage = function() {
       var view;
-      App.main.closeSidebar();
       if (App.familiars == null) {
         App.familiars = new App.Collections.Familiars();
         App.familiars.fetch({
