@@ -39,19 +39,15 @@
             </p>
           </div>
           <div class="media-info-title">技能</div>
-          <div class="media-info-group">
-            <p class="media-info">
-              <%= @model.get("skill") %><br><br>
-              技能消耗SP：<%= @model.get("sklsp") %><br>
-              技能CD：<%= @model.get("sklcd") %><br>
-            </p>
-          </div>
+          <p class="media-info">
+            <%= @model.get("skill") %><br><br>
+            技能消耗SP：<%= @model.get("sklsp") %><br>
+            技能CD：<%= @model.get("sklcd") %><br>
+          </p>
           <div class="media-info-title">掉落</div>
-          <div class="media-info-group">
-            <p class="media-info">
-              <%= @model.get("obtain") %>
-            </p>
-          </div>
+          <p class="media-info">
+            <%= @model.get("obtain") %>
+          </p>
         </div>
       </div>
     </div>

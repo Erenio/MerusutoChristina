@@ -140,16 +140,20 @@ a[sref] {
 }
 
 .modal {
-  .media-info-group {
+  .media-info-group, .media-info {
     padding: 10px 25px;
+  }
+  .media-info-group .media-info {
+    padding: 0;
   }
   .media-info-title {
     padding: 10px 25px 0;
   }
-  .media-info-group .media-info, .media-title, .media-info-title {
+  .media-info, .media-title, .media-info-title {
     text-shadow: 1px 1px 5px #000, 1px -1px 5px #000,
       -1px 1px 5px #000, -1px -1px 5px #000;
     color: white!important;
+    white-space: normal;
   }
   .media-title, .media-info-title {
     font-size: 18px!important;

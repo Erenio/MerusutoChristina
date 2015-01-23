@@ -21,6 +21,9 @@ class App.Widgets.Slider extends Backbone.View
     event
 
   onMouseDown: (event) ->
+    if @mouseIsDown
+      event.stopPropagation()
+      event.preventDefault()
     @mouseIsDown = true
     @onTouchStart(@_imitateTouchEvent(event))
   onMouseMove: (event) ->
