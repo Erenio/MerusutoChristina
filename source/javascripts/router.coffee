@@ -21,7 +21,6 @@ class App.Router extends Backbone.Router
     @navigate("#companions", true)
 
   openCompanionsIndexPage: ->
-    App.main.closeSidebar()
     unless App.companions?
       App.companions = new App.Collections.Companions()
       App.companions.fetch(reset: true)
@@ -35,7 +34,6 @@ class App.Router extends Backbone.Router
     App.main.openModal(view.render())
 
   openFamiliarsIndexPage: ->
-    App.main.closeSidebar()
     unless App.familiars?
       App.familiars = new App.Collections.Familiars()
       App.familiars.fetch(reset: true)

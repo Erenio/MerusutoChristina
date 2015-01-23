@@ -10,6 +10,7 @@ class App.Views.Main extends Backbone.View
 
   events:
     "click a[sref]": "loadState"
+    "click a[href^='#']": "closeSidebar"
 
   loadState: (event) ->
     # load url & run callback defined in AppRouter without change hash
