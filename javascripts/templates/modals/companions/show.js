@@ -131,7 +131,7 @@
       
         __out.push(__sanitize(this.model.get('country')));
       
-        __out.push('\n              火：');
+        __out.push('<br>\n              火：');
       
         __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
       
