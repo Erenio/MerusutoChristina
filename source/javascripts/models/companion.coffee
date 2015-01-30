@@ -5,6 +5,8 @@ class App.Models.Companion extends Backbone.Model
       atk: attributes.atk
       life: attributes.life
     @setLevelMode("zero")
+    @origin.dps = @get('dps')
+    @origin.mdps = @get('mdps')
 
   calcF: ->
     @f ||= 1.8 + 0.1 * @get("type")

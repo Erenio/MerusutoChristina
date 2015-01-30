@@ -31,15 +31,19 @@
           </div>
           <div class="media-info-group">
             <p class="media-info">
+              初始DPS：<%= Math.round(@model.origin.dps) %><br>
+              满级DPS：<%= Math.round(@model.calcMaxLv(@model.origin.dps)) %><br>
+              满觉DPS：<%= Math.round(@model.calcMaxLvAndGrow(@model.origin.dps)) %><br>
+              初始总DPS：<%= Math.round(@model.origin.mdps) %><br>
+              满级总DPS：<%= Math.round(@model.calcMaxLv(@model.origin.mdps)) %><br>
+              满觉总DPS：<%= Math.round(@model.calcMaxLvAndGrow(@model.origin.mdps)) %><br>
+            </p>
+            <p class="media-info">
               火：<%= Math.round(@model.get("fire")*100) %>%<br>
               水：<%= Math.round(@model.get("aqua")*100) %>%<br>
               风：<%= Math.round(@model.get("wind")*100) %>%<br>
               光：<%= Math.round(@model.get("light")*100) %>%<br>
               暗：<%= Math.round(@model.get("dark")*100) %>%<br>
-            </p>
-            <p class="media-info">
-              DPS：<%= Math.round(@model.get("dps")) %><br>
-              总DPS：<%= Math.round(@model.get("mdps")) %><br>
             </p>
           </div>
         </div>
