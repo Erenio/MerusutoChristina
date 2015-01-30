@@ -14,7 +14,9 @@
         atk: attributes.atk,
         life: attributes.life
       };
-      return this.setLevelMode("zero");
+      this.setLevelMode("zero");
+      this.origin.dps = this.get('dps');
+      return this.origin.mdps = this.get('mdps');
     };
 
     Companion.prototype.calcF = function() {

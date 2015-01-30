@@ -5391,7 +5391,9 @@ window.$ === undefined && (window.$ = Zepto)
         atk: attributes.atk,
         life: attributes.life
       };
-      return this.setLevelMode("zero");
+      this.setLevelMode("zero");
+      this.origin.dps = this.get('dps');
+      return this.origin.mdps = this.get('mdps');
     };
 
     Companion.prototype.calcF = function() {
@@ -5735,7 +5737,31 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(this.model.getTypeString()));
       
-        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-group">\n            <p class="media-info">\n              火：');
+        __out.push('<br>\n            </p>\n          </div>\n          <div class="media-info-group">\n            <p class="media-info">\n              初始DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.origin.dps)));
+      
+        __out.push('<br>\n              满级DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.calcMaxLv(this.model.origin.dps))));
+      
+        __out.push('<br>\n              满觉DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.calcMaxLvAndGrow(this.model.origin.dps))));
+      
+        __out.push('<br>\n              初始总DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.origin.mdps)));
+      
+        __out.push('<br>\n              满级总DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.calcMaxLv(this.model.origin.mdps))));
+      
+        __out.push('<br>\n              满觉总DPS：');
+      
+        __out.push(__sanitize(Math.round(this.model.calcMaxLvAndGrow(this.model.origin.mdps))));
+      
+        __out.push('<br>\n            </p>\n            <p class="media-info">\n              火：');
       
         __out.push(__sanitize(Math.round(this.model.get("fire") * 100)));
       
@@ -5755,15 +5781,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
       
-        __out.push('%<br>\n            </p>\n            <p class="media-info">\n              DPS：');
-      
-        __out.push(__sanitize(Math.round(this.model.get("dps"))));
-      
-        __out.push('<br>\n              总DPS：');
-      
-        __out.push(__sanitize(Math.round(this.model.get("mdps"))));
-      
-        __out.push('<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('%<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       
