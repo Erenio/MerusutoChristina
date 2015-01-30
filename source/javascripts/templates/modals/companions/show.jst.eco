@@ -39,6 +39,7 @@
               满觉总DPS：<%= Math.round(@model.calcMaxLvAndGrow(@model.origin.mdps)) %><br>
             </p>
             <p class="media-info">
+              国家：<%= @model.get('country') %><br>
               火：<%= Math.round(@model.get("fire")*100) %>%<br>
               水：<%= Math.round(@model.get("aqua")*100) %>%<br>
               风：<%= Math.round(@model.get("wind")*100) %>%<br>
