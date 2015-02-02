@@ -12,10 +12,10 @@
     Router.prototype.routes = {
       "toggle-sidebar": "toggleSidebar",
       "close-modal": "closeModal",
-      "companions": "openCompanionsIndexPage",
-      "companions/:id": "openCompanionsShowPage",
-      "familiars": "openFamiliarsIndexPage",
-      "familiars/:id": "openFamiliarsShowPage",
+      "units": "openUnitsIndexPage",
+      "units/:id": "openUnitsShowPage",
+      "monsters": "openMonstersIndexPage",
+      "monsters/:id": "openMonstersShowPage",
       "*otherwise": "index"
     };
 
@@ -28,56 +28,56 @@
     };
 
     Router.prototype.index = function() {
-      return this.navigate("#companions", true);
+      return this.navigate("#units", true);
     };
 
-    Router.prototype.openCompanionsIndexPage = function() {
+    Router.prototype.openUnitsIndexPage = function() {
       var view;
-      if (App.companions == null) {
-        App.companions = new App.Collections.Companions();
-        App.companions.fetch({
+      if (App.units == null) {
+        App.units = new App.Collections.Units();
+        App.units.fetch({
           reset: true
         });
       }
-      view = new App.Pages.CompanionsIndex({
-        collection: App.companions
+      view = new App.Pages.UnitsIndex({
+        collection: App.units
       });
       return App.main.openPage(view.render());
     };
 
-    Router.prototype.openCompanionsShowPage = function(id) {
+    Router.prototype.openUnitsShowPage = function(id) {
       var model, view;
-      if (App.companions == null) {
-        return this.navigate("#companions", true);
+      if (App.units == null) {
+        return this.navigate("#units", true);
       }
-      model = App.companions.get(id);
-      view = new App.Pages.CompanionsShow({
+      model = App.units.get(id);
+      view = new App.Pages.UnitsShow({
         model: model
       });
       return App.main.openModal(view.render());
     };
 
-    Router.prototype.openFamiliarsIndexPage = function() {
+    Router.prototype.openMonstersIndexPage = function() {
       var view;
-      if (App.familiars == null) {
-        App.familiars = new App.Collections.Familiars();
-        App.familiars.fetch({
+      if (App.monsters == null) {
+        App.monsters = new App.Collections.Monsters();
+        App.monsters.fetch({
           reset: true
         });
       }
-      view = new App.Pages.FamiliarsIndex({
-        collection: App.familiars
+      view = new App.Pages.MonstersIndex({
+        collection: App.monsters
       });
       return App.main.openPage(view.render());
     };
 
-    Router.prototype.openFamiliarsShowPage = function(id) {
+    Router.prototype.openMonstersShowPage = function(id) {
       var model, view;
-      if (App.familiars == null) {
-        return this.navigate("#familiars", true);
+      if (App.monsters == null) {
+        return this.navigate("#monsters", true);
       }
-      model = App.familiars.get(id);
-      view = new App.Pages.FamiliarsShow({
+      model = App.monsters.get(id);
+      view = new App.Pages.MonstersShow({
         model: model
       });
       return App.main.openModal(view.render());

@@ -2221,11 +2221,11 @@ a[sref] {
     fill: #9b59b6; }
 
 /* line 85, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
-.table-view-cell.companion .media-object {
+.table-view-cell.unit .media-object {
   height: 80px;
   width: 56px; }
 /* line 89, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
-.table-view-cell.companion > a:not(.btn) {
+.table-view-cell.unit > a:not(.btn) {
   margin: -16px -120px -16px -20px; }
 
 /* line 95, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
