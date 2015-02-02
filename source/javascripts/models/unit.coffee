@@ -1,4 +1,4 @@
-class App.Models.Companion extends Backbone.Model
+class App.Models.Unit extends Backbone.Model
 
   initialize: (attributes, options) ->
     @origin =
@@ -45,7 +45,7 @@ class App.Models.Companion extends Backbone.Model
     @set("mdps", mdps)
 
   imageUrl: (type) ->
-    "data/companions/#{type}/#{@id}.png"
+    "data/units/#{type}/#{@id}.png"
 
   thumbnailUrl: ->
     @imageUrl("thumbnail")

@@ -1,16 +1,16 @@
-class App.Pages.CompanionsItem extends Backbone.View
-  template: _.loadTemplate("templates/pages/companions/item")
+class App.Pages.UnitsItem extends Backbone.View
+  template: _.loadTemplate("templates/pages/units/item")
 
   bindings:
     "#life": "life"
     "#atk": "atk"
 
-class App.Pages.CompanionsIndex extends Backbone.View
-  template: _.loadTemplate("templates/pages/companions/index")
+class App.Pages.UnitsIndex extends Backbone.View
+  template: _.loadTemplate("templates/pages/units/index")
 
   store:
     selector: ".table-view"
-    template: App.Pages.CompanionsItem
+    template: App.Pages.UnitsItem
     infinite:
       container: ".content"
       slice: 10

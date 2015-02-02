@@ -1,4 +1,6 @@
-class App.Models.Familiar extends App.Models.Companion
+#= require models/unit
+
+class App.Models.Monster extends App.Models.Unit
 
   initialize: (attributes, options) ->
     @origin =
@@ -21,7 +23,7 @@ class App.Models.Familiar extends App.Models.Companion
     @set("mdps", mdps)
 
   imageUrl: (type) ->
-    "data/familiars/#{type}/#{@id}.png"
+    "data/monsters/#{type}/#{@id}.png"
 
   getSkinString: ->
     @getString(["坚硬", "常规", "柔软"], "skin")

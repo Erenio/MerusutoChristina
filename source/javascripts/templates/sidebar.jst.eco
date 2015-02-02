@@ -1,7 +1,7 @@
 <sidebar class="content sidebar">
   <ul class="table-view">
     <li class="table-view-cell media">
-      <a class="navigate-right" href="#companions">
+      <a class="navigate-right" href="#units">
         <span class="media-object pull-left icon icon-person"></span>
         <div class="media-body">
           同伴
@@ -9,7 +9,7 @@
       </a>
     </li>
     <li class="table-view-cell media">
-      <a class="navigate-right" href="#familiars">
+      <a class="navigate-right" href="#monsters">
         <span class="media-object pull-left icon icon-gear"></span>
         <div class="media-body">
           魔宠

@@ -1,5 +1,5 @@
-<li class="table-view-cell media companion">
-  <a sref="#familiars/<%= @model.id %>">
+<li class="table-view-cell media unit">
+  <a sref="#units/<%= @model.id %>">
     <img class="media-object pull-left" src="<%= @model.thumbnailUrl() %>">
     <svg class="media-graphics element pull-right" width="80" height="80">
       <polygon xmlns="http://www.w3.org/2000/svg" points="<%= App.Utils.SVG.getBackgroundPolygonPointsString(80, 40) %>" class="element-background"/>
@@ -23,7 +23,7 @@
           攻速：<%= @model.get("aspd") %><br>
           韧性：<%= @model.get("tenacity") %><br>
           移速：<%= @model.get("mspd") %><br>
-          皮肤：<%= @model.getSkinString() %><br>
+          成长：<%= @model.getTypeString() %><br>
         </p>
         <p class="media-info hidden-xs">
           火：<%= Math.round(@model.get("fire")*100) %>%<br>

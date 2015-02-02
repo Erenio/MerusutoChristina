@@ -4,10 +4,10 @@ class App.Router extends Backbone.Router
     "toggle-sidebar": "toggleSidebar"
     "close-modal": "closeModal"
 
-    "companions": "openCompanionsIndexPage"
-    "companions/:id": "openCompanionsShowPage"
-    "familiars": "openFamiliarsIndexPage"
-    "familiars/:id": "openFamiliarsShowPage"
+    "units": "openUnitsIndexPage"
+    "units/:id": "openUnitsShowPage"
+    "monsters": "openMonstersIndexPage"
+    "monsters/:id": "openMonstersShowPage"
 
     "*otherwise": "index"
 
@@ -18,30 +18,30 @@ class App.Router extends Backbone.Router
     App.main.closeModal()
 
   index: ->
-    @navigate("#companions", true)
+    @navigate("#units", true)
 
-  openCompanionsIndexPage: ->
-    unless App.companions?
-      App.companions = new App.Collections.Companions()
-      App.companions.fetch(reset: true)
-    view = new App.Pages.CompanionsIndex(collection: App.companions)
+  openUnitsIndexPage: ->
+    unless App.units?
+      App.units = new App.Collections.Units()
+      App.units.fetch(reset: true)
+    view = new App.Pages.UnitsIndex(collection: App.units)
     App.main.openPage(view.render())
 
-  openCompanionsShowPage: (id) ->
-    return @navigate("#companions", true) unless App.companions?
-    model = App.companions.get(id)
-    view = new App.Pages.CompanionsShow(model: model)
+  openUnitsShowPage: (id) ->
+    return @navigate("#units", true) unless App.units?
+    model = App.units.get(id)
+    view = new App.Pages.UnitsShow(model: model)
     App.main.openModal(view.render())
 
-  openFamiliarsIndexPage: ->
-    unless App.familiars?
-      App.familiars = new App.Collections.Familiars()
-      App.familiars.fetch(reset: true)
-    view = new App.Pages.FamiliarsIndex(collection: App.familiars)
+  openMonstersIndexPage: ->
+    unless App.monsters?
+      App.monsters = new App.Collections.Monsters()
+      App.monsters.fetch(reset: true)
+    view = new App.Pages.MonstersIndex(collection: App.monsters)
     App.main.openPage(view.render())
 
-  openFamiliarsShowPage: (id) ->
-    return @navigate("#familiars", true) unless App.familiars?
-    model = App.familiars.get(id)
-    view = new App.Pages.FamiliarsShow(model: model)
+  openMonstersShowPage: (id) ->
+    return @navigate("#monsters", true) unless App.monsters?
+    model = App.monsters.get(id)
+    view = new App.Pages.MonstersShow(model: model)
     App.main.openModal(view.render())
