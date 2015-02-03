@@ -15,3 +15,7 @@ $sidebar-width: 240px;
 .container.sidebar-active {
   @include transform(translateX($sidebar-width));
 }
+
+.bar {
+  position: absolute;
+}
