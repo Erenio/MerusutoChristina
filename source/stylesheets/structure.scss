@@ -7,6 +7,12 @@
   transition: transform $properties;
 }
 
+* {
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  // i.e. Nexus5/Chrome and Kindle Fire HD 7''
+  -webkit-tap-highlight-color: transparent;
+}
+
 a[sref] {
   cursor: pointer;
 }
