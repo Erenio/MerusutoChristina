@@ -2300,15 +2300,16 @@ a[sref] {
   position: absolute;
   top: 0;
   bottom: 0;
-  margin: auto;
-  width: 100%; }
+  left: 0;
+  right: 0;
+  margin: auto; }
 
 @media (max-width: 440px) {
-  /* line 174, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 175, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-xs {
     display: none !important; } }
 @media (max-width: 550px) {
-  /* line 180, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 181, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-sm {
     display: none !important; } }
 /*

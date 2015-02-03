@@ -7014,6 +7014,26 @@ window.$ === undefined && (window.$ = Zepto)
       ".slider": App.Widgets.Slider
     };
 
+    UnitsShow.prototype.afterRender = function() {
+      var $image, radio, resize;
+      $image = this.$(".slider .image");
+      radio = null;
+      resize = function() {
+        if (window.innerWidth / window.innerHeight < radio) {
+          $image.width("100%");
+          return $image.height("auto");
+        } else {
+          $image.width("auto");
+          return $image.height("100%");
+        }
+      };
+      _.defer(function() {
+        radio = $image.width() / $image.height();
+        return resize();
+      });
+      return $(window).resize(resize);
+    };
+
     return UnitsShow;
 
   })(Backbone.View);
