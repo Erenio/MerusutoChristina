@@ -5721,11 +5721,11 @@ window.$ === undefined && (window.$ = Zepto)
       (function() {
         __out.push(_.renderTemplate("templates/modals/header"));
       
-        __out.push('\n<div class="content">\n  <div class="slider">\n    <div class="slide-group">\n      <div class="slide">\n        <div class="image" style="background: url(');
+        __out.push('\n<div class="content">\n  <div class="slider">\n    <div class="slide-group">\n      <div class="slide">\n        <img class="image" src="');
       
         __out.push(__sanitize(this.model.originalUrl()));
       
-        __out.push(') no-repeat center center fixed; background-size: contain;">\n      </div>\n      <div class="slide media">\n        <div class="media-body">\n          <h4 class="media-title media-info-group">\n            ');
+        __out.push('">\n      </div>\n      <div class="slide media">\n        <div class="media-body">\n          <h4 class="media-title media-info-group">\n            ');
       
         __out.push(__sanitize(this.model.get("title")));
       
@@ -5863,11 +5863,11 @@ window.$ === undefined && (window.$ = Zepto)
       (function() {
         __out.push(_.renderTemplate("templates/modals/header"));
       
-        __out.push('\n<div class="content">\n  <div class="slider">\n    <div class="slide-group">\n      <div class="slide">\n        <div class="image" style="background: url(');
+        __out.push('\n<div class="content">\n  <div class="slider">\n    <div class="slide-group">\n      <div class="slide">\n        <img class="image" src="');
       
         __out.push(__sanitize(this.model.originalUrl()));
       
-        __out.push(') no-repeat center center fixed; background-size: contain;">\n      </div>\n      <div class="slide media">\n        <div class="media-body">\n          <h4 class="media-title media-info-group">\n            ');
+        __out.push('">\n      </div>\n      <div class="slide media">\n        <div class="media-body">\n          <h4 class="media-title media-info-group">\n            ');
       
         __out.push(__sanitize(this.model.get("title")));
       
@@ -7012,6 +7012,26 @@ window.$ === undefined && (window.$ = Zepto)
 
     UnitsShow.prototype.layout = {
       ".slider": App.Widgets.Slider
+    };
+
+    UnitsShow.prototype.afterRender = function() {
+      var $image, radio, resize;
+      $image = this.$(".slider .image");
+      radio = null;
+      resize = function() {
+        if (window.innerWidth / window.innerHeight < radio) {
+          $image.width("100%");
+          return $image.height("auto");
+        } else {
+          $image.width("auto");
+          return $image.height("100%");
+        }
+      };
+      _.defer(function() {
+        radio = $image.width() / $image.height();
+        return resize();
+      });
+      return $(window).resize(resize);
     };
 
     return UnitsShow;
