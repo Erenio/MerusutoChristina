@@ -1942,6 +1942,10 @@ a[sref] {
   -o-transform: translateX(240px);
   transform: translateX(240px); }
 
+/* line 19, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_sidebar.scss */
+.bar {
+  position: absolute; }
+
 /* line 3, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure/_slider.scss */
 .slider .slide {
   cursor: -webkit-grab;
