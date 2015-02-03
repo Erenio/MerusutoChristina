@@ -390,18 +390,14 @@ a[sref] {
   padding-top: 50px; }
 /* line 164, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
 .modal .image {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto; }
+  width: 100%;
+  height: 100%; }
 
 @media (max-width: 440px) {
-  /* line 175, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 171, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-xs {
     display: none !important; } }
 @media (max-width: 550px) {
-  /* line 181, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
+  /* line 177, /Users/amber/Workspace/WEBSITE/MerusutoChristina/source/stylesheets/structure.scss */
   .hidden-sm {
     display: none !important; } }
