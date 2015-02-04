@@ -83,4 +83,7 @@ activate :deploy do |deploy|
 
   deploy.remote = "git@github.com:bbtfr/MerusutoChristina.git"
   deploy.branch = "gh-pages"
+
+  # deploy.remote = "git@gitcafe.com:bbtfr/MerusutoChristina.git"
+  # deploy.branch = "gitcafe-pages"
 end
