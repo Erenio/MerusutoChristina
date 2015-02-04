@@ -398,8 +398,9 @@ public class UnitListFragment extends Fragment {
             break;
           case SORT_ASPD:
             l = rhs.aspd;
-            l = l == 0f ? 9999f : l;
             r = lhs.aspd;
+            l = l == 0f ? 9999f : l;
+            r = r == 0f ? 9999f : r;
             break;
           case SORT_TENACITY:
             l = lhs.tenacity;

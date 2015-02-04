@@ -3,6 +3,8 @@ package com.kagami.merusuto;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Environment;
 import android.util.Log;
 
@@ -29,7 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Utils {
-  public final static long EXPIRATION = 86400000L;
+  public final static long EXPIRATION = 7200000L;
   private final static String BASEURL =
     "https://bbtfr.github.io/MerusutoChristina/data/";
 
@@ -111,14 +113,14 @@ public class Utils {
       File cache = new File(context.getFilesDir(), filename);
       long expiration = System.currentTimeMillis() - cache.lastModified();
       if (stream != null) {
-        Log.i("com/kagami/merusuto", "Read JSON from internal stream.");
+        Log.v("com/kagami/merusuto", "Read JSON from internal stream.");
         return new JSONArray(readStreamAsString(stream));
       } else if (local.exists()) {
-        Log.i("com/kagami/merusuto", "Read JSON from local file: " +
+        Log.v("com/kagami/merusuto", "Read JSON from local file: " +
           local.getAbsolutePath() + ".");
         return new JSONArray(readFileAsString(local));
       } else if (cache.exists() && expiration < EXPIRATION) {
-        Log.i("com/kagami/merusuto", "Read JSON from local cache file: " +
+        Log.v("com/kagami/merusuto", "Read JSON from local cache file: " +
           cache.getAbsolutePath() + ", expiration: " + expiration + ".");
         return new JSONArray(readFileAsString(cache));
       } else {
@@ -140,12 +142,12 @@ public class Utils {
         String json = EntityUtils.toString(response.getEntity(), "UTF8");
         JSONArray jsonObj = new JSONArray(json);
 
-        Log.i("com/kagami/merusuto", "Write JSON to local cache file: " +
+        Log.v("com/kagami/merusuto", "Write JSON to local cache file: " +
           cache.getAbsolutePath() + ".");
         writeStringAsFile(cache, json);
         return jsonObj;
       } else {
-        Log.i("com/kagami/merusuto", "Read JSON from local cache file: " +
+        Log.v("com/kagami/merusuto", "Read JSON from local cache file: " +
           cache.getAbsolutePath() + ".");
         cache.setLastModified(System.currentTimeMillis());
         return new JSONArray(readFileAsString(cache));
@@ -166,10 +168,10 @@ public class Utils {
       File local = new File(Environment.getExternalStorageDirectory(),
         "merusuto/" + filename);
       if (stream != null) {
-        Log.i("com/kagami/merusuto", "Read Bitmap from internal stream.");
+        Log.v("com/kagami/merusuto", "Read Bitmap from internal stream.");
         return BitmapFactory.decodeStream(stream, null, options);
       } else if (local.exists()) {
-        Log.i("com/kagami/merusuto", "Read Bitmap from local file: " +
+        Log.v("com/kagami/merusuto", "Read Bitmap from local file: " +
           local.getAbsolutePath() + ".");
         return BitmapFactory.decodeStream(new FileInputStream(local), null, options);
       } else {
@@ -191,7 +193,7 @@ public class Utils {
 
       File local = new File(Environment.getExternalStorageDirectory(),
         "merusuto/" + filename);
-      Log.i("com/kagami/merusuto", "Write Bitmap to local file: " +
+      Log.v("com/kagami/merusuto", "Write Bitmap to local file: " +
         local.getAbsolutePath() + ".");
       writeBytesAsFile(local, bytes);
       return bitmap;
@@ -203,21 +205,28 @@ public class Utils {
 
   static public boolean needUpdate(Context context) {
     try {
+      ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo wifiInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+      if (!wifiInfo.isConnected()) {
+        return false;
+      }
+
       String url = BASEURL + "version";
       Log.i("com/kagami/merusuto", "Read version from github: " + url + ".");
       HttpResponse response = getHttpResponse(url);
-      String version = EntityUtils.toString(response.getEntity(), "UTF8");
+      String version = EntityUtils.toString(response.getEntity(), "UTF8").trim();
 
       File cache = new File(context.getFilesDir(), "version");
       if (cache.exists()) {
-        Log.i("com/kagami/merusuto", "Compare version with local cache file: " +
+        Log.v("com/kagami/merusuto", "Compare version with local cache file: " +
           cache.getAbsolutePath() + ".");
         if (readFileAsString(cache).equals(version)) {
           return false;
         }
       }
 
-      Log.i("com/kagami/merusuto", "Write version to local cache file: " +
+      Log.v("com/kagami/merusuto", "Write version to local cache file: " +
         cache.getAbsolutePath() + ".");
       writeStringAsFile(cache, version);
       return true;
