@@ -9,4 +9,12 @@
         android:layout_height="wrap_content" >
     </ListView>
 
+    <ImageButton
+      android:id="@+id/totop_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="bottom|right"
+      android:layout_margin="@dimen/dialog_large_margin"
+      android:src="@drawable/ic_action_collapse" />
+
 </FrameLayout>

@@ -3,6 +3,8 @@
 
     <string name="app_name">MerusutoChristina</string>
 
+    <string name="drawer_open">打开侧边栏</string>
+    <string name="drawer_close">收起侧边栏</string>
 
     <string name="template">类别</string>
     <string name="setting">设置</string>

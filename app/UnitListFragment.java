@@ -19,15 +19,17 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -159,7 +161,7 @@ public class UnitListFragment extends Fragment {
     mAdapter = new UnitListAdapter();
 
     mListView.setAdapter(mAdapter);
-    mListView.setOnItemClickListener(new OnItemClickListener() {
+    mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
 
       class ReadUnitOriginalTask extends AsyncTask<Object, Void, Bitmap> {
 
@@ -198,7 +200,7 @@ public class UnitListFragment extends Fragment {
           try {
             if (bitmap != null && mProgressDialog != null) {
               mProgressDialog.dismiss();
-              ImageDialog dialog = new ImageDialog(getActivity(), mItem, bitmap, mTemplate);
+              UnitItemDialog dialog = new UnitItemDialog(getActivity(), mItem, bitmap, mTemplate);
               dialog.show();
             }
           } catch (Exception e) {}
@@ -220,10 +222,45 @@ public class UnitListFragment extends Fragment {
         if (bitmap == null) {
           new ReadUnitOriginalTask(item).execute(bitmapPath, options);
         } else {
-          ImageDialog dialog = new ImageDialog(getActivity(), item, bitmap, mTemplate);
+          UnitItemDialog dialog = new UnitItemDialog(getActivity(), item, bitmap, mTemplate);
           dialog.show();
         }
 
+      }
+    });
+
+    final ImageButton imageButton = (ImageButton) rootView.findViewById(R.id.totop_btn);
+    imageButton.setOnClickListener(new ImageButton.OnClickListener() {
+
+      @Override
+      public void onClick(View view) {
+        scrollToTop();
+      }
+    });
+
+    mListView.setOnScrollListener(new ListView.OnScrollListener() {
+
+      @Override
+      public void onScroll(AbsListView view, int firstVisibleItem,
+        int visibleItemCount, int totalItemCount) {
+        if (firstVisibleItem > 10) {
+          if (imageButton.getVisibility() == View.INVISIBLE) {
+            Animation in = AnimationUtils.makeInAnimation(getActivity(), false);
+            imageButton.startAnimation(in);
+            imageButton.setVisibility(View.VISIBLE);
+          }
+        } else {
+          if (imageButton.getVisibility() == View.VISIBLE) {
+            Animation out = AnimationUtils.makeOutAnimation(getActivity(), true);
+            imageButton.startAnimation(out);
+            imageButton.setVisibility(View.INVISIBLE);
+          }
+        }
+      }
+
+      @Override
+      public void onScrollStateChanged(AbsListView view, int scrollState) {
+        // TODO Auto-generated method stub
       }
     });
 

@@ -17,12 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
 
-class ImageDialog extends Dialog {
+class UnitItemDialog extends Dialog {
   private Bitmap mBitmap;
   private UnitItem mItem;
   private int mTemplate;
 
-  public ImageDialog(Context context, UnitItem item, Bitmap bitmap, int template) {
+  public UnitItemDialog(Context context, UnitItem item, Bitmap bitmap, int template) {
     super(context, R.style.NobackgroundDialog);
     mItem = item;
     mBitmap = bitmap;
@@ -32,7 +32,7 @@ class ImageDialog extends Dialog {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.dialog_image);
+    setContentView(R.layout.dialog_unit_item);
 
     getWindow().setLayout(LayoutParams.MATCH_PARENT,
       LayoutParams.MATCH_PARENT);

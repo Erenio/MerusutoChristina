@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import java.io.File;
@@ -56,17 +57,19 @@ public class MainActivity extends Activity {
 
     setContentView(R.layout.activity_main);
     ActionBar actionBar = getActionBar();
-    actionBar.setDisplayShowHomeEnabled(true);
+    // actionBar.setDisplayShowHomeEnabled(true);
     actionBar.setDisplayShowTitleEnabled(false);
     actionBar.setDisplayHomeAsUpEnabled(true);
-    actionBar.setIcon(R.drawable.ic_logo);
+    actionBar.setHomeButtonEnabled(true);
+    // actionBar.setIcon(R.drawable.ic_logo);
 
     final ListView drawerList = (ListView) findViewById(R.id.left_drawer);
 
     Resources resources = getResources();
     DrawerListAdapter adapter = new DrawerListAdapter(this);
     adapter.addSectionHeaderItem(resources.getString(R.string.template));
-    for (String title: resources.getStringArray(R.array.template_array)) {
+    final String[] templates = resources.getStringArray(R.array.template_array);
+    for (String title: templates) {
       adapter.addItem(title);
     }
     adapter.addSectionHeaderItem(resources.getString(R.string.setting));
@@ -74,7 +77,10 @@ public class MainActivity extends Activity {
       adapter.addItem(title);
     }
 
+    actionBar.setTitle(templates[0]);
+
     final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+    drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
     drawerList.setAdapter(adapter);
     drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -85,10 +91,12 @@ public class MainActivity extends Activity {
 
         switch (position) {
         case ID_TEMPLATE_UNIT:
+          getActionBar().setTitle(templates[0]);
           mUnitListFragment.setTemplate(UnitListFragment.TEMPLATE_UNIT);
           invalidateOptionsMenu();
           break;
         case ID_TEMPLATE_MONSTER:
+          getActionBar().setTitle(templates[1]);
           mUnitListFragment.setTemplate(UnitListFragment.TEMPLATE_MONSTER);
           invalidateOptionsMenu();
           break;
@@ -102,6 +110,11 @@ public class MainActivity extends Activity {
       }
     });
 
+    mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+      R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+
+    drawerLayout.setDrawerListener(mDrawerToggle);
+
     if (savedInstanceState == null) {
       mUnitListFragment = new UnitListFragment();
       getFragmentManager().beginTransaction()
@@ -111,6 +124,18 @@ public class MainActivity extends Activity {
       mUnitListFragment = (UnitListFragment) getFragmentManager()
         .findFragmentByTag("UnitListFragment");
     }
+  }
+
+  @Override
+  protected void onPostCreate(Bundle savedInstanceState) {
+    super.onPostCreate(savedInstanceState);
+    mDrawerToggle.syncState();
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    mDrawerToggle.onConfigurationChanged(newConfig);
   }
 
   @Override
@@ -163,7 +188,7 @@ public class MainActivity extends Activity {
       }
 
       @Override
-      public boolean  onQueryTextSubmit(String query) {
+      public boolean onQueryTextSubmit(String query) {
         mUnitListFragment.setSearchQuery(query);
         return true;
       }
@@ -174,10 +199,11 @@ public class MainActivity extends Activity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+    if (mDrawerToggle.onOptionsItemSelected(item)) {
+      return true;
+    }
+
     switch (item.getItemId()) {
-    case android.R.id.home:
-      mUnitListFragment.scrollToTop();
-      break;
     case R.id.menu_close_search:
       mSearchMenu.collapseActionView();
       break;
@@ -471,32 +497,22 @@ public class MainActivity extends Activity {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-      ViewHolder holder = null;
       int rowType = getItemViewType(position);
 
-      if (convertView == null) {
-        holder = new ViewHolder();
-        switch (rowType) {
-        case TYPE_ITEM:
-          convertView = mInflater.inflate(R.layout.drawer_listview_item, null);
-          holder.textView = (TextView) convertView.findViewById(R.id.text);
-          break;
-        case TYPE_SEPARATOR:
-          convertView = mInflater.inflate(R.layout.drawer_listview_item_separator, null);
-          holder.textView = (TextView) convertView.findViewById(R.id.textSeparator);
-          break;
-        }
-        convertView.setTag(holder);
-      } else {
-        holder = (ViewHolder) convertView.getTag();
+      TextView textView = null;
+      switch (rowType) {
+      case TYPE_ITEM:
+        convertView = mInflater.inflate(R.layout.drawer_listview_item, null);
+        textView = (TextView) convertView.findViewById(R.id.text);
+        break;
+      case TYPE_SEPARATOR:
+        convertView = mInflater.inflate(R.layout.drawer_listview_item_separator, null);
+        textView = (TextView) convertView.findViewById(R.id.textSeparator);
+        break;
       }
-      holder.textView.setText(mData.get(position));
+      textView.setText(mData.get(position));
 
       return convertView;
-    }
-
-    private class ViewHolder {
-      public TextView textView;
     }
   }
 }
