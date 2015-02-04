@@ -5343,6 +5343,33 @@ window.$ === undefined && (window.$ = Zepto)
   })();
 
 }).call(this);
+;(function($){
+  $.fn.scrollToTop = function(){
+    var $this = $(this),
+      initialY = $this.scrollTop(),
+      start = +new Date,
+      speed = Math.min(750, Math.min(1500, initialY)),
+      now,
+      t, y
+
+    if (initialY == 0) return
+
+    function smooth(pos){
+      if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,5)
+      return 0.5 * (Math.pow((pos-2),5) + 2)
+    }
+
+    requestAnimationFrame(function frame(){
+      now = +new Date
+      t = Math.min(1, Math.max((now - start)/speed, 0))
+      y = initialY - initialY * smooth(t)
+      if (y<0) y = 0
+      $this.scrollTop(y)
+      if (y>0) requestAnimationFrame(frame)
+    })
+  }
+})(Zepto)
+;
 (function() {
   App.Utils.SVG = {
     getPolygonPointsString: function(ps) {
@@ -6125,7 +6152,7 @@ window.$ === undefined && (window.$ = Zepto)
       (function() {
         __out.push(_.renderTemplate("templates/pages/units/header"));
       
-        __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n');
+        __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n<a class="btn btn-lg scroll-to-top">\n  <span class="icon icon-up"></span>\n</a>\n');
       
       }).call(this);
       
@@ -6379,7 +6406,7 @@ window.$ === undefined && (window.$ = Zepto)
       (function() {
         __out.push(_.renderTemplate("templates/pages/units/header"));
       
-        __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n');
+        __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n<a class="btn btn-lg scroll-to-top">\n  <span class="icon icon-up"></span>\n</a>\n');
       
       }).call(this);
       
@@ -6642,6 +6669,22 @@ window.$ === undefined && (window.$ = Zepto)
 
     UnitsIndex.prototype.beforeInitialize = function() {
       return this.filters = {};
+    };
+
+    UnitsIndex.prototype.afterRender = function() {
+      var $content, $scroll;
+      $content = this.$el.filter(".content");
+      $scroll = this.$el.filter(".scroll-to-top");
+      $scroll.click(function() {
+        return $content.scrollToTop();
+      });
+      return this.$el.scroll(function(event) {
+        if (event.target.scrollTop > 1000) {
+          return $scroll.addClass("in");
+        } else {
+          return $scroll.removeClass("in");
+        }
+      });
     };
 
     UnitsIndex.prototype.triggerHover = function(event) {

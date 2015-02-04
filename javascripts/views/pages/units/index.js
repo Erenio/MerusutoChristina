@@ -54,6 +54,22 @@
       return this.filters = {};
     };
 
+    UnitsIndex.prototype.afterRender = function() {
+      var $content, $scroll;
+      $content = this.$el.filter(".content");
+      $scroll = this.$el.filter(".scroll-to-top");
+      $scroll.click(function() {
+        return $content.scrollToTop();
+      });
+      return this.$el.scroll(function(event) {
+        if (event.target.scrollTop > 1000) {
+          return $scroll.addClass("in");
+        } else {
+          return $scroll.removeClass("in");
+        }
+      });
+    };
+
     UnitsIndex.prototype.triggerHover = function(event) {
       $(event.target).trigger('hover');
       return event.stopPropagation();
