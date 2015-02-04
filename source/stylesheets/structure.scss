@@ -120,6 +120,35 @@ a[sref] {
   }
 }
 
+.scroll-to-top {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  opacity: 0;
+  z-index: 10;
+  border: 0;
+  -webkit-transition: -webkit-transform .25s, opacity 1ms .25s;
+     -moz-transition:    -moz-transform .25s, opacity 1ms .25s;
+          transition:         transform .25s, opacity 1ms .25s;
+  -webkit-transform: translate3d(300%, 0, 0);
+      -ms-transform: translate3d(300%, 0, 0);
+          transform: translate3d(300%, 0, 0);
+}
+
+.scroll-to-top.in {
+  opacity: 0.7;
+  -webkit-transition: -webkit-transform .25s;
+     -moz-transition:    -moz-transform .25s;
+          transition:         transform .25s;
+  -webkit-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
+}
+
+.content {
+  overflow-x: hidden;
+}
+
 .modal {
   @include transition-property(opacity);
   background-color: rgba(0,0,0,0.7);

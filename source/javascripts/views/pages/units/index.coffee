@@ -29,6 +29,17 @@ class App.Pages.UnitsIndex extends Backbone.View
   beforeInitialize: ->
     @filters = {}
 
+  afterRender: ->
+    $content = @$el.filter(".content")
+    $scroll = @$el.filter(".scroll-to-top")
+    $scroll.click ->
+      $content.scrollToTop()
+    @$el.scroll (event) ->
+      if event.target.scrollTop > 1000
+        $scroll.addClass("in")
+      else
+        $scroll.removeClass("in")
+
   triggerHover: (event) ->
     $(event.target).trigger('hover')
     event.stopPropagation()
