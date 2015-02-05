@@ -135,7 +135,7 @@ public class Utils {
   static public JSONArray readRemoteJSONData(Context context, String filename) {
     try {
       File cache = new File(context.getFilesDir(), filename);
-      if (needUpdate(context) || !cache.exists()) {
+      if (!cache.exists() || needUpdate(context, filename)) {
         String url = BASEURL + filename;
         Log.i("com/kagami/merusuto", "Read JSON from github: " + url + ".");
         HttpResponse response = getHttpResponse(url);
@@ -203,7 +203,7 @@ public class Utils {
     }
   }
 
-  static public boolean needUpdate(Context context) {
+  static public boolean needUpdate(Context context, String filename) {
     try {
       ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
       NetworkInfo wifiInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -212,16 +212,19 @@ public class Utils {
         return false;
       }
 
-      String url = BASEURL + "version";
+      String url = BASEURL + filename + ".version";
       Log.i("com/kagami/merusuto", "Read version from github: " + url + ".");
       HttpResponse response = getHttpResponse(url);
       String version = EntityUtils.toString(response.getEntity(), "UTF8").trim();
 
-      File cache = new File(context.getFilesDir(), "version");
+      File cache = new File(context.getFilesDir(), filename + ".version");
       if (cache.exists()) {
         Log.v("com/kagami/merusuto", "Compare version with local cache file: " +
           cache.getAbsolutePath() + ".");
-        if (readFileAsString(cache).equals(version)) {
+        String remoteVersion = readFileAsString(cache);
+        Log.v("com/kagami/merusuto", "Local version: " + version);
+        Log.v("com/kagami/merusuto", "Remote version: " + remoteVersion);
+        if (remoteVersion.equals(version)) {
           return false;
         }
       }
