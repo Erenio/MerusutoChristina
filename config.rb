@@ -87,3 +87,14 @@ activate :deploy do |deploy|
   # deploy.remote = "git@gitcafe.com:bbtfr/MerusutoChristina.git"
   # deploy.branch = "gitcafe-pages"
 end
+
+after_build do |builder|
+  require "digest"
+
+  jsons = Dir[File.join config[:build_dir], "data/*.json"]
+  jsons.each do |json|
+    sha = Digest::SHA2.file(json).hexdigest
+    builder.create_file "#{json}.version", sha
+  end
+
+end
