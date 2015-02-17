@@ -32,8 +32,8 @@
             android:layout_below="@+id/name"
             android:layout_marginLeft="@dimen/fragment_medium_margin"
             android:minWidth="56dp"
-            android:scaleType="fitStart"
-            android:src="@drawable/default_thumbnail" />
+            android:maxWidth="58dp"
+            android:scaleType="fitStart" />
 
         <LinearLayout
             android:id="@+id/text_layout"

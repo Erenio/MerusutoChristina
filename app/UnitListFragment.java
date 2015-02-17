@@ -47,6 +47,7 @@ public class UnitListFragment extends Fragment {
   public final static int SORT_ASPD = 7;
   public final static int SORT_TENACITY = 8;
   public final static int SORT_MSPD = 9;
+  public final static int SORT_ID = 10;
 
   public final static int LEVEL_ZERO = 0;
   public final static int LEVEL_MAX_LV = 1;
@@ -57,10 +58,10 @@ public class UnitListFragment extends Fragment {
 
   private UnitListAdapter mAdapter;
   private int mRare = 0, mElement = 0, mWeapon = 0, mType = 0, mSkin = 0;
-  private int mLevel = 0, mGrow = 0;
   private int mSortMode = 0, mLevelMode = 0;
   private int mTemplate = 0;
   private String mQuery = null;
+  private String mCountry = null;
 
   private ListView mListView;
 
@@ -87,6 +88,11 @@ public class UnitListFragment extends Fragment {
 
   public void setSearchQuery(String query) {
     mQuery = query;
+    mAdapter.search();
+  }
+
+  public void setCountry(String country) {
+    mCountry = country;
     mAdapter.search();
   }
 
@@ -127,6 +133,7 @@ public class UnitListFragment extends Fragment {
 
   private void resetFilters() {
     mRare = mElement = mWeapon = mType = mSkin = 0;
+    mQuery = mCountry = null;
   }
 
   public void reset() {
@@ -343,18 +350,35 @@ public class UnitListFragment extends Fragment {
           mAllData.add(item);
         } catch (Exception e) {}
       }
+      if (mTemplate == TEMPLATE_UNIT) {
+        ArrayList<String> countries = new ArrayList<String>();
+        for (UnitItem item: mAllData) {
+          if(!countries.contains(item.country)) {
+            countries.add(item.country);
+          }
+        }
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity != null) activity.setCountries(countries);
+      }
     }
 
     public void search() {
       mDisplayedData.clear();
 
       for (UnitItem item: mAllData)
-        if ((mRare == 0 || item.rare == mRare) &&
+        if (
+          (mRare == 0 || item.rare == mRare) &&
           (mElement == 0 || item.element == mElement) &&
           (mWeapon == 0 || item.weapon == mWeapon) &&
           (mType == 0 || item.type == mType) &&
           (mSkin == 0 || item.skin == mSkin) &&
-          (mQuery == null || item.name.indexOf(mQuery) > 0 || item.title.indexOf(mQuery) > 0))
+          (mCountry == null || item.country.equals(mCountry)) &&
+          (mQuery == null ||
+            item.name.indexOf(mQuery) >= 0 ||
+            item.title.indexOf(mQuery) >= 0 ||
+            String.valueOf(item.id).indexOf(mQuery) >= 0
+            )
+          )
           mDisplayedData.add(item);
 
       sort();
@@ -409,6 +433,10 @@ public class UnitListFragment extends Fragment {
           case SORT_MSPD:
             l = lhs.mspd;
             r = rhs.mspd;
+            break;
+          case SORT_ID:
+            l = lhs.id;
+            r = rhs.id;
             break;
           }
 
@@ -492,11 +520,10 @@ public class UnitListFragment extends Fragment {
       String bitmapPath = getTemplateString() + "/thumbnail/" + item.id + ".png";
       Bitmap bitmap = Utils.readLocalBitmap(getActivity(), bitmapPath, null);
       if (bitmap == null) {
-        thumbnailView.setImageResource(R.drawable.default_thumbnail);
+        bitmap = Utils.readLocalBitmap(getActivity(), "default_thumbnail.png", null);
         new ReadUnitThumbnailTask(convertView).execute(bitmapPath);
-      } else {
-        thumbnailView.setImageBitmap(bitmap);
       }
+      thumbnailView.setImageBitmap(bitmap);
 
       nameView.setText(item.title + item.name);
       rareView.setText(item.getRareString());
@@ -526,7 +553,7 @@ public class UnitListFragment extends Fragment {
 
         if (textViewNum > 3) {
           addUnitTextView(textLayout, String.format(
-            "暗: %.0f%%\n国家: %s\nDPS: %d\n总DPS: %d",
+            "暗: %.0f%%\n\nDPS: %d\n总DPS: %d",
             item.dark * 100, item.country, item.getDPS(mLevelMode),
             item.getMultDPS(mLevelMode)));
         }

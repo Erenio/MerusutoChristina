@@ -55,6 +55,9 @@
             <item
                 android:id="@+id/menu_sort_mspd"
                 android:title="移动速度" />
+            <item
+                android:id="@+id/menu_sort_id"
+                android:title="新品上架" />
         </menu>
     </item>
     <item
@@ -156,6 +159,16 @@
                     <item
                         android:id="@+id/menu_type_3"
                         android:title="晚成" />
+                </menu>
+            </item>
+            <item
+                android:id="@+id/menu_country"
+                android:showAsAction="withText"
+                android:title="国别" >
+                <menu>
+                    <item
+                        android:id="@+id/menu_country_0"
+                        android:title="全部" />
                 </menu>
             </item>
             <item

@@ -1,15 +1,19 @@
 package com.kagami.merusuto;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import org.apache.http.HttpResponse;
@@ -237,5 +242,104 @@ public class Utils {
       Log.e("com/kagami/merusuto", e.getMessage(), e);
       return false;
     }
+  }
+
+  static private class DecompressTask extends AsyncTask<Integer, Integer, Void> {
+
+    private ProgressDialog mProgressDialog = null;
+    private String mFilename;
+    private Context mContext;
+    private int mProgress = 0;
+
+    public DecompressTask(Context context, String filename) {
+      mContext = context;
+      mFilename = filename;
+    }
+
+    @Override
+    protected void onPreExecute() {
+      try {
+        int size = new ZipFile(mFilename).size();
+        Log.i("com/kagami/merusuto", "Unzip file: " + mFilename);
+
+        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog.setButton("取消", new DialogInterface.OnClickListener() {
+
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+          }
+        });
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+        mProgressDialog.setTitle("请稍后再舔");
+        mProgressDialog.setMessage("正在加载数据，请稍后...");
+        mProgressDialog.setMax(size);
+        mProgressDialog.show();
+      } catch(Exception e) {
+        Log.e("com/kagami/merusuto", e.getMessage(), e);
+      }
+    }
+
+    @Override
+    protected Void doInBackground(Integer... param) {
+      try  {
+        File location = new File(Environment.getExternalStorageDirectory(),
+          "merusuto/");
+
+        FileInputStream fin = new FileInputStream(mFilename);
+        ZipInputStream zin = new ZipInputStream(fin);
+        ZipEntry entry = null;
+        while ((entry = zin.getNextEntry()) != null) {
+          String name = entry.getName();
+          File file = new File(location, name);
+
+          if (entry.isDirectory()) {
+            if (!file.isDirectory()) {
+              file.mkdirs();
+            }
+          } else {
+            publishProgress(mProgress++);
+
+            int size;
+            byte[] buffer = new byte[2048];
+
+            FileOutputStream fout = new FileOutputStream(file);
+            BufferedOutputStream bout = new BufferedOutputStream(fout, buffer.length);
+
+            while ((size = zin.read(buffer, 0, buffer.length)) != -1) {
+              bout.write(buffer, 0, size);
+            }
+
+            bout.flush();
+            bout.close();
+            fout.close();
+            zin.closeEntry();
+          }
+        }
+        zin.close();
+        fin.close();
+      } catch(Exception e) {
+        Log.e("com/kagami/merusuto", e.getMessage(), e);
+      }
+      return null;
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+      if (mProgressDialog != null)
+        mProgressDialog.setProgress(mProgress);
+    }
+
+    @Override
+    protected void onPostExecute(Void result) {
+      if (mProgressDialog != null)
+        mProgressDialog.dismiss();
+    }
+  }
+
+  static public void createDecompressTask(Context context, String filename) {
+    new DecompressTask(context, filename).execute();
   }
 }

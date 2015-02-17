@@ -4,41 +4,42 @@ import org.json.JSONObject;
 
 public class UnitItem {
 
-  public String name;
+  public String name; // 名称
   public int id;
-  public int rare;
-  public int element; // 1火 2水 3风 4光 5暗
+  public int rare; // 稀有度
+  public int element; // 属性 1火 2水 3风 4光 5暗
 
-  public float fire;
-  public float aqua;
-  public float wind;
-  public float light;
-  public float dark;
+  public float fire; // 火
+  public float aqua; // 水
+  public float wind; // 风
+  public float light; // 光
+  public float dark; // 暗
 
   // =====
   // 同伴
-  public String title;
-  public int atk;
-  public int life;
-  public int mspd;
-  public int tenacity;
-  public float aspd;
-  public String country;
+  public String title; // 称号
+  public int atk; // 攻击
+  public int life; // 生命
+  public int mspd; // 移动速度
+  public int tenacity; // 韧性
+  public float aspd; // 攻击速度
+  public String country; // 国家
 
-  public int weapon; // 1斩击 2突击 3打击 4弓箭 5魔法 6铳弹 7回复
-  public int aarea;
-  public int anum;
-  public int type; // 1早熟 2平均 3晚成
+  public int weapon; // 武器 1斩击 2突击 3打击 4弓箭 5魔法 6铳弹 7回复
+  public int aarea; // 攻击范围
+  public int anum; // 攻击数量
+  public int type; // 类型 1早熟 2平均 3晚成
   // =====
 
   // =====
   // 魔宠
-  public int skin; // 1坚硬 2常规 3柔软
-  public int sklsp;
-  public int sklcd;
-  public String skill;
-  public String obtain;
+  public int skin; // 皮肤 1坚硬 2常规 3柔软
+  public int sklsp; // 技能消耗SP
+  public int sklcd; // 技能CD
+  public String skill; // 技能描述
+  public String obtain; // 获取方式
   // =====
+
   public UnitItem(JSONObject json) {
     this.id = json.optInt("id", 0);
     this.name = json.optString("name", "");
@@ -129,7 +130,11 @@ public class UnitItem {
   }
 
   public float calcDPS(int mode) {
-    return calcByLevel(mode, atk) / aspd;
+    if (aspd != 0) {
+      return calcByLevel(mode, atk) / aspd;
+    } else {
+      return 0;
+    }
   }
 
   public int getDPS(int mode) {

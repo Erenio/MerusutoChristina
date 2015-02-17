@@ -3,20 +3,18 @@ package com.kagami.merusuto;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,21 +23,15 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.BufferedOutputStream;
 import java.util.ArrayList;
 import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 public class MainActivity extends Activity {
 
@@ -47,9 +39,13 @@ public class MainActivity extends Activity {
   public final static int ID_TEMPLATE_MONSTER = 2;
   public final static int ID_LOAD_ZIP_DATA = 4;
 
+  public final static int ID_COUNTRY_MENU_GROUP = 1;
+
   private UnitListFragment mUnitListFragment;
   private ActionBarDrawerToggle mDrawerToggle;
-  private MenuItem mSearchMenu;
+  private MenuItem mSearchMenu, mCountryFilter;
+  private ArrayList<String> mCountries;
+  private boolean mCountryFilterUpdated = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -65,19 +61,22 @@ public class MainActivity extends Activity {
 
     final ListView drawerList = (ListView) findViewById(R.id.left_drawer);
 
-    Resources resources = getResources();
     DrawerListAdapter adapter = new DrawerListAdapter(this);
-    adapter.addSectionHeaderItem(resources.getString(R.string.template));
-    final String[] templates = resources.getStringArray(R.array.template_array);
-    for (String title: templates) {
-      adapter.addItem(title);
+    PopupMenu popupMenu = new PopupMenu(this, null);
+    popupMenu.inflate(R.menu.sidebar);
+    Menu menu = popupMenu.getMenu();
+    MenuItem menuItem;
+    for (int i = 0; i < menu.size(); i++) {
+      menuItem = menu.getItem(i);
+      adapter.addItem(new DrawerItem(menuItem.getItemId(),
+        menuItem.getTitle(), true));
+      SubMenu subMenu = menuItem.getSubMenu();
+      for (int j = 0; j < subMenu.size(); j++) {
+        menuItem = subMenu.getItem(j);
+        adapter.addItem(new DrawerItem(menuItem.getItemId(),
+          menuItem.getTitle(), false));
+      }
     }
-    adapter.addSectionHeaderItem(resources.getString(R.string.setting));
-    for (String title: resources.getStringArray(R.array.setting_array)) {
-      adapter.addItem(title);
-    }
-
-    actionBar.setTitle(templates[0]);
 
     final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -91,12 +90,10 @@ public class MainActivity extends Activity {
 
         switch (position) {
         case ID_TEMPLATE_UNIT:
-          getActionBar().setTitle(templates[0]);
           mUnitListFragment.setTemplate(UnitListFragment.TEMPLATE_UNIT);
           invalidateOptionsMenu();
           break;
         case ID_TEMPLATE_MONSTER:
-          getActionBar().setTitle(templates[1]);
           mUnitListFragment.setTemplate(UnitListFragment.TEMPLATE_MONSTER);
           invalidateOptionsMenu();
           break;
@@ -149,6 +146,10 @@ public class MainActivity extends Activity {
       break;
     }
 
+    mCountryFilter = menu.findItem(R.id.menu_country);
+    mCountryFilterUpdated = false;
+    updateCountryFilters();
+
     mSearchMenu = menu.findItem(R.id.menu_search);
     mSearchMenu.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 
@@ -197,10 +198,29 @@ public class MainActivity extends Activity {
     return true;
   }
 
+  public void setCountries(ArrayList<String> countries) {
+    mCountries = countries;
+    updateCountryFilters();
+  }
+
+  public void updateCountryFilters() {
+    if (!mCountryFilterUpdated && mCountries != null && mCountryFilter != null) {
+      SubMenu subMenu = mCountryFilter.getSubMenu();
+      for (int i = 0; i < mCountries.size(); i++) {
+        subMenu.add(ID_COUNTRY_MENU_GROUP, i, Menu.NONE, mCountries.get(i));
+      }
+      mCountryFilterUpdated = true;
+    }
+  }
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if (mDrawerToggle.onOptionsItemSelected(item)) {
       return true;
+    }
+
+    if (item.getGroupId() == ID_COUNTRY_MENU_GROUP) {
+      mUnitListFragment.setCountry(item.getTitle().toString());
     }
 
     switch (item.getItemId()) {
@@ -291,6 +311,9 @@ public class MainActivity extends Activity {
     case R.id.menu_skin_3:
       mUnitListFragment.setSkin(3);
       break;
+    case R.id.menu_country_0:
+      mUnitListFragment.setCountry(null);
+      break;
     case R.id.menu_sort_rare:
       mUnitListFragment.setSortMode(UnitListFragment.SORT_RARE);
       break;
@@ -321,6 +344,9 @@ public class MainActivity extends Activity {
     case R.id.menu_sort_mspd:
       mUnitListFragment.setSortMode(UnitListFragment.SORT_MSPD);
       break;
+    case R.id.menu_sort_id:
+      mUnitListFragment.setSortMode(UnitListFragment.SORT_ID);
+      break;
     case R.id.menu_level_zero:
       mUnitListFragment.setLevelMode(UnitListFragment.LEVEL_ZERO);
       break;
@@ -338,99 +364,6 @@ public class MainActivity extends Activity {
     return super.onOptionsItemSelected(item);
   }
 
-  private class DecompressTask extends AsyncTask<Integer, Integer, Void> {
-
-    private ProgressDialog mProgressDialog = null;
-    private String mFilename;
-    private int mProgress = 0;
-
-    public DecompressTask(String filename) {
-      mFilename = filename;
-    }
-
-    @Override
-    protected void onPreExecute() {
-      try {
-        int size = new ZipFile(mFilename).size();
-        Log.i("com/kagami/merusuto", "Unzip file: " + mFilename);
-
-        mProgressDialog = new ProgressDialog(MainActivity.this);
-        mProgressDialog.setButton("取消", new DialogInterface.OnClickListener() {
-
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-          }
-        });
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setCanceledOnTouchOutside(false);
-        mProgressDialog.setTitle("请稍后再舔");
-        mProgressDialog.setMessage("正在加载数据，请稍后...");
-        mProgressDialog.setMax(size);
-        mProgressDialog.show();
-      } catch(Exception e) {
-        Log.e("com/kagami/merusuto", e.getMessage(), e);
-      }
-    }
-
-    @Override
-    protected Void doInBackground(Integer... param) {
-      try  {
-        File location = new File(Environment.getExternalStorageDirectory(),
-          "merusuto/");
-
-        FileInputStream fin = new FileInputStream(mFilename);
-        ZipInputStream zin = new ZipInputStream(fin);
-        ZipEntry entry = null;
-        while ((entry = zin.getNextEntry()) != null) {
-          String name = entry.getName();
-          File file = new File(location, name);
-
-          if (entry.isDirectory()) {
-            if (!file.isDirectory()) {
-              file.mkdirs();
-            }
-          } else {
-            publishProgress(mProgress++);
-
-            int size;
-            byte[] buffer = new byte[2048];
-
-            FileOutputStream fout = new FileOutputStream(file);
-            BufferedOutputStream bout = new BufferedOutputStream(fout, buffer.length);
-
-            while ((size = zin.read(buffer, 0, buffer.length)) != -1) {
-              bout.write(buffer, 0, size);
-            }
-
-            bout.flush();
-            bout.close();
-            fout.close();
-            zin.closeEntry();
-          }
-        }
-        zin.close();
-        fin.close();
-      } catch(Exception e) {
-        Log.e("com/kagami/merusuto", e.getMessage(), e);
-      }
-      return null;
-    }
-
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-      if (mProgressDialog != null)
-        mProgressDialog.setProgress(mProgress);
-    }
-
-    @Override
-    protected void onPostExecute(Void result) {
-      if (mProgressDialog != null)
-        mProgressDialog.dismiss();
-    }
-  }
-
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (resultCode != Activity.RESULT_OK) {
@@ -440,18 +373,27 @@ public class MainActivity extends Activity {
     switch (requestCode) {
     case ID_LOAD_ZIP_DATA:
       String filename = data.getData().getPath();
-      new DecompressTask(filename).execute();
+      Utils.createDecompressTask(this, filename);
       break;
+    }
+  }
+
+  private class DrawerItem {
+
+    public int id;
+    public String title;
+    public boolean separator = false;
+
+    public DrawerItem(int id, CharSequence title, boolean separator) {
+      this.id = id;
+      this.title = title.toString();
+      this.separator = separator;
     }
   }
 
   private class DrawerListAdapter extends BaseAdapter {
 
-    private static final int TYPE_ITEM = 0;
-    private static final int TYPE_SEPARATOR = 1;
-
-    private ArrayList<String> mData = new ArrayList<String>();
-    private TreeSet<Integer> sectionHeader = new TreeSet<Integer>();
+    private ArrayList<DrawerItem> mData = new ArrayList<DrawerItem>();
 
     private LayoutInflater mInflater;
 
@@ -460,25 +402,9 @@ public class MainActivity extends Activity {
           .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void addItem(final String item) {
+    public void addItem(DrawerItem item) {
       mData.add(item);
       notifyDataSetChanged();
-    }
-
-    public void addSectionHeaderItem(final String item) {
-      mData.add(item);
-      sectionHeader.add(mData.size() - 1);
-      notifyDataSetChanged();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-      return sectionHeader.contains(position) ? TYPE_SEPARATOR : TYPE_ITEM;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-      return 2;
     }
 
     @Override
@@ -487,30 +413,27 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public String getItem(int position) {
+    public DrawerItem getItem(int position) {
       return mData.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-      return position;
+      return mData.get(position).id;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
       int rowType = getItemViewType(position);
 
       TextView textView = null;
-      switch (rowType) {
-      case TYPE_ITEM:
-        convertView = mInflater.inflate(R.layout.drawer_listview_item, null);
-        textView = (TextView) convertView.findViewById(R.id.text);
-        break;
-      case TYPE_SEPARATOR:
+      if (mData.get(position).separator) {
         convertView = mInflater.inflate(R.layout.drawer_listview_item_separator, null);
         textView = (TextView) convertView.findViewById(R.id.textSeparator);
-        break;
+      } else {
+        convertView = mInflater.inflate(R.layout.drawer_listview_item, null);
+        textView = (TextView) convertView.findViewById(R.id.text);
       }
-      textView.setText(mData.get(position));
+      textView.setText(mData.get(position).title);
 
       return convertView;
     }

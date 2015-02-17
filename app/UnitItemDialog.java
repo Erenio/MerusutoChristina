@@ -63,7 +63,7 @@ class UnitItemDialog extends Dialog {
 
     UnitItem item = mItem;
 
-    nameView.setText(item.title + item.name);
+    nameView.setText(item.title + item.name + " ID:" + item.id);
     rareView.setText(item.getRareString());
 
     LinearLayout textLayout = (LinearLayout) detailView.findViewById(R.id.text_layout1);
