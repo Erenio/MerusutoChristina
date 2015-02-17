@@ -37,7 +37,7 @@
     }
     (function() {
       (function() {
-        __out.push(_.renderTemplate("templates/pages/units/header"));
+        __out.push(_.renderTemplate("templates/pages/monsters/header"));
       
         __out.push('\n<div class="content">\n  <ul class="table-view"></ul>\n</div>\n<a class="btn btn-lg scroll-to-top">\n  <span class="icon icon-up"></span>\n</a>\n');
       

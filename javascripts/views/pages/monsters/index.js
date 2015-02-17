@@ -55,19 +55,37 @@
     };
 
     UnitsIndex.prototype.afterRender = function() {
-      var $content, $scroll;
+      var $content, $country, $scroll;
       $content = this.$el.filter(".content");
       $scroll = this.$el.filter(".scroll-to-top");
       $scroll.click(function() {
         return $content.scrollToTop();
       });
-      return this.$el.scroll(function(event) {
+      this.$el.scroll(function(event) {
         if (event.target.scrollTop > 1000) {
           return $scroll.addClass("in");
         } else {
           return $scroll.removeClass("in");
         }
       });
+      $country = this.$("#country");
+      if ($country.length > 0) {
+        return this.collection.once("reset", (function(_this) {
+          return function() {
+            var countries, country, _i, _len, _results;
+            countries = _this.collection.map(function(model) {
+              return model.get("country");
+            });
+            countries = _.uniq(countries);
+            _results = [];
+            for (_i = 0, _len = countries.length; _i < _len; _i++) {
+              country = countries[_i];
+              _results.push($country.append("<li><a class=\"filter\" data-key=\"country\" data-value=\"" + country + "\">" + country + "</a></li>"));
+            }
+            return _results;
+          };
+        })(this));
+      }
     };
 
     UnitsIndex.prototype.triggerHover = function(event) {
@@ -168,10 +186,12 @@
     };
 
     UnitsIndex.prototype.setFilter = function(event) {
-      var $target;
+      var $target, key, value;
       $target = $(event.target);
       this.setActive($target);
-      this.filters[$target.data("key")] = parseInt($target.data("value"));
+      key = $target.data("key");
+      value = $target.data("value");
+      this.filters[key] = value;
       return this.binder.filter(this.filters);
     };
 
