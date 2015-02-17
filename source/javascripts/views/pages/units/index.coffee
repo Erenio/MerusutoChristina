@@ -26,10 +26,10 @@ class App.Pages.UnitsIndex extends Backbone.View
     "click .search-open": "openSearch"
     "click .search-close": "closeSearch"
 
-  beforeInitialize: ->
-    @filters = {}
-
   afterRender: ->
+    @filters = {}
+    @binder.filter(@filters)
+
     $content = @$el.filter(".content")
     $scroll = @$el.filter(".scroll-to-top")
     $scroll.click ->
