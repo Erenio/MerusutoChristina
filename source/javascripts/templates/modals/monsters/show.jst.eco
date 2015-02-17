@@ -10,6 +10,8 @@
           <h4 class="media-title media-info-group">
             <%= @model.get("title") %> <%= @model.get("name") %>
             <small><%= @model.getRareString() %></small>
+            <br>
+            <small>ID: <%= @model.get("id") %></small>
           </h4>
           <div class="media-info-group">
             <p class="media-info">
