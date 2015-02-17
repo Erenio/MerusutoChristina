@@ -6667,12 +6667,10 @@ window.$ === undefined && (window.$ = Zepto)
       "click .search-close": "closeSearch"
     };
 
-    UnitsIndex.prototype.beforeInitialize = function() {
-      return this.filters = {};
-    };
-
     UnitsIndex.prototype.afterRender = function() {
       var $content, $country, $scroll;
+      this.filters = {};
+      this.binder.filter(this.filters);
       $content = this.$el.filter(".content");
       $scroll = this.$el.filter(".scroll-to-top");
       $scroll.click(function() {
