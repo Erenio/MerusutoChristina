@@ -55,6 +55,10 @@
       
         __out.push(__sanitize(this.model.getRareString()));
       
+        __out.push('</small>\n            <br>\n            <small>ID: ');
+      
+        __out.push(__sanitize(this.model.get("id")));
+      
         __out.push('</small>\n          </h4>\n          <div class="media-info-group">\n            <p class="media-info">\n              生命：');
       
         __out.push(__sanitize(this.model.origin.life));
