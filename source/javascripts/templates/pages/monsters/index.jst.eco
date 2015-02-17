@@ -1,4 +1,4 @@
-<%- _.renderTemplate("templates/pages/units/header") %>
+<%- _.renderTemplate("templates/pages/monsters/header") %>
 <div class="content">
   <ul class="table-view"></ul>
 </div>

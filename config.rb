@@ -53,7 +53,7 @@ set :js_dir, 'javascripts'
 
 set :images_dir, 'images'
 
-set :debug_assets, true
+# set :debug_assets, true
 
 activate :directory_indexes
 

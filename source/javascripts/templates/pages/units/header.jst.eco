@@ -57,6 +57,12 @@
           <li><a class="filter" data-key="type" data-value="3">晚成</a></li>
         </ul>
       </li>
+      <li class="dropdown-submenu pull-left">
+        <a class="">国别</a>
+        <ul class="dropdown-menu" id="country">
+          <li><a class="filter-reset" data-key="country">全部</a></li>
+        </ul>
+      </li>
       <li class="divider"></li>
       <li><a class="filter-reset">重置</a></li>
     </ul>
@@ -76,6 +82,7 @@
       <li><a class="sort-mode" data-key="aspd">攻击速度</a></li>
       <li><a class="sort-mode" data-key="tenacity">韧性</a></li>
       <li><a class="sort-mode" data-key="mspd">移动速度</a></li>
+      <li><a class="sort-mode" data-key="id">新款上架</a></li>
     </ul>
   </div>
   <div class="dropdown pull-right">

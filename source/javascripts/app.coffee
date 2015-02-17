@@ -14,7 +14,7 @@ window.App =
 
   initialize: ->
     _.setDebugLevel(2)
-    
+
     @main = new App.Views.Main
       el: $('body')
     @main.render()

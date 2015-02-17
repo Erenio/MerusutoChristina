@@ -40,6 +40,17 @@ class App.Pages.UnitsIndex extends Backbone.View
       else
         $scroll.removeClass("in")
 
+    $country = @$("#country")
+    if $country.length > 0
+      @collection.once "reset", =>
+        countries = @collection.map (model) ->
+          model.get("country")
+        countries = _.uniq(countries)
+        for country in countries
+          $country.append(
+            """<li><a class="filter" data-key="country" data-value="#{country}">#{country}</a></li>"""
+            )
+
   triggerHover: (event) ->
     $(event.target).trigger('hover')
     event.stopPropagation()
@@ -111,7 +122,9 @@ class App.Pages.UnitsIndex extends Backbone.View
   setFilter: (event) ->
     $target = $(event.target)
     @setActive($target)
-    @filters[$target.data("key")] = parseInt($target.data("value"))
+    key = $target.data("key")
+    value = $target.data("value")
+    @filters[key] = value
     @binder.filter(@filters)
 
   setSortMode: (event) ->

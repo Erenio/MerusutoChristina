@@ -36,25 +36,12 @@
         </ul>
       </li>
       <li class="dropdown-submenu pull-left">
-        <a class="">武器</a>
+        <a class="">皮肤</a>
         <ul class="dropdown-menu">
-          <li><a class="filter-reset" data-key="weapon">全部</a></li>
-          <li><a class="filter" data-key="weapon" data-value="1">斩击</a></li>
-          <li><a class="filter" data-key="weapon" data-value="2">突击</a></li>
-          <li><a class="filter" data-key="weapon" data-value="3">打击</a></li>
-          <li><a class="filter" data-key="weapon" data-value="4">弓箭</a></li>
-          <li><a class="filter" data-key="weapon" data-value="5">魔法</a></li>
-          <li><a class="filter" data-key="weapon" data-value="6">铳弹</a></li>
-          <li><a class="filter" data-key="weapon" data-value="7">回复</a></li>
-        </ul>
-      </li>
-      <li class="dropdown-submenu pull-left">
-        <a class="">成长</a>
-        <ul class="dropdown-menu">
-          <li><a class="filter-reset" data-key="type">全部</a></li>
-          <li><a class="filter" data-key="type" data-value="1">早熟</a></li>
-          <li><a class="filter" data-key="type" data-value="2">平均</a></li>
-          <li><a class="filter" data-key="type" data-value="3">晚成</a></li>
+          <li><a class="filter-reset" data-key="skin">全部</a></li>
+          <li><a class="filter" data-key="skin" data-value="1">坚硬</a></li>
+          <li><a class="filter" data-key="skin" data-value="2">常规</a></li>
+          <li><a class="filter" data-key="skin" data-value="3">柔软</a></li>
         </ul>
       </li>
       <li class="divider"></li>
@@ -76,6 +63,7 @@
       <li><a class="sort-mode" data-key="aspd">攻击速度</a></li>
       <li><a class="sort-mode" data-key="tenacity">韧性</a></li>
       <li><a class="sort-mode" data-key="mspd">移动速度</a></li>
+      <li><a class="sort-mode" data-key="id">新款上架</a></li>
     </ul>
   </div>
   <div class="dropdown pull-right">
