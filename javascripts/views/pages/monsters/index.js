@@ -151,10 +151,10 @@
             if (query !== "") {
               models = _.filter(models, function(model) {
                 var key, value, _i, _len, _ref;
-                _ref = ["name", "title"];
+                _ref = ["id", "name", "title"];
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                   key = _ref[_i];
-                  value = model.get(key);
+                  value = model.get(key).toString();
                   if (value && value.indexOf(query) >= 0) {
                     return true;
                   }
