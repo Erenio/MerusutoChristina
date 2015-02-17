@@ -51,7 +51,7 @@
     };
 
     UnitsIndex.prototype.afterRender = function() {
-      var $content, $country, $scroll;
+      var $content, $country, $scroll, appendCountryFilter;
       this.filters = {};
       this.binder.filter(this.filters);
       $content = this.$el.filter(".content");
@@ -67,22 +67,29 @@
         }
       });
       $country = this.$("#country");
+      appendCountryFilter = function(collection) {
+        var countries, country, _i, _len, _results;
+        countries = collection.map(function(model) {
+          return model.get("country");
+        });
+        countries = _.uniq(countries);
+        _results = [];
+        for (_i = 0, _len = countries.length; _i < _len; _i++) {
+          country = countries[_i];
+          _results.push($country.append("<li><a class=\"filter\" data-key=\"country\" data-value=\"" + country + "\">" + country + "</a></li>"));
+        }
+        return _results;
+      };
       if ($country.length > 0) {
-        return this.collection.once("reset", (function(_this) {
-          return function() {
-            var countries, country, _i, _len, _results;
-            countries = _this.collection.map(function(model) {
-              return model.get("country");
-            });
-            countries = _.uniq(countries);
-            _results = [];
-            for (_i = 0, _len = countries.length; _i < _len; _i++) {
-              country = countries[_i];
-              _results.push($country.append("<li><a class=\"filter\" data-key=\"country\" data-value=\"" + country + "\">" + country + "</a></li>"));
-            }
-            return _results;
-          };
-        })(this));
+        if (this.collection.length === 0) {
+          return this.collection.once("reset", (function(_this) {
+            return function(collection) {
+              return appendCountryFilter(collection);
+            };
+          })(this));
+        } else {
+          return appendCountryFilter(this.collection);
+        }
       }
     };
 
