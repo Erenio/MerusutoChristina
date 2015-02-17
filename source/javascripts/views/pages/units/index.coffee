@@ -41,15 +41,22 @@ class App.Pages.UnitsIndex extends Backbone.View
         $scroll.removeClass("in")
 
     $country = @$("#country")
+
+    appendCountryFilter = (collection) ->
+      countries = collection.map (model) ->
+        model.get("country")
+      countries = _.uniq(countries)
+      for country in countries
+        $country.append(
+          """<li><a class="filter" data-key="country" data-value="#{country}">#{country}</a></li>"""
+          )
+
     if $country.length > 0
-      @collection.once "reset", =>
-        countries = @collection.map (model) ->
-          model.get("country")
-        countries = _.uniq(countries)
-        for country in countries
-          $country.append(
-            """<li><a class="filter" data-key="country" data-value="#{country}">#{country}</a></li>"""
-            )
+      if @collection.length == 0
+        @collection.once "reset", (collection) =>
+          appendCountryFilter(collection)
+      else
+        appendCountryFilter(@collection)
 
   triggerHover: (event) ->
     $(event.target).trigger('hover')
