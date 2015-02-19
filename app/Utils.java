@@ -36,7 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Utils {
-  public final static long EXPIRATION = 7200000L;
+  public final static long EXPIRATION = 3600000L;
   private final static String BASEURL =
     "https://bbtfr.github.io/MerusutoChristina/data/";
 
@@ -116,7 +116,6 @@ public class Utils {
       File local = new File(Environment.getExternalStorageDirectory(),
         "merusuto/" + filename);
       File cache = new File(context.getFilesDir(), filename);
-      long expiration = System.currentTimeMillis() - cache.lastModified();
       if (stream != null) {
         Log.v("com/kagami/merusuto", "Read JSON from internal stream.");
         return new JSONArray(readStreamAsString(stream));
@@ -124,9 +123,9 @@ public class Utils {
         Log.v("com/kagami/merusuto", "Read JSON from local file: " +
           local.getAbsolutePath() + ".");
         return new JSONArray(readFileAsString(local));
-      } else if (cache.exists() && expiration < EXPIRATION) {
+      } else if (cache.exists()) {
         Log.v("com/kagami/merusuto", "Read JSON from local cache file: " +
-          cache.getAbsolutePath() + ", expiration: " + expiration + ".");
+          cache.getAbsolutePath() + ".");
         return new JSONArray(readFileAsString(cache));
       } else {
         return null;
@@ -140,24 +139,17 @@ public class Utils {
   static public JSONArray readRemoteJSONData(Context context, String filename) {
     try {
       File cache = new File(context.getFilesDir(), filename);
-      if (!cache.exists() || needUpdate(context, filename)) {
-        String url = BASEURL + filename;
-        Log.i("com/kagami/merusuto", "Read JSON from github: " + url + ".");
-        HttpResponse response = getHttpResponse(url);
-        String json = EntityUtils.toString(response.getEntity(), "UTF8");
-        JSONArray jsonObj = new JSONArray(json);
+      String url = BASEURL + filename;
+      Log.i("com/kagami/merusuto", "Read JSON from github: " + url + ".");
+      HttpResponse response = getHttpResponse(url);
+      String json = EntityUtils.toString(response.getEntity(), "UTF8");
+      JSONArray array = new JSONArray(json);
 
-        Log.v("com/kagami/merusuto", "Write JSON to local cache file: " +
-          cache.getAbsolutePath() + ".");
-        writeStringAsFile(cache, json);
-        return jsonObj;
-      } else {
-        Log.v("com/kagami/merusuto", "Read JSON from local cache file: " +
-          cache.getAbsolutePath() + ".");
-        cache.setLastModified(System.currentTimeMillis());
-        return new JSONArray(readFileAsString(cache));
-      }
+      Log.v("com/kagami/merusuto", "Write JSON to local cache file: " +
+        cache.getAbsolutePath() + ".");
+      writeStringAsFile(cache, json);
 
+      return array;
     } catch (Exception e) {
       Log.e("com/kagami/merusuto", e.getMessage(), e);
       return null;
@@ -208,21 +200,28 @@ public class Utils {
     }
   }
 
-  static public boolean needUpdate(Context context, String filename) {
+  static public JSONArray updateJSONData(Context context, String filename) {
     try {
       ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
       NetworkInfo wifiInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
       if (!wifiInfo.isConnected()) {
-        return false;
+        return null;
       }
+
+      File cache = new File(context.getFilesDir(), filename + ".version");
+      // long expiration = System.currentTimeMillis() - cache.lastModified();
+      // if (expiration < EXPIRATION) {
+      //   return null;
+      // }
 
       String url = BASEURL + filename + ".version";
       Log.i("com/kagami/merusuto", "Read version from github: " + url + ".");
       HttpResponse response = getHttpResponse(url);
       String version = EntityUtils.toString(response.getEntity(), "UTF8").trim();
 
-      File cache = new File(context.getFilesDir(), filename + ".version");
+      JSONArray array = null;
+
       if (cache.exists()) {
         Log.v("com/kagami/merusuto", "Compare version with local cache file: " +
           cache.getAbsolutePath() + ".");
@@ -230,17 +229,21 @@ public class Utils {
         Log.v("com/kagami/merusuto", "Local version: " + version);
         Log.v("com/kagami/merusuto", "Remote version: " + remoteVersion);
         if (remoteVersion.equals(version)) {
-          return false;
+          cache.setLastModified(System.currentTimeMillis());
+          return null;
+        } else {
+          array = readRemoteJSONData(context, filename);
         }
       }
 
       Log.v("com/kagami/merusuto", "Write version to local cache file: " +
         cache.getAbsolutePath() + ".");
       writeStringAsFile(cache, version);
-      return true;
+
+      return array;
     } catch (Exception e) {
       Log.e("com/kagami/merusuto", e.getMessage(), e);
-      return false;
+      return null;
     }
   }
 

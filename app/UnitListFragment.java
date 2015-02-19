@@ -172,16 +172,18 @@ public class UnitListFragment extends Fragment {
 
       class ReadUnitOriginalTask extends AsyncTask<Object, Void, Bitmap> {
 
+        private Context mContext;
         private ProgressDialog mProgressDialog;
         private UnitItem mItem;
 
-        ReadUnitOriginalTask(UnitItem item) {
+        public ReadUnitOriginalTask(UnitItem item) {
+          mContext = getActivity();
           mItem = item;
         }
 
         @Override
         protected void onPreExecute() {
-          mProgressDialog = new ProgressDialog(getActivity());
+          mProgressDialog = new ProgressDialog(mContext);
           mProgressDialog.setButton("取消", new DialogInterface.OnClickListener() {
 
             @Override
@@ -198,7 +200,7 @@ public class UnitListFragment extends Fragment {
 
         @Override
         protected Bitmap doInBackground(Object... params) {
-          return Utils.readRemoteBitmap(getActivity(), (String) params[0],
+          return Utils.readRemoteBitmap(mContext, (String) params[0],
             (BitmapFactory.Options) params[1]);
         }
 
@@ -207,7 +209,7 @@ public class UnitListFragment extends Fragment {
           try {
             if (bitmap != null && mProgressDialog != null) {
               mProgressDialog.dismiss();
-              UnitItemDialog dialog = new UnitItemDialog(getActivity(), mItem, bitmap, mTemplate);
+              UnitItemDialog dialog = new UnitItemDialog(mContext, mItem, bitmap, mTemplate);
               dialog.show();
             }
           } catch (Exception e) {}
@@ -304,9 +306,15 @@ public class UnitListFragment extends Fragment {
 
     private class ReadUnitDataTask extends AsyncTask<Void, Void, JSONArray> {
 
+      private Context mContext;
+
+      public ReadUnitDataTask() {
+        mContext = getActivity();
+      }
+
       @Override
       protected JSONArray doInBackground(Void... params) {
-        return Utils.readRemoteJSONData(getActivity(), getTemplateString() + ".json");
+        return Utils.readRemoteJSONData(mContext, getTemplateString() + ".json");
       }
 
       @Override
@@ -315,8 +323,36 @@ public class UnitListFragment extends Fragment {
           addAllJSONData(json);
           search();
         } else {
-          Toast.makeText(getActivity(), "网络错误，请稍候重试...",
+          Toast.makeText(mContext, "网络错误，请稍候重试...",
             Toast.LENGTH_SHORT).show();
+        }
+      }
+    }
+
+    private class UpdateUnitDataTask extends AsyncTask<Void, Void, JSONArray> {
+
+      private Context mContext;
+
+      public UpdateUnitDataTask() {
+        mContext = getActivity();
+      }
+
+      @Override
+      protected JSONArray doInBackground(Void... params) {
+        return Utils.updateJSONData(mContext, getTemplateString() + ".json");
+      }
+
+      @Override
+      protected void onPostExecute(JSONArray json) {
+        if (json != null) {
+          Toast.makeText(mContext, "检测到数据更新，重新加载界面...",
+            Toast.LENGTH_SHORT).show();
+
+          mAllData.clear();
+          mDisplayedData.clear();
+          notifyDataSetChanged();
+          addAllJSONData(json);
+          search();
         }
       }
     }
@@ -340,6 +376,7 @@ public class UnitListFragment extends Fragment {
       } else {
         addAllJSONData(json);
         search();
+        new UpdateUnitDataTask().execute();
       }
     }
 
