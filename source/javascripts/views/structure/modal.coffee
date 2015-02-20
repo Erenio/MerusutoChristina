@@ -22,7 +22,7 @@ class App.Views.Modal extends App.Views.Page
     event.pageY = event.touches[0].pageY
     event
 
-  onMouseDown: (event) -> 
+  onMouseDown: (event) ->
     @lastClick =
       timestamp: Date.now()
       pageX: event.pageX
@@ -30,7 +30,7 @@ class App.Views.Modal extends App.Views.Page
 
   onMouseUp: (event) ->
     duration = Date.now() - @lastClick.timestamp
-    distance = Math.sqrt(Math.pow(event.pageX - @lastClick.pageX, 2) + 
+    distance = Math.sqrt(Math.pow(event.pageX - @lastClick.pageX, 2) +
       Math.pow(event.pageY - @lastClick.pageY, 2))
     if duration < MAX_CLICK_DURATION && distance < MAX_CLICK_DISTANCE
       event.stopPropagation()

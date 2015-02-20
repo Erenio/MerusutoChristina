@@ -103,8 +103,8 @@ class App.Pages.UnitsIndex extends Backbone.View
         if query != ""
           models = _.filter models, (model) ->
             for key in ["id", "name", "title"]
-              value = model.get(key).toString()
-              if value && value.indexOf(query) >= 0
+              value = model.get(key)
+              if value && value.toString().indexOf(query) >= 0
                 return true
             false
         models

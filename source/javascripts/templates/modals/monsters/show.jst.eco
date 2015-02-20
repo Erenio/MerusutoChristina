@@ -53,5 +53,9 @@
         </div>
       </div>
     </div>
+    <div class="slide-handler">
+      <span class="icon icon-right-nav slide-next"></span>
+      <span class="icon icon-left-nav slide-prev"></span>
+    </div>
   </div>
 </div>

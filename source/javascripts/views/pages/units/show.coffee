@@ -8,17 +8,14 @@ class App.Pages.UnitsShow extends Backbone.View
 
   afterRender: ->
     $image = @$(".slider .image")
-    radio = null
 
     resize = ->
-      if window.innerWidth / window.innerHeight < radio
+      if window.innerWidth < window.innerHeight
         $image.width("100%")
         $image.height("auto")
       else
         $image.width("auto")
         $image.height("100%")
 
-    _.defer ->
-      radio = $image.width() / $image.height()
-      resize()
+    _.defer resize
     $(window).resize resize
