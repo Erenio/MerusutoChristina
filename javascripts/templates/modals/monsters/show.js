@@ -135,7 +135,7 @@
       
         __out.push(__sanitize(this.model.get("obtain")));
       
-        __out.push('\n          </p>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('\n          </p>\n        </div>\n      </div>\n    </div>\n    <div class="slide-handler">\n      <span class="icon icon-right-nav slide-next"></span>\n      <span class="icon icon-left-nav slide-prev"></span>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       

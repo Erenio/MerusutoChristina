@@ -154,8 +154,8 @@
                 _ref = ["id", "name", "title"];
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                   key = _ref[_i];
-                  value = model.get(key).toString();
-                  if (value && value.indexOf(query) >= 0) {
+                  value = model.get(key);
+                  if (value && value.toString().indexOf(query) >= 0) {
                     return true;
                   }
                 }

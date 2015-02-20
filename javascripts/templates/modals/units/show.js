@@ -155,7 +155,7 @@
       
         __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
       
-        __out.push('%<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('%<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class="slide-handler">\n      <span class="icon icon-right-nav slide-next"></span>\n      <span class="icon icon-left-nav slide-prev"></span>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       

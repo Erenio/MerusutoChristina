@@ -5844,7 +5844,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(this.model.get("obtain")));
       
-        __out.push('\n          </p>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('\n          </p>\n        </div>\n      </div>\n    </div>\n    <div class="slide-handler">\n      <span class="icon icon-right-nav slide-next"></span>\n      <span class="icon icon-left-nav slide-prev"></span>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       
@@ -6010,7 +6010,7 @@ window.$ === undefined && (window.$ = Zepto)
       
         __out.push(__sanitize(Math.round(this.model.get("dark") * 100)));
       
-        __out.push('%<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
+        __out.push('%<br>\n            </p>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class="slide-handler">\n      <span class="icon icon-right-nav slide-next"></span>\n      <span class="icon icon-left-nav slide-prev"></span>\n    </div>\n  </div>\n</div>\n');
       
       }).call(this);
       
@@ -6779,8 +6779,8 @@ window.$ === undefined && (window.$ = Zepto)
                 _ref = ["id", "name", "title"];
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                   key = _ref[_i];
-                  value = model.get(key).toString();
-                  if (value && value.indexOf(query) >= 0) {
+                  value = model.get(key);
+                  if (value && value.toString().indexOf(query) >= 0) {
                     return true;
                   }
                 }
@@ -7028,19 +7028,110 @@ window.$ === undefined && (window.$ = Zepto)
       "touchend": "onTouchEnd",
       "mousedown": "onMouseDown",
       "mousemove": "onMouseMove",
-      "mouseup": "onMouseUp"
+      "mouseup": "onMouseUp",
+      "mouseup .slide-next": "slideToNext",
+      "mouseup .slide-prev": "slideToPrev"
+    };
+
+    Slider.prototype.afterRender = function() {
+      this.slider = this.$(".slide-group").get(0);
+      return this.slideNumber = 0;
+    };
+
+    Slider.prototype.getScroll = function() {
+      var offsetX, translate3d;
+      if (this.slider.style.webkitTransform != null) {
+        translate3d = this.slider.style.webkitTransform.match(/translate3d\(([^,]*)/);
+        offsetX = translate3d ? translate3d[1] : 0;
+        return parseInt(offsetX, 10);
+      }
+    };
+
+    Slider.prototype.setSlideNumber = function(offset) {
+      var round, slideNumber;
+      round = offset ? (this.deltaX < 0 ? 'ceil' : 'floor') : 'round';
+      slideNumber = Math[round](this.getScroll() / (this.scrollableArea / this.slider.children.length));
+      slideNumber += offset;
+      slideNumber = Math.min(slideNumber, 0);
+      slideNumber = Math.max(-(this.slider.children.length - 1), slideNumber);
+      return this.slideNumber = slideNumber;
     };
 
     Slider.prototype.onTouchStart = function(event) {
-      return Ratchet.Sliders.onTouchStart(event);
+      var firstItem;
+      firstItem = this.$('.slide').get(0);
+      this.scrollableArea = firstItem.offsetWidth * this.slider.children.length;
+      this.isScrolling = void 0;
+      this.sliderWidth = this.slider.offsetWidth;
+      this.resistance = 1;
+      this.lastSlide = -(this.slider.children.length - 1);
+      this.startTime = +new Date();
+      this.pageX = event.touches[0].pageX;
+      this.pageY = event.touches[0].pageY;
+      this.deltaX = 0;
+      this.deltaY = 0;
+      this.setSlideNumber(0);
+      return this.slider.style['-webkit-transition-duration'] = 0;
     };
 
     Slider.prototype.onTouchMove = function(event) {
-      return Ratchet.Sliders.onTouchMove(event);
+      var offsetX;
+      if (event.touches.length > 1) {
+        return;
+      }
+      this.deltaX = event.touches[0].pageX - this.pageX;
+      this.deltaY = event.touches[0].pageY - this.pageY;
+      this.pageX = event.touches[0].pageX;
+      this.pageY = event.touches[0].pageY;
+      this.isScrolling || (this.isScrolling = Math.abs(this.deltaY) > Math.abs(this.deltaX));
+      if (this.isScrolling) {
+        return;
+      }
+      offsetX = (this.deltaX / this.resistance) + this.getScroll();
+      event.preventDefault();
+      this.resistance = this.slideNumber === 0 && this.deltaX > 0 ? (this.pageX / this.sliderWidth) + 1.25 : this.slideNumber === this.lastSlide && this.deltaX < 0 ? (Math.abs(this.pageX) / this.sliderWidth) + 1.25 : 1;
+      return this.slider.style.webkitTransform = 'translate3d(' + offsetX + 'px,0,0)';
     };
 
     Slider.prototype.onTouchEnd = function(event) {
-      return Ratchet.Sliders.onTouchEnd(event);
+      var offset, offsetX;
+      if (this.isScrolling) {
+        return;
+      }
+      offset = (+new Date()) - this.startTime < 1000 && Math.abs(this.deltaX) > 15 ? (this.deltaX < 0 ? -1 : 1) : 0;
+      this.setSlideNumber(offset);
+      offsetX = this.slideNumber * this.sliderWidth;
+      this.slider.style['-webkit-transition-duration'] = '.2s';
+      this.slider.style.webkitTransform = 'translate3d(' + offsetX + 'px,0,0)';
+      event = new CustomEvent('slide', {
+        detail: {
+          slideNumber: Math.abs(this.slideNumber)
+        },
+        bubbles: true,
+        cancelable: true
+      });
+      return this.slider.parentNode.dispatchEvent(event);
+    };
+
+    Slider.prototype.slideTo = function(event, slideNumber) {
+      var offsetX;
+      offsetX = slideNumber * this.sliderWidth;
+      this.slider.style['-webkit-transition-duration'] = '.2s';
+      return this.slider.style.webkitTransform = 'translate3d(' + offsetX + 'px,0,0)';
+    };
+
+    Slider.prototype.slideToNext = function(event) {
+      this.setSlideNumber(-1);
+      this.slideTo(event, this.slideNumber);
+      event.stopPropagation();
+      return event.preventDefault();
+    };
+
+    Slider.prototype.slideToPrev = function(event) {
+      this.setSlideNumber(1);
+      this.slideTo(event, this.slideNumber);
+      event.stopPropagation();
+      return event.preventDefault();
     };
 
     Slider.prototype._imitateTouchEvent = function(event) {
@@ -7091,11 +7182,10 @@ window.$ === undefined && (window.$ = Zepto)
     };
 
     UnitsShow.prototype.afterRender = function() {
-      var $image, radio, resize;
+      var $image, resize;
       $image = this.$(".slider .image");
-      radio = null;
       resize = function() {
-        if (window.innerWidth / window.innerHeight < radio) {
+        if (window.innerWidth < window.innerHeight) {
           $image.width("100%");
           return $image.height("auto");
         } else {
@@ -7103,10 +7193,7 @@ window.$ === undefined && (window.$ = Zepto)
           return $image.height("100%");
         }
       };
-      _.defer(function() {
-        radio = $image.width() / $image.height();
-        return resize();
-      });
+      _.defer(resize);
       return $(window).resize(resize);
     };
 
